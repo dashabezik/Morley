@@ -10,7 +10,7 @@ setup(
     # long_description_content_type="text/markdown",
     author               = 'Daria Emekeeva & Lev Levitsky',
     author_email         = None,
-    install_requires     = ['pyteomics', 'seaborn', 'scipy', 'scikit-learn', 'opencv-python'],
+    install_requires     = ['pyteomics', 'seaborn', 'scipy', 'scikit-learn', 'opencv-python', 'imutils'],
     classifiers          = ['Intended Audience :: Science/Research',
                             'Programming Language :: Python :: 3',
                             'Topic :: Scientific/Engineering :: Bio-Informatics',
