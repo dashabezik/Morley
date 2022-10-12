@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, askdirectory
 from PIL import ImageTk, Image
 import cv2
 import imutils
@@ -9,15 +9,46 @@ from functools import partial
 import os
 
 state = {
-    'settings': {}
+    'settings': {
+        'slider': 1.0
+    },
+    'paths': {
+        'out_dir': os.getcwd()
+    }
 }
 
-def get_image_filename(label):
-    fname = askopenfilename(title='Image file')
+def set_state_variables(d):
+    for k, v in d.items():
+        if isinstance(v, dict):
+            set_state_variables(v)
+        if isinstance(v, float):
+            d[k] = tk.DoubleVar(value=v)
+        # if isinstance(v, str):
+        #     d[k] = tk.StringVar(value=v)
+
+
+def get_image_dirname(label):
+    fname = askdirectory(title='Raw image directory')
 
     if fname:
-        state['fname'] = fname
-        label['text'] = f'Selected image: {os.path.basename(fname)}.'
+        state['paths']['input'] = fname
+        label['text'] = f'Selected image directory: {os.path.basename(fname)}.'
+
+
+def get_template_file(label):
+    fname = askopenfilename(title='Seed template file')
+
+    if fname:
+        state['paths']['template_file'] = fname
+        label['text'] = f'Selected seed template: {os.path.basename(fname)}.'
+
+
+def get_out_dirname(label):
+    fname = askdirectory(title='Output directory')
+
+    if fname:
+        state['paths']['out_dir'] = fname
+        label['text'] = f'Output directory: {os.path.basename(fname)}.'
 
 
 def slider_changed(label, img_widget, event):
