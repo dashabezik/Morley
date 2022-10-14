@@ -12,7 +12,8 @@ import os
 state = {
     'settings': {
         'morph': 0.0,
-        'gauss':0.0
+        'gauss':0.0,
+        'canny_top': 255.0
     },
     'paths': {
         'out_dir': os.getcwd()
@@ -20,7 +21,7 @@ state = {
 }
 
 
-contour_area_threshold = 10
+contour_area_threshold = 1000
 
 def set_state_variables(d):
     for k, v in d.items():
@@ -75,14 +76,14 @@ def slider_changed(label, img_widget, event):
     img_widget.image = obj
     img_widget['image'] = obj
     
-def blur(param, label, morph, gauss,event):
+def blur(param, label, morph, gauss,canny_top,event):
     morph = state['settings']['morph'].get()
     morph = 2*morph+1
     gauss = state['settings']['gauss'].get()
     gauss = 2*gauss+1
     canny_bottom = 0
-    canny_top = 150
-    label['text'] = morph*(param==0)+gauss*(param==1)
+    canny_top = state['settings']['canny_top'].get()
+    label['text'] = morph*(param==0)+gauss*(param==1)+canny_top*(param==2)
     
     src = state['img_arr']
     gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
@@ -94,22 +95,20 @@ def blur(param, label, morph, gauss,event):
     closed = cv.morphologyEx(canny, cv.MORPH_CLOSE, kernel)
     contours0 = cv.findContours(closed.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[0]
     (contours0, _) = contours.sort_contours(contours0)
-    print('contours',len(contours0))
+    real_conts = []
     
     for cont in contours0:
         center, radius = cv.minEnclosingCircle(cont)
         if ((cv.contourArea(cont)>contour_area_threshold)&
             (center[0] >src.shape[1]//4)&(center[0] < 2*src.shape[1]//3)):
-#             print(src.shape)
             sm = cv.arcLength(cont, True)
             apd = cv.approxPolyDP(cont, 0.02*sm, True)
             cv.drawContours(src, [cont], -1, (255,0,0), -2)
-#             print('Drawing')
+            real_conts.append(cont)
+    print('contours',len(real_conts))
     src = src.astype('uint8')
     src = imutils.resize(src, height=500)
     obj = ImageTk.PhotoImage(Image.fromarray(src))
-#     img_widget.image = obj
-#     img_widget['image'] = obj
 
 def tweak_image(w):
     window = tk.Toplevel(w)
@@ -131,24 +130,28 @@ def tweak_image(w):
     tweak_frame = tk.Frame(master=window)
     
     morph_slider_lbl = tk.Label(master=tweak_frame, text="morph")
-    morph_slider = ttk.Scale(master=tweak_frame, from_ = 1, to = 11, command=partial(blur,0,morph_slider_lbl,
-                                                                               state['settings']['morph'],state['settings']['gauss']),
+    morph_slider = ttk.Scale(master=tweak_frame, from_ = 1, to = 5, command=partial(blur,0,morph_slider_lbl,
+                                                                               state['settings']['morph'],state['settings']['gauss'],
+                                                                                   state['settings']['canny_top']),
                        variable=state['settings']['morph'])
     morph_slider.grid(column=1, row=4)
     morph_slider_lbl.grid(column=1, row=5)
     
     gauss_slider_lbl = tk.Label(master=tweak_frame, text="gauss")
-    gauss_slider = ttk.Scale(master=tweak_frame, from_ = 1, to = 11, command=partial(blur,1,gauss_slider_lbl,
-                                                                               state['settings']['morph'],state['settings']['gauss']),
+    gauss_slider = ttk.Scale(master=tweak_frame, from_ = 1, to = 5, command=partial(blur,1,gauss_slider_lbl,
+                                                                               state['settings']['morph'],state['settings']['gauss'],
+                                                                                   state['settings']['canny_top']),
                        variable=state['settings']['gauss'])
     gauss_slider.grid(column=1, row=6)
     gauss_slider_lbl.grid(column=1, row=7)
 
-    slider_lbl_2 = tk.Label(master=tweak_frame, text="Canny")
-    slider_2 = ttk.Scale(master=tweak_frame, command=partial(slider_changed, slider_lbl_2, img))
-    slider_2.grid(column=2, row=6)
+    canny_top_slider_lbl = tk.Label(master=tweak_frame, text="Canny")
+    canny_top_slider = ttk.Scale(master=tweak_frame, from_ = 0, to = 255, value = 255,
+                                 command=partial(blur,2,canny_top_slider_lbl, state['settings']['morph'],state['settings']['gauss'],
+                                                 state['settings']['canny_top']), variable=state['settings']['canny_top'])
+    canny_top_slider.grid(column=2, row=6)
 
-    slider_lbl_2.grid(column=2, row=7)
+    canny_top_slider_lbl.grid(column=2, row=7)
         
     
     
