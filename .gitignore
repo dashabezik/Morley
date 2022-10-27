@@ -1,4 +1,2 @@
 **.egg-info
 **/__pycache__
-morley/gui.py
-morley/main.py
