@@ -12,7 +12,7 @@ from functools import partial
 import os
 
 
-import Morley
+from . import Morley
 
 state = {
     'settings': {
@@ -39,7 +39,8 @@ state = {
     'paths': {
         'out_dir': os.getcwd()
     },
-    'rotation': 1
+    'rotation': 1,
+    'paper_area_thresold':5000,
 }
 
 
@@ -140,7 +141,7 @@ def blur(param,img_widget, label, morph, gauss,canny_top,event):
     Morley.picture_params.contour_params(group_param, morph,gauss,canny_bottom,canny_top)
     print(group_param.return_bl_params())
     
-def color(img_widget, event):
+def color(img_widget, label, event):
     src = state['img_color_to_analys']
     hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV )
     template = cv.imread(state['paths']['template_file'],0)
@@ -160,7 +161,6 @@ def color(img_widget, event):
         for pt in zip(*loc[::-1]):
             if (pt[0] > src.shape[1]/3)&((pt[0] < 2*src.shape[1]/3)):
                 numbers0.append(pt[0])
-    #             cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,0,255), 5)
 
     numbers = pd.Series(numbers0)
     Mean = numbers.mean()
@@ -176,6 +176,7 @@ def color(img_widget, event):
     opacity = 0.25
     cv.rectangle(overlay, (mean_right_x, src.shape[0]), (src.shape[1],0), (240,0,255), -5)
     cv.addWeighted(overlay, opacity, src, 1 - opacity, 0, src)
+    hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV )
     
     h1 = state['color']['h_bottom'].get()
     s1 = state['color']['s_bottom'].get()
@@ -183,6 +184,8 @@ def color(img_widget, event):
     h2 = state['color']['h_top'].get()
     s2 = state['color']['s_top'].get()
     v2 = state['color']['v_top'].get()
+    
+    label['text'] = v1  
     
     # формируем начальный и конечный цвет фильтра
     h_min = np.array((h1, s1, v1), np.uint8)
@@ -195,7 +198,7 @@ def color(img_widget, event):
     thresh = thresh.astype('uint8')
     thresh = imutils.resize(thresh, height=500)
     obj_color = ImageTk.PhotoImage(Image.fromarray(thresh))
-    state['img_color_to_analys'] = src
+#     state['img_color_to_analys'] = src
     state['img_color_to_show'] = thresh
     img_widget.image = obj_color
     img_widget['image'] = obj_color
@@ -229,14 +232,19 @@ def rotation(w):
     window.geometry('300x200')
     var=tk.IntVar()
     var.set(1)
-    rad0 = tk.Radiobutton(window, text="90", variable=var, value=0)
-    rad1 = tk.Radiobutton(window, text="180", variable=var, value=1)
-    rad2 = tk.Radiobutton(window, text="270", variable=var, value=2)
-    
+    rad0 = tk.Radiobutton(window, text="90", variable=var, value=90)
+    rad1 = tk.Radiobutton(window, text="180", variable=var, value=180)
+    rad2 = tk.Radiobutton(window, text="270", variable=var, value=270)
+    def get_val(label):
+        label['text'] = var.get()
+    l = tk.Label(window, text = 'initial')
+    b = tk.Button(window, text ='Set Value', command = partial(get_val,l))
+    l.pack()
+    b.pack()
     rad0.pack()
     rad1.pack()
     rad2.pack()
-    state['rotation'] = var
+    state['rotation'] = var.get()   
     print(state['rotation'])
 
 
@@ -257,10 +265,10 @@ def tweak_image(w):
     window.geometry('900x700')
     img_arr = cv.imread(state['fname'])
     img_arr_2 = imutils.resize(cv.imread(state['fname']), height=500)
-    state['img_arr'] = img_arr
-    state['img_color_to_analys'] = img_arr
+    state['img_arr'] = img_arr.copy()
+    state['img_color_to_analys'] = img_arr.copy()
     state['img_color_to_show'] = np.zeros_like(img_arr)
-    state['img_seed_to_analys'] = img_arr
+    state['img_seed_to_analys'] = img_arr.copy()
     state['img_seed_to_show'] = np.zeros_like(img_arr)
     
     def contours_tab():
@@ -293,7 +301,7 @@ def tweak_image(w):
             for i in sliders_list:
                 l = tk.Label(master=tweak_frame, text=i)
                 s = ttk.Scale(master=tweak_frame, from_ = 0, to = 255, value = state['color'][i].get(),
-                                     variable=state['color'][i], command=partial(color,img_color))
+                                     variable=state['color'][i], command=partial(color,img_color, l))
                 s.grid(column=col+1, row=(row//2)*2)
                 l.grid(column=col+1, row=(row//2)*2+1)
                 row = row+1
@@ -332,6 +340,8 @@ def tweak_image(w):
                 button_end.grid(column=6, row=7)
             button_b1 = tk.Button(tweak_frame, text = 'Back', command = partial(back,img_frame_color, contours_tab))
             button_n2 = tk.Button(tweak_frame, text = 'Next', command = seeds_tab)
+            button_b1 = tk.Button(tweak_frame, text = 'Set sprout parameters', command = partial(back,img_frame_color, contours_tab))
+            button_n2 = tk.Button(tweak_frame, text = 'Set root parameters', command = seeds_tab)
             button_b1.grid(column=0, row=7)
             button_n2.grid(column=6, row=7)
 

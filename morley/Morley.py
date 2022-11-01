@@ -740,7 +740,16 @@ def add_annotation(name, text):
     
 
 
-
+def search(paper_size):
+    state['paper_area'] = paper_size.get()
+    ppm = [7.45]
+    rotate = state['rotation']
+    path_to_file_folder_fixed = state['paths']['input']
+    paper_area = state['paper_area']
+    paper_area_thresold = state['paper_area_thresold']
+    x_pos_divider = 10
+    contour_area_threshold = 1000 # look at your img size and evaluate the threshold, 1000 is recomended
+    template_filename = state['paths']['template_file']
 
 
 
