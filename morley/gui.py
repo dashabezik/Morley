@@ -7,9 +7,10 @@ import imutils
 from imutils import contours
 import numpy as np
 import pandas as pd
-
+import os, random
+from os import path, listdir
 from functools import partial
-import os
+# from . import Morley
 
 
 state = {
@@ -26,6 +27,24 @@ state = {
         'v_bottom':0.0,
         'v_top':255.0,
     },
+    'roots':{
+        'h_bottom':0.0,
+        'h_top':255.0,
+        's_bottom':0.0,
+        's_top':255.0,
+        'v_bottom':0.0,
+        'v_top':255.0,
+    },
+    
+    'leaves':{
+        'h_bottom':0.0,
+        'h_top':255.0,
+        's_bottom':0.0,
+        's_top':255.0,
+        'v_bottom':0.0,
+        'v_top':255.0,
+    },
+    
     'seed':{
         'h_bottom':0.0,
         'h_top':255.0,
@@ -76,6 +95,17 @@ class FormatLabel(tk.Label):
         self["text"] = self._format.format(self._textvariable.get())
 
 
+def random_file(path_to_file_folder):
+    a=random.choice(os.listdir(path_to_file_folder))
+    while (a=='template')|(a=='.ipynb_checkpoints'):
+        a=random.choice(os.listdir(path_to_file_folder))
+    path_to_file = path.join(path_to_file_folder, a+'/')
+    b = random.choice(os.listdir(path_to_file))
+    while (b=='.ipynb_checkpoints'):
+        b=random.choice(os.listdir(path_to_file))
+    path_to_file = path.join(path_to_file, b)
+    return path_to_file
+        
 def set_state_variables(d):
     for k, v in d.items():
         if isinstance(v, dict):
@@ -128,8 +158,6 @@ def blur(img_widget, event):
     canny_top = state['settings']['canny_top'].get()
 
     src = state['img_arr'].copy()
-    # print('sum:', src.sum())
-    # gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
     bl = cv.GaussianBlur(src, (gauss, gauss), 0)
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (morph, morph))
     closed = cv.morphologyEx(bl, cv.MORPH_CLOSE, kernel)
@@ -158,7 +186,6 @@ def blur(img_widget, event):
 
 def color(img_widget, event):
     src = state['img_arr'].copy()
-    # hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
     template = state['template']  # TODO: Morley.rotate_pic(template, rotate)
     w, h = template.shape[::-1]
 
@@ -236,9 +263,10 @@ def rotation(w):
     window.geometry('300x200')
     var=tk.IntVar()
     var.set(1)
-    rad0 = tk.Radiobutton(window, text="90", variable=var, value=90)
-    rad1 = tk.Radiobutton(window, text="180", variable=var, value=180)
-    rad2 = tk.Radiobutton(window, text="270", variable=var, value=270)
+    rad0 = tk.Radiobutton(window, text="0", variable=var, value=0)
+    rad1 = tk.Radiobutton(window, text="90", variable=var, value=90)
+    rad2 = tk.Radiobutton(window, text="180", variable=var, value=180)
+    rad3 = tk.Radiobutton(window, text="270", variable=var, value=270)
     def get_val(label):
         label['text'] = var.get()
     l = tk.Label(window, text = 'initial')
@@ -256,7 +284,10 @@ def clear(w): # clear all the wigets
     for c in w.grid_slaves():
         c.destroy()
 
-
+def set_params(parameter):
+    for i in state[parameter]:
+        state[parameter][i] = state['color'][i].get()
+        
 def add_color_sliders(d, frame, command, startrow=1):
     for i, param in enumerate('hsv'):
         row = startrow + 2 * i
@@ -275,25 +306,29 @@ def seeds_tab(img, tweak_frame):
     clear(tweak_frame)
     seed(img, None)
 
+    color_label = tk.Label(master=tweak_frame, text="Choosing color for seed excluding")
     row = 1 + add_color_sliders(state['seed'], tweak_frame, partial(seed, img))
     button_b2 = tk.Button(tweak_frame, text='Back', command=partial(colors_tab, img, tweak_frame))
     button_end = tk.Button(tweak_frame, text='Done', command=lambda: tweak_frame.winfo_toplevel().destroy())
     button_b2.grid(column=0, row=row)
     button_end.grid(column=2, row=row)
-
-
+    
 def colors_tab(img, tweak_frame):
     clear(tweak_frame)
     color(img, None)
 
     color_label = tk.Label(master=tweak_frame, text="Choosing color for pixel counting")
     color_label.grid(column=0, row=0, columnspan=3)
-    row = add_color_sliders(state['color'], tweak_frame, partial(color, img))
+    row = add_color_sliders(state['color'], tweak_frame, partial(color, img))+1
 
-    button_b1 = tk.Button(tweak_frame, text='Back', command=partial(contours_tab, img, tweak_frame))
-    button_n2 = tk.Button(tweak_frame, text='Next', command=partial(seeds_tab, img, tweak_frame))
+    button_b1 = tk.Button(tweak_frame, text='Set sprouts', command=partial(set_params,'leaves'))
+    button_n2 = tk.Button(tweak_frame, text='Set roots', command=partial(set_params,'roots'))
     button_b1.grid(column=0, row=row)
     button_n2.grid(column=2, row=row)
+    button_b1 = tk.Button(tweak_frame, text='Back', command=partial(contours_tab, img, tweak_frame))
+    button_n2 = tk.Button(tweak_frame, text='Next', command=partial(seeds_tab, img, tweak_frame))
+    button_b1.grid(column=0, row=row+1)
+    button_n2.grid(column=2, row=row+1)
 
 
 def contours_tab(img, tweak_frame):
@@ -333,9 +368,10 @@ def contours_tab(img, tweak_frame):
 def tweak_image(w):
     window = tk.Toplevel(w)
     window.title('Tweak image')
-    window.geometry('900x700')
-    img_arr = cv.imread(state['fname'])
-    img_arr_0 = cv.imread(state['fname'], 0)
+    window.geometry('900x800')
+    file_name =  random_file(state['paths']['input'])
+    img_arr = cv.imread(file_name)
+    img_arr_0 = cv.imread(file_name, 0)
     state['img_arr'] = img_arr  #.copy()
     state['img_arr_0'] = img_arr_0
     state['img_resized'] = ImageTk.PhotoImage(Image.fromarray(imutils.resize(img_arr, height=500)))

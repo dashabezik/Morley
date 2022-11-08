@@ -1,7 +1,7 @@
 import tkinter as tk
 from functools import partial
 from . import gui
-
+from . import Morley
 
 
 def main():
@@ -66,9 +66,12 @@ def main():
     rotation_file_lbl.grid(column=1, row=6)
 
     paper_size = tk.Entry(master=files_frame, text="Paper size, mm^2", width=20)
-    paper_size_lbl = tk.Label(master=files_frame, text="Paper size", width=20)
+    paper_size_lbl = tk.Label(master=files_frame, text="Paper size", width=20)  
     paper_size_lbl.grid(column=1, row=7)
     paper_size.grid(column=0, row=7)
+    
+    run_file_btn = tk.Button(master=files_frame, text="RUN", command=partial(Morley.search, paper_size), width=20)
+    run_file_btn.grid(column=1, row=9)
 
     files_frame.grid(column=0, row=0, columnspan=2, rowspan=7)
 

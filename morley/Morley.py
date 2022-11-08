@@ -28,7 +28,7 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.patches as mpatches
 from collections import defaultdict
 import time
-
+from . import gui
 
 # # Functions
 
@@ -130,8 +130,8 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, is_save = False, figna
     if is_save:
         if figname is None:
             figname = pic_filename('hist','l_rm_rs',path_to_file_folder_fixed)
-            print(figname)
-        plt.savefig(figname,bbox_inches = 'tight')
+            print(path.join(path_to_output_dir,figname))
+        plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
     plt.show()
 
 
@@ -309,8 +309,8 @@ def bar_plot_function(l_or_r, color_deff, df, columns, pv_table,
     if is_save:
         if figname is None:
             figname = pic_filename('bar',l_or_r.replace(' ', ''),path_to_file_folder_fixed)
-            print(figname)
-        plt.savefig(figname,bbox_inches = 'tight')
+            print(path.join(path_to_output_dir,figname))
+        plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
     plt.show()
     
     return tmp, whiskers
@@ -354,7 +354,7 @@ def seed_germination(df,group_names,threshold = 10, is_save = False, figname = N
     if is_save:
         if figname is None:
             figname = pic_filename('bar','seed_germ',path_to_file_folder_fixed)
-        plt.savefig(figname)
+        plt.savefig(path.join(path_to_output_dir,figname))
     plt.show()
     return non_germinated_table
 
@@ -712,23 +712,6 @@ class picture_params:
 def position_x_axes(src,divider):
     return src.shape[1]//divider
 
-ppm = [7.45]
-rotate = 270
-path_to_file_folder_fixed = '4567days/4567days/'
-paper_area = 79*79
-paper_area_thresold = 5000
-x_pos_divider = 10
-contour_area_threshold = 1000 # look at your img size and evaluate the threshold, 1000 is recomended
-template_filename = path_to_file_folder_fixed+'template/template.JPG'
-
-
-# ### Bluring
-
-# In[ ]:
-
-
-
-
 
 def add_annotation(name, text):
     with open(name, 'r+') as f:
@@ -740,16 +723,330 @@ def add_annotation(name, text):
     
 
 
-def search(paper_size):
-    state['paper_area'] = paper_size.get()
-    ppm = [7.45]
-    rotate = state['rotation']
-    path_to_file_folder_fixed = state['paths']['input']
-    paper_area = state['paper_area']
-    paper_area_thresold = state['paper_area_thresold']
-    x_pos_divider = 10
-    contour_area_threshold = 1000 # look at your img size and evaluate the threshold, 1000 is recomended
-    template_filename = state['paths']['template_file']
+def midpoint(ptA, ptB):
+    return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 
+def get_state_values(param):
+    l=[]
+    for i in gui.state[param]:
+        l.append(gui.state[param][i].get())
+    return l
+
+def search(paper_size):
+    gui.state['paper_area'] = paper_size.get()
+    ppm = [7.45]
+    rotate = gui.state['rotation']
+    path_to_file_folder_fixed = gui.state['paths']['input']
+    path_to_output_dir = gui.state['paths']['out_dir']
+    paper_area = gui.state['paper_area']
+    paper_area_thresold = gui.state['paper_area_thresold']
+    x_pos_divider = 10
+    contour_area_threshold = gui.CONTOUR_AREA_THRESHOLD # look at your img size and evaluate the threshold, 1000 is recomended
+    template_filename = gui.state['paths']['template_file']
+    hlb,hlt,slb,slt,vlb,vlt = get_state_values('roots')
+    hrb,hrt,srb,srt,vrb,vrt = get_state_values('leaves')
+    hsb,hst,ssb,sst,vsb,vst = get_state_values('seed')
+    morph, gs, c_top = get_state_values('settings')
+    c_bottom=0
+    
+    ###SEARCH###
+    
+    measure_full2 = pd.DataFrame(columns=[],index=np.arange(30))
+    # ppm - pixel per metric, массив с коэфам пересчета пикселя в мм, на случай плохого поиска стикера на фото
+
+    folders_list = folders_list_function(path_to_file_folder_fixed)
+    # pic_num=0
+    for g in folders_list:
+        path_to_file_folder = path.join(path_to_file_folder_fixed, str(g)+'/')
+        for filename_in_folder in listdir(path_to_file_folder):
+
+            if filename_in_folder=='.ipynb_checkpoints':
+                continue
+    #         pic_num +=1
+    #         if pic_num>3:
+    #             continue
+            ### CONTOURS ###
+
+            print('...LOOKING FOR CONTOURS...')
+
+            file_name = path.join(path_to_file_folder, filename_in_folder)
+
+            ### Plant contour ####       
+
+            src = cv.imread(file_name)
+            src = rotate_pic(src, rotate)
+            gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+            bl=cv.GaussianBlur(src,(gs,gs),0)
+            canny = cv.Canny(bl, c_bottom, c_top)
+            kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (morph,morph))
+            closed = cv.morphologyEx(canny, cv.MORPH_CLOSE, kernel)
+            contours0 = cv.findContours(closed.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[0]
+            # contours0 = contours0[0] if imutils.is_cv2() else contours0[1]
+            (contours0, _) = contours.sort_contours(contours0)
+            pixelsPerMetric = None
+            quantity_of_plants = 0
+            real_conts = []
+
+            pixelsPerMetric = find_paper(src,paper_area,paper_area_thresold, position_x_axes(src,x_pos_divider),
+                                         canny_top=c_top, canny_bottom=c_bottom,morf=morph)
+
+            for cont in contours0:
+                if (cv.contourArea(cont)>contour_area_threshold):
+                    center, radius = cv.minEnclosingCircle(cont) #recomended range of plants position is between 1/3 and 2/3
+                    if ((cv.contourArea(cont) > contour_area_threshold)&
+                        (center[0] > src.shape[1]//3)&(center[0] < src.shape[1]*2//3)):
+                        real_conts.append(cont)
+    #                     cv.drawContours(src,[cont],0,(255,255,5),2)
+
+            quantity_of_plants = len(real_conts)
+            print(quantity_of_plants)
+            print(pixelsPerMetric)
+
+            ### SEEDS ###
+
+            print('...LOOKING FOR SEEDS POSITION...')
+
+            img2 = cv.imread(file_name,0)
+            img2 = rotate_pic(img2, rotate)
+            template = cv.imread(template_filename,0)
+            template = rotate_pic(template, rotate)
+        #         template = cv.cvtColor(template, cv.COLOR_BGR2GRAY)
+            w, h = template.shape[::-1]
+
+            # All the 6 methods for comparison in a list
+            # methods = ['cv.TM_CCOEFF', 'cv.TM_CCOEFF_NORMED', 'cv.TM_CCORR',
+            #             'cv.TM_CCORR_NORMED', 'cv.TM_SQDIFF', 'cv.TM_SQDIFF_NORMED']
+            methods = ['cv.TM_CCOEFF_NORMED']
+            for meth in methods:
+                img = img2.copy()
+                method = eval(meth)
+                # Apply template Matching
+                res = cv.matchTemplate(img,template,method)
+                threshold = 0.55
+                loc = np.where( res > threshold)
+                x=np.array([])
+                y=np.array([])
+                for pt in zip(*loc[::-1]):
+                    if (pt[0] > src.shape[1]/3)&((pt[0] < 2*src.shape[1]/3)):
+                        cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,0,255), 5)
+                        x=np.append(x,pt[0])
+                        y=np.append(y,pt[1])
+                slope, intercept = linear_approx(y,x)
+                p1 = [int(intercept),0]
+                p2 = [int(slope*img.shape[0]+intercept),img.shape[0]]
+                pts_leaves = np.array([[0,0],p1,p2,[0,img.shape[0]]])
+                pts_roots = np.array([[p1[0]+3*w//4,p1[1]],[p2[0]+3*w//4,p2[1]],[img.shape[1],img.shape[0]],[img.shape[1],0]])
+                plt.figure(figsize = (14,14))
+                plt.subplot(121),plt.imshow(res,cmap = 'gray')
+                plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
+                plt.subplot(122),plt.imshow(img,cmap = 'gray')
+                plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
+                plt.suptitle(meth)
+                plt.show()
+
+            src = drop_seeds(src,hsb,hst,ssb,sst,vsb,vst)
+            src_black_seeds = src.copy()
+            src_black_seeds = cv.cvtColor(src_black_seeds, cv.COLOR_BGR2HSV)
+            ### COLOR ###
+
+            print('...MAKING COLOR...')
+
+            overlay = src.copy()
+            cv.drawContours(overlay, [pts_leaves], -1,(0,224,79), -1)
+            opacity = 0.25
+            cv.drawContours(overlay, [pts_roots], -1, (240,0,255), -5)
+            cv.addWeighted(overlay, opacity, src, 1 - opacity, 0, src)
+            bl = cv.medianBlur(src, 7)
+            bl=cv.GaussianBlur(bl,(5,   5),0)
+            img_hsv = cv.cvtColor(bl, cv.COLOR_BGR2HSV)
+            cv.imwrite('colored/{0}'.format(filename_in_folder), src)
+            print(src.shape)
+            print('mean_left_x = ', mean_left_x, 'mean_right_x  =', mean_right_x)
+
+            ## WIDTH ###
+
+            print('...WIDTH CALCULATION...')
+            measure = pd.DataFrame(columns=['roots_area_{0}'.format(file_name), 'leaves_area_{0}'.format(file_name),
+                                            'roots_length_{0}'.format(file_name), 'leaves_length_{0}'.format(file_name),
+                                            'roots_width_{0}'.format(file_name), 'leaves_width_{0}'.format(file_name),
+                                           'plant_area_{0}'.format(file_name),'seed_area_{0}'.format(file_name),
+                                           'roots_max_length_{0}'.format(file_name),'roots_max_width_{0}'.format(file_name)],
+                                   index=np.arange(len(real_conts)))
+
+
+            for i in range(quantity_of_plants):
+                is_first = True
+                is_first_r = True
+                is_first_r_max = True
+                roots = 0
+                leaves = 0
+                lamount = 0
+                ramount = 0
+                r_max_amount = 0
+                c = real_conts[i]
+                left = tuple(c[c[:, :, 0].argmin()][0])
+                right = tuple(c[c[:, :, 0].argmax()][0])
+                top = tuple(c[c[:, :, 1].argmin()][0])
+                bottom = tuple(c[c[:, :, 1].argmax()][0])
+                cv.line(img_hsv, left, right, (255, 255, 255), thickness=2)
+                step = (right[0]-mean_right_x)//3
+                if (mean_right_x-left[0])//3!=0:                
+                    for y in range(left[0],mean_left_x,(mean_right_x-left[0])//3):
+                        is_first = True
+                        for x in range(top[1],bottom[1]):#иттерация по вертикали, т к img.shape => (height, width), но компонента контура (х,у)
+                            h, s, v = img_hsv[x, y]
+                            if (cv.pointPolygonTest(real_conts[i],(x,y), False)):
+                                if (v>vlb)&(h>hlb)&(h<hlt):
+                                    lamount = lamount + 1*is_first
+                                    is_first = False
+                                    leaves += 1
+                                else:
+                                    is_first = True
+                            else:
+                                is_first = True
+                else:
+                    leaves_width = 0 
+
+    # r_max_amaunt - счетчик для максимальной длины корня, ramount - для суммарной длины                
+
+                if step!=0:
+                    for y in range(mean_right_x, right[0],step):#идем по ввертикальным линиям   
+                        is_first_r = True
+                        is_first_r_max = True
+                        for x in range(top[1],bottom[1]):#иттерация по вертикали, т к img.shape => (height, width), но компонента контура (х,у)
+                            h, s, v = img_hsv[x, y]
+                            if (cv.pointPolygonTest(real_conts[i],(x,y), False)):# если точка внутри контура
+                                if (v>vrb)&((h>hrb)&(h<hrt)):# если эта точка = корень, а не фон 
+                                    ramount = ramount + 1*is_first_r#если это первое вхождение корня, то число корней+=1
+                                    r_max_amount=r_max_amount+1*is_first_r_max
+                                    is_first_r_max = False
+                                    is_first_r = False#далее вхождение уже не первое
+                                    roots += 1#число пикселей +=1
+                                else:
+                                    is_first_r = True #если это не корень а фон, то вхождения нет
+                            else:
+                                is_first_r = True#если это не в контуре, то вхождения точно нет
+                if (lamount == 0.0)|(lamount == 0):
+                    leaves_width = 0
+                else: 
+                    leaves_width = leaves/lamount
+
+                if (ramount == 0.0)|(ramount == 0)|(step == 0):
+                    roots_width = 0
+                    roots_max_width = 0
+                else:
+                    roots_width = roots/ramount
+                    roots_max_width = roots/r_max_amount
+
+                measure['roots_width_{0}'.format(file_name)].iloc[i] = roots_width
+                measure['roots_max_width_{0}'.format(file_name)].iloc[i] = roots_max_width
+                measure['leaves_width_{0}'.format(file_name)].iloc[i]= leaves_width
+
+            ### PIXEL COUNTING ###
+
+            print('...PIXEL COUNTING...')
+
+            for i in range(len(real_conts)):
+                c = real_conts[i]
+                measure.iloc[i]['plant_area_{0}'.format(file_name)] = cv.contourArea(c)
+    #             measure.iloc[i]['seed_area_{0}'.format(file_name)] = seed_area
+            measure['leaves_area_{0}'.format(file_name)] =color_range_counter(src, real_conts, hlb,hlt,slb,slt,vlb,vlt)
+            measure['roots_area_{0}'.format(file_name)] =color_range_counter(src, real_conts, hrb,hrt,srb,srt,vrb,vrt)
+            measure['seed_area_{0}'.format(file_name)] =color_range_counter(src_black_seeds, real_conts, 0,1,0,1,0,1)
+            measure['plant_area_{0}'.format(file_name)] = measure['plant_area_{0}'.format(file_name)]-measure['seed_area_{0}'.format(file_name)]
+            measure['plant_area_{0}'.format(file_name)] = measure.apply(lambda x: x['plant_area_{0}'.format(file_name)]/(pixelsPerMetric*pixelsPerMetric), axis = 1 )
+            measure['roots_length_{0}'.format(file_name)] = measure['roots_area_{0}'.format(file_name)] 
+            measure['leaves_length_{0}'.format(file_name)] = measure['leaves_area_{0}'.format(file_name)] 
+
+            measure['roots_length_{0}'.format(file_name)] = measure.apply(lambda x: length(x['roots_width_{0}'.format(file_name)],x['roots_area_{0}'.format(file_name)],pixelsPerMetric), axis = 1 )
+            measure['roots_max_length_{0}'.format(file_name)] = measure.apply(lambda x: length(x['roots_max_width_{0}'.format(file_name)],x['roots_area_{0}'.format(file_name)],pixelsPerMetric), axis = 1 )
+            measure['leaves_length_{0}'.format(file_name)] = measure.apply(lambda x: length(x['leaves_width_{0}'.format(file_name)],x['leaves_area_{0}'.format(file_name)],pixelsPerMetric), axis = 1 )
+            measure_full2 = measure_full2.join(measure, how = 'outer')
+
+            plt.figure(figsize = (14,14))
+            plt.imshow(src)
+            plt.show()
+    print ("{:g} s".format(time.clock() - start_time))
+
+    del res,bl,overlay, img, img2, img_hsv, gr, canny, src, closed, src_black_seeds
+    
+    dicts = files_dicts(path_to_file_folder_fixed)
+    roots_sum_dict, roots_max_dict, plant_area_dict, leaves_dict = dicts.values()
+    seed_germ = seed_germination(measure_full2, roots_max_dict.keys(), threshold=7, is_save=True)
+    shap =shapiro_test(measure_full2, dicts)
+    plant_parameters = ['roots_sum','roots_max','plant_area','leaves']
+    v= [0,0,0,0]
+    p_value_dict = dict(zip(plant_parameters, v))
+    for i in plant_parameters:
+        is_not_norm = any(shap[i]<0.05)
+        is_norm = not is_not_norm
+        test_type = 'test_type = '+str(is_norm*'Unpaired T-test'+is_not_norm*'Mann Whitney U-test')+'\n' +'\n'
+
+        p_value_dict[i] = (p_value_function(measure_full2, dicts[i],is_norm),test_type)
+        
+    whiskers_dict = {'roots_sum': {},
+                   'roots_max': {},
+                   'plant_area': {},
+                   'leaves': {}}
+    result_dict = {'roots_sum': '',
+                   'roots_max': '',
+                   'plant_area': '',
+                   'leaves': '',
+                  'full_file_photo_separated': measure_full2}
+
+    for i in whiskers_dict.keys():
+        ylabel = 'length, mm'*(i!='plant_area')+'area, mm2'*(i=='plant_area')
+        result_dict[i], whiskers_dict[i] = bar_plot_function(i, 5, measure_full2, dicts[i], p_value_dict[i][0], ylabel=ylabel,
+                                  is_save= True, union_DF_length=250)
+    
+    hist(result_dict['leaves'],result_dict['roots_max'], result_dict['roots_sum'],result_dict['plant_area'],
+     whiskers_dict,True)
+    
+    report_information = ('Date and time: ' + str(datetime.datetime.now())+'\n'+
+                      'Program settings and initial information: \n'+ 
+                      'path_to_file_folder_fixed = '+ str(path_to_file_folder_fixed)+'\n'+
+                      'paper_area = '+str(paper_area)+'mm2; paper_area_thresold = '+str(paper_area_thresold)+'pixels \n'+
+                      'paper threshold position = photo width/x_pos_divider = img.shape[0]/'+str(x_pos_divider)+'\n'+
+                      'contour_area_threshold = '+str(contour_area_threshold)+' pixels \n'+
+                      'template_filename = '+str(template_filename)+'\n'+
+                      'leaves parameters'+ str(group_param_leaves.return_colors()) +'\n'+
+                      'roots parameters'+str(group_param_roots.return_colors())+'\n'+
+                      'seeds parameters'+str(group_param_seeds.return_colors())+'\n'+
+                      'blur parameters'+str(group_param.return_bl_params())+'\n' +'\n' )
+
+    for i in result_dict.keys():
+        report_table_filename = str(path_to_file_folder_fixed[:-1])+'_'+str(i)+'_'+str(datetime.datetime.now().date())+'.csv'
+        result_dict[i].to_csv(path.join(path_to_output_dir,report_table_filename))
+
+        with open(path.join(path_to_output_dir,report_table_filename), 'r+') as f:
+            content = f.read()
+            f.seek(0, 0)
+            f.write(report_information)
+            f.write(content)
+            writer = csv.writer(f)
+
+
+    shap_filename = str(path_to_file_folder_fixed[:-1])+'_shapiro_'+str(datetime.datetime.now().date())+'.csv'
+    shap.to_csv(path.join(path_to_output_dir,shap_filename))
+    add_annotation(path.join(path_to_output_dir,shap_filename), report_information)
+
+    for i in whiskers_dict.keys():
+        pval_filename = str(path_to_file_folder_fixed[:-1])+'_pvalue_'+str(i)+str(datetime.datetime.now().date())+'.csv'
+        p_value_dict[i][0].to_csv(path.join(path_to_output_dir,pval_filename))
+        test_type = p_value_dict[i][1]
+        add_annotation(path.join(path_to_output_dir,pval_filename), report_information+test_type)
+
+    seed_germ_filename = str(path_to_file_folder_fixed[:-1])+'_seed_germ_'+str(datetime.datetime.now().date())+'.csv'
+    seed_germ.to_csv(path.join(path_to_output_dir,seed_germ_filename))
+    add_annotation(path.join(path_to_output_dir,seed_germ_filename), report_information)
+
+    
+    
+    
+
+    
+    
+    
+    
 
 
