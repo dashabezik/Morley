@@ -57,6 +57,7 @@ state = {
         'out_dir': os.getcwd()
     },
     'rotation': 1,
+    'paper_area_thresold':5000  
 }
 
 CONTOUR_AREA_THRESHOLD = 1000
@@ -269,6 +270,7 @@ def rotation(w):
     rad3 = tk.Radiobutton(window, text="270", variable=var, value=270)
     def get_val(label):
         label['text'] = var.get()
+        state['rotation'] = var.get()
     l = tk.Label(window, text = 'initial')
     b = tk.Button(window, text ='Set Value', command = partial(get_val,l))
     l.pack()
@@ -276,6 +278,7 @@ def rotation(w):
     rad0.pack()
     rad1.pack()
     rad2.pack()
+    rad3.pack()
     state['rotation'] = var.get()
     print(state['rotation'])
 
@@ -285,6 +288,7 @@ def clear(w): # clear all the wigets
         c.destroy()
 
 def set_params(parameter):
+    state[parameter]=state['color']
     for i in state[parameter]:
         state[parameter][i] = state['color'][i].get()
         

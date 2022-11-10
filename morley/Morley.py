@@ -61,7 +61,8 @@ def rotate_pic(img,rotate = None):
               180:cv.ROTATE_180,
               270:cv.ROTATE_90_COUNTERCLOCKWISE}
     if rotate!=None:
-        img = cv.rotate(img, rotate_dict[int(rotate)])
+        if int(rotate)!=0:
+            img = cv.rotate(img, rotate_dict[int(rotate)])
     return img
 
 
@@ -729,7 +730,7 @@ def midpoint(ptA, ptB):
 def get_state_values(param):
     l=[]
     for i in gui.state[param]:
-        l.append(gui.state[param][i].get())
+        l.append(gui.state[param][i])
     return l
 
 def search(paper_size):
@@ -746,7 +747,7 @@ def search(paper_size):
     hlb,hlt,slb,slt,vlb,vlt = get_state_values('roots')
     hrb,hrt,srb,srt,vrb,vrt = get_state_values('leaves')
     hsb,hst,ssb,sst,vsb,vst = get_state_values('seed')
-    morph, gs, c_top = get_state_values('settings')
+    morph, gs, c_top,_ = get_state_values('settings')
     c_bottom=0
     
     ###SEARCH###
