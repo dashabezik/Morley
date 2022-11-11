@@ -11,7 +11,7 @@ def main():
 
     # gui.state['settings']['slider'] = tk.DoubleVar(value=1.0)
     gui.set_state_variables(gui.state)
-    gui.state['settings']['slider'] = tk.IntVar(value=1.0)
+#     gui.state['settings']['slider'] = tk.IntVar(value=1.0)
 
     # https://stackoverflow.com/a/54068050/1258041
     try:

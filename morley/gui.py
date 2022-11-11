@@ -288,7 +288,7 @@ def clear(w): # clear all the wigets
         c.destroy()
 
 def set_params(parameter):
-    state[parameter]=state['color']
+#     state[parameter]=state['color']
     for i in state[parameter]:
         state[parameter][i] = state['color'][i].get()
         
@@ -372,13 +372,13 @@ def contours_tab(img, tweak_frame):
 def tweak_image(w):
     window = tk.Toplevel(w)
     window.title('Tweak image')
-    window.geometry('900x800')
+    window.geometry('700x600')
     file_name =  random_file(state['paths']['input'])
     img_arr = cv.imread(file_name)
     img_arr_0 = cv.imread(file_name, 0)
     state['img_arr'] = img_arr  #.copy()
     state['img_arr_0'] = img_arr_0
-    state['img_resized'] = ImageTk.PhotoImage(Image.fromarray(imutils.resize(img_arr, height=500)))
+    state['img_resized'] = ImageTk.PhotoImage(Image.fromarray(imutils.resize(img_arr, height=200)))
     state['img_mask'] = np.zeros_like(img_arr)
 
     img_frame = tk.Frame(master=window)

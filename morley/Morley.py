@@ -593,7 +593,8 @@ def color_range_counter(src, contours, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255)
 # In[ ]:
 
 
-def find_paper (src, template_size, square_threshold, position_x_axes, canny_top = 100, canny_bottom = 10, morf = 7, gauss = 3):
+def find_paper (src, template_size, square_threshold, position_x_axes, canny_top = 100, canny_bottom = 10, morph = 7, gauss = 3):
+    ppm = [7.45]
     gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
     bl=cv.GaussianBlur(src,(gauss,gauss),0)
     canny = cv.Canny(bl, canny_bottom, canny_top)
@@ -729,12 +730,17 @@ def midpoint(ptA, ptB):
 
 def get_state_values(param):
     l=[]
-    for i in gui.state[param]:
-        l.append(gui.state[param][i])
+    if param=='settings':
+        l.append(2*int(gui.state[param]['morph'].get())+1)
+        l.append(2*int(gui.state[param]['gauss'].get())+1)
+        l.append(int(gui.state[param]['canny_top'].get()))
+    else:
+        for i in gui.state[param]:
+            l.append(int(gui.state[param][i].get()))
     return l
 
 def search(paper_size):
-    gui.state['paper_area'] = paper_size.get()
+    gui.state['paper_area'] = int(paper_size.get())
     ppm = [7.45]
     rotate = gui.state['rotation']
     path_to_file_folder_fixed = gui.state['paths']['input']
@@ -747,8 +753,11 @@ def search(paper_size):
     hlb,hlt,slb,slt,vlb,vlt = get_state_values('roots')
     hrb,hrt,srb,srt,vrb,vrt = get_state_values('leaves')
     hsb,hst,ssb,sst,vsb,vst = get_state_values('seed')
-    morph, gs, c_top,_ = get_state_values('settings')
+    morph, gs, c_top = get_state_values('settings')
     c_bottom=0
+    print(get_state_values('settings'))
+    print(get_state_values('roots'))
+    print(get_state_values('leaves'))
     
     ###SEARCH###
     
@@ -756,16 +765,13 @@ def search(paper_size):
     # ppm - pixel per metric, массив с коэфам пересчета пикселя в мм, на случай плохого поиска стикера на фото
 
     folders_list = folders_list_function(path_to_file_folder_fixed)
-    # pic_num=0
+    
     for g in folders_list:
         path_to_file_folder = path.join(path_to_file_folder_fixed, str(g)+'/')
         for filename_in_folder in listdir(path_to_file_folder):
 
             if filename_in_folder=='.ipynb_checkpoints':
                 continue
-    #         pic_num +=1
-    #         if pic_num>3:
-    #             continue
             ### CONTOURS ###
 
             print('...LOOKING FOR CONTOURS...')
@@ -787,9 +793,10 @@ def search(paper_size):
             pixelsPerMetric = None
             quantity_of_plants = 0
             real_conts = []
+            print(morph)
 
             pixelsPerMetric = find_paper(src,paper_area,paper_area_thresold, position_x_axes(src,x_pos_divider),
-                                         canny_top=c_top, canny_bottom=c_bottom,morf=morph)
+                                         canny_top=c_top, canny_bottom=c_bottom,morph=morph)
 
             for cont in contours0:
                 if (cv.contourArea(cont)>contour_area_threshold):
@@ -862,7 +869,9 @@ def search(paper_size):
             img_hsv = cv.cvtColor(bl, cv.COLOR_BGR2HSV)
             cv.imwrite('colored/{0}'.format(filename_in_folder), src)
             print(src.shape)
-            print('mean_left_x = ', mean_left_x, 'mean_right_x  =', mean_right_x)
+            mean_right_x = p1[0]+3*w//4
+            mean_left_x = p1[0]
+#             print('mean_left_x = ', mean_left_x, 'mean_right_x  =', mean_right_x)
 
             ## WIDTH ###
 
@@ -967,7 +976,7 @@ def search(paper_size):
             plt.figure(figsize = (14,14))
             plt.imshow(src)
             plt.show()
-    print ("{:g} s".format(time.clock() - start_time))
+#     print ("{:g} s".format(time.clock() - start_time))
 
     del res,bl,overlay, img, img2, img_hsv, gr, canny, src, closed, src_black_seeds
     
