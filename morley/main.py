@@ -48,22 +48,16 @@ def main():
     get_out_dir_btn.grid(column=0, row=2)
     out_dir_lbl.grid(column=1, row=2)
 
-    raw_file_lbl = tk.Label(master=files_frame, text="No file selected", justify='left')
-    get_raw_file_btn = tk.Button(master=files_frame, text="Select image file",
-        command=partial(gui.get_file, raw_file_lbl), width=20)
-
-    get_raw_file_btn.grid(column=0, row=4)
-    raw_file_lbl.grid(column=1, row=4)
 
     tweak_file_lbl = tk.Label(master=files_frame, text="Tweaking image" , justify='left')
     tweak_file_btn = tk.Button(master=files_frame, text="Tweak image", command=partial(gui.tweak_image, window), width=20)
-    tweak_file_btn.grid(column=0, row=5)
-    tweak_file_lbl.grid(column=1, row=5)
+    tweak_file_btn.grid(column=0, row=6)
+    tweak_file_lbl.grid(column=1, row=6)
 
     rotation_file_lbl = tk.Label(master=files_frame, text="Rotating image" , justify='left')
     rotation_file_btn = tk.Button(master=files_frame, text="Rotate image", command=partial(gui.rotation, window), width=20)
-    rotation_file_btn.grid(column=0, row=6)
-    rotation_file_lbl.grid(column=1, row=6)
+    rotation_file_btn.grid(column=0, row=5)
+    rotation_file_lbl.grid(column=1, row=5)
 
     paper_size = tk.Entry(master=files_frame, text="Paper size, mm^2", width=20)
     paper_size_lbl = tk.Label(master=files_frame, text="Paper size", width=20)  

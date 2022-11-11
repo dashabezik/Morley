@@ -30,6 +30,10 @@ from collections import defaultdict
 import time
 from . import gui
 
+
+
+
+
 # # Functions
 
 # If you need files which include russian letters in their names, read images with 
@@ -95,7 +99,7 @@ def pic_filename(plot_type, plant_param, path):
                              '_'+str(datetime.datetime.now().date())+'.jpg')
     return report_filename
 
-def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, is_save = False, figname=None):
+def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fixed, is_save = False, figname=None):
     fig, axes = plt.subplots(len(tmp_l.columns), 4, figsize=(35, 8*len(tmp_l.columns)))
 
     matplotlib.rcParams.update({'font.size': 20})
@@ -254,7 +258,7 @@ def pic_filename(plot_type, plant_param, path):
                              '_'+str(datetime.datetime.now().date())+'.jpg')
     return report_filename
 
-def bar_plot_function(l_or_r, color_deff, df, columns, pv_table,
+def bar_plot_function(l_or_r, color_deff, df, columns, pv_table, path_to_file_folder_fixed,
                       is_save = False, figname=None,  union_DF_length = 500, xlabel = 'group label', ylabel = 'length, mm',
                       param = 'length', auto_or_man = 'automatic',  is_drop_outliers = False):
     
@@ -332,7 +336,7 @@ def bar_plot_function(l_or_r, color_deff, df, columns, pv_table,
 # In[ ]:
 
 
-def seed_germination(df,group_names,threshold = 10, is_save = False, figname = None):
+def seed_germination(df,group_names, path_to_file_folder_fixed, threshold = 10, is_save = False, figname = None):
     non_germinated_table = pd.DataFrame(columns=group_names, index=np.arange(1))
     for i in group_names:
         l_columns = 'leaves_length_'+path_to_file_folder_fixed+i
@@ -673,37 +677,6 @@ def random_file(path_to_file_folder):
 # In[ ]:
 
 
-class picture_params:   
-    count = 0  
-    def __init__(self):  
-        picture_params.count += 1 
-    def contour_params(self, morph, gauss, canny_bottom, canny_top): 
-        self.morph = morph 
-        self.gauss = gauss 
-        self.canny_bottom = canny_bottom 
-        self.canny_top = canny_top
-  
-    def color(self, h1,h2,s1,s2,v1,v2):
-        self.h1 = h1
-        self.h2 = h2
-        self.s1 = s1
-        self.s2 = s2
-        self.v1 = v1
-        self.v2 = v2
-    
-    def display_count(self):  
-        print('Groups total number: %d' % picture_params.count)
-        
-    def return_bl_params(self):  
-        return self.morph, self.gauss, self.canny_bottom, self.canny_top 
-    def display_element(self):
-        attrs = vars(self)
-        print(', '.join("%s: %s" % item for item in attrs.items()))
-        
-    def return_colors(self):
-        return self.h1,self.h2,self.s1,self.s2,self.v1,self.v2
-
-
 # # Main.AUTOMATIC
 
 # ## Parameters
@@ -736,7 +709,7 @@ def get_state_values(param):
         l.append(int(gui.state[param]['canny_top'].get()))
     else:
         for i in gui.state[param]:
-            l.append(int(gui.state[param][i].get()))
+            l.append(int(gui.state[param][i]))
     return l
 
 def search(paper_size):
@@ -982,7 +955,8 @@ def search(paper_size):
     
     dicts = files_dicts(path_to_file_folder_fixed)
     roots_sum_dict, roots_max_dict, plant_area_dict, leaves_dict = dicts.values()
-    seed_germ = seed_germination(measure_full2, roots_max_dict.keys(), threshold=7, is_save=True)
+    seed_germ = seed_germination(measure_full2, roots_max_dict.keys(), threshold=7,
+                                 path_to_file_folder_fixed = path_to_file_folder_fixed, is_save=True)
     shap =shapiro_test(measure_full2, dicts)
     plant_parameters = ['roots_sum','roots_max','plant_area','leaves']
     v= [0,0,0,0]
@@ -1007,10 +981,10 @@ def search(paper_size):
     for i in whiskers_dict.keys():
         ylabel = 'length, mm'*(i!='plant_area')+'area, mm2'*(i=='plant_area')
         result_dict[i], whiskers_dict[i] = bar_plot_function(i, 5, measure_full2, dicts[i], p_value_dict[i][0], ylabel=ylabel,
-                                  is_save= True, union_DF_length=250)
+                                  path_to_file_folder_fixed = path_to_file_folder_fixed, is_save= True, union_DF_length=250)
     
     hist(result_dict['leaves'],result_dict['roots_max'], result_dict['roots_sum'],result_dict['plant_area'],
-     whiskers_dict,True)
+     whiskers_dict, path_to_file_folder_fixed = path_to_file_folder_fixed, is_save = True)
     
     report_information = ('Date and time: ' + str(datetime.datetime.now())+'\n'+
                       'Program settings and initial information: \n'+ 

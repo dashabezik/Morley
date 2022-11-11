@@ -56,7 +56,7 @@ state = {
     'paths': {
         'out_dir': os.getcwd()
     },
-    'rotation': 1,
+    'rotation': 0,
     'paper_area_thresold':5000  
 }
 
@@ -149,6 +149,14 @@ def get_out_dirname(label):
         state['paths']['out_dir'] = fname
         label['text'] = f'Output directory: {os.path.basename(fname)}.'
 
+def rotate_pic(img,rotate = None):
+    rotate_dict = {90:cv.ROTATE_90_CLOCKWISE,
+              180:cv.ROTATE_180,
+              270:cv.ROTATE_90_COUNTERCLOCKWISE}
+    if rotate!=None:
+        if int(rotate)!=0:
+            img = cv.rotate(img, rotate_dict[int(rotate)])
+    return img
 
 def blur(img_widget, event):
     morph = state['settings']['morph'].get()
@@ -187,7 +195,8 @@ def blur(img_widget, event):
 
 def color(img_widget, event):
     src = state['img_arr'].copy()
-    template = state['template']  # TODO: Morley.rotate_pic(template, rotate)
+    template = state['template']
+    template = rotate_pic(template, state['rotation'])    # TODO: Morley.rotate_pic(template, rotate)
     w, h = template.shape[::-1]
 
     method = cv.TM_CCOEFF_NORMED
@@ -257,6 +266,7 @@ def seed(img_widget, event):
     img_widget.image = obj_color
     img_widget['image'] = obj_color
 
+   
 
 def rotation(w):
     window = tk.Toplevel(w)
@@ -375,7 +385,9 @@ def tweak_image(w):
     window.geometry('700x600')
     file_name =  random_file(state['paths']['input'])
     img_arr = cv.imread(file_name)
+    img_arr = rotate_pic(img_arr, state['rotation'])
     img_arr_0 = cv.imread(file_name, 0)
+    img_arr_0 = rotate_pic(img_arr_0, state['rotation'])
     state['img_arr'] = img_arr  #.copy()
     state['img_arr_0'] = img_arr_0
     state['img_resized'] = ImageTk.PhotoImage(Image.fromarray(imutils.resize(img_arr, height=200)))
