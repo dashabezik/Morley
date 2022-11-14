@@ -266,8 +266,6 @@ def seed(img_widget, event):
     img_widget.image = obj_color
     img_widget['image'] = obj_color
 
-   
-
 def rotation(w):
     window = tk.Toplevel(w)
     window.title('Rotate image')

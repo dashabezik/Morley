@@ -28,9 +28,10 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.patches as mpatches
 from collections import defaultdict
 import time
+import tkinter as tk
 from . import gui
 
-
+path_to_output_dir = ''
 
 
 
@@ -65,7 +66,7 @@ def rotate_pic(img,rotate = None):
               180:cv.ROTATE_180,
               270:cv.ROTATE_90_COUNTERCLOCKWISE}
     if rotate!=None:
-        if int(rotate)!=0:
+        if (int(rotate)!=0)&(int(rotate)!=1):
             img = cv.rotate(img, rotate_dict[int(rotate)])
     return img
 
@@ -341,8 +342,8 @@ def seed_germination(df,group_names, path_to_file_folder_fixed, threshold = 10, 
     for i in group_names:
         l_columns = 'leaves_length_'+path_to_file_folder_fixed+i
         r_columns = 'roots_max_length_'+path_to_file_folder_fixed+i
-        l = df[[i for i in measure_full2.columns if i.startswith(l_columns)]]
-        r = df[[i for i in measure_full2.columns if i.startswith(r_columns)]]
+        l = df[[i for i in df.columns if i.startswith(l_columns)]]
+        r = df[[i for i in df.columns if i.startswith(r_columns)]]
         full_number = (np.array((r>=0))*np.array((l>=0))).sum()
         non_germinated_table[i].loc[0] = 1-(np.array((r<threshold))*np.array((l<threshold))).sum()/full_number
     
@@ -701,15 +702,22 @@ def add_annotation(name, text):
 def midpoint(ptA, ptB):
     return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 
+def tk2int(var):
+    if type(var)==tk.IntVar:
+        var = int(var.get())
+    else:
+        var = int(var)
+    return var
+
 def get_state_values(param):
     l=[]
     if param=='settings':
-        l.append(2*int(gui.state[param]['morph'].get())+1)
-        l.append(2*int(gui.state[param]['gauss'].get())+1)
-        l.append(int(gui.state[param]['canny_top'].get()))
+        l.append(2*tk2int(gui.state[param]['morph'])+1)
+        l.append(2*tk2int(gui.state[param]['gauss'])+1)
+        l.append(tk2int(gui.state[param]['canny_top']))
     else:
         for i in gui.state[param]:
-            l.append(int(gui.state[param][i]))
+            l.append(tk2int(gui.state[param][i]))
     return l
 
 def search(paper_size):
@@ -844,7 +852,7 @@ def search(paper_size):
             print(src.shape)
             mean_right_x = p1[0]+3*w//4
             mean_left_x = p1[0]
-#             print('mean_left_x = ', mean_left_x, 'mean_right_x  =', mean_right_x)
+            print('mean_left_x = ', mean_left_x, 'mean_right_x  =', mean_right_x)
 
             ## WIDTH ###
 
@@ -952,6 +960,8 @@ def search(paper_size):
 #     print ("{:g} s".format(time.clock() - start_time))
 
     del res,bl,overlay, img, img2, img_hsv, gr, canny, src, closed, src_black_seeds
+    
+    measure_full2.to_csv(path.join(path_to_output_dir,'measure.csv'))
     
     dicts = files_dicts(path_to_file_folder_fixed)
     roots_sum_dict, roots_max_dict, plant_area_dict, leaves_dict = dicts.values()
