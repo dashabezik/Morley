@@ -1,7 +1,9 @@
 import tkinter as tk
+from tkinter import ttk
 from functools import partial
 from . import gui
 from . import Morley
+import time
 
 
 def main():
@@ -70,17 +72,20 @@ def main():
     germ_threshold.grid(column=0, row=8)
     
     report_area = tk.Text(files_frame, width = 40, height = 20)
-    report_area.grid(column = 2, row =0, rowspan = 15)
+    report_area.grid(column = 2, row =0, rowspan = 9)
+    pb = ttk.Progressbar(files_frame, orient = tk.HORIZONTAL, mode = 'determinate', length = 100)
+    pb.grid(column = 2, row = 10)
     
-    run_file_btn = tk.Button(master=files_frame, text="RUN", command=partial(Morley.search,report_area, paper_size, germ_threshold), width=20)
+    run_file_btn = tk.Button(master=files_frame, text="RUN", command=partial(Morley.search,files_frame, report_area, pb, paper_size, germ_threshold), width=20)
     run_file_btn.grid(column=1, row=9)
     
     
 
-    files_frame.grid(column=0, row=0, columnspan=3, rowspan=10)
+    files_frame.grid(column=0, row=0, columnspan=3, rowspan=11)
 
     status_frame = tk.Frame()
     status_frame.grid(column=2, row=0, rowspan=3)
+    
 
     window.mainloop()
 

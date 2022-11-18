@@ -380,7 +380,7 @@ def contours_tab(img, tweak_frame):
 def tweak_image(w):
     window = tk.Toplevel(w)
     window.title('Tweak image')
-    window.geometry('700x600')
+    window.geometry('900x700')
     file_name =  random_file(state['paths']['input'])
     img_arr = cv.imread(file_name)
     img_arr = rotate_pic(img_arr, state['rotation'])
