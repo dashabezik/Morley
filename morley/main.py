@@ -69,10 +69,15 @@ def main():
     germ_threshold_lbl.grid(column=1, row=8)
     germ_threshold.grid(column=0, row=8)
     
-    run_file_btn = tk.Button(master=files_frame, text="RUN", command=partial(Morley.search, paper_size, germ_threshold), width=20)
+    report_area = tk.Text(files_frame, width = 40, height = 20)
+    report_area.grid(column = 2, row =0, rowspan = 15)
+    
+    run_file_btn = tk.Button(master=files_frame, text="RUN", command=partial(Morley.search,report_area, paper_size, germ_threshold), width=20)
     run_file_btn.grid(column=1, row=9)
+    
+    
 
-    files_frame.grid(column=0, row=0, columnspan=2, rowspan=8)
+    files_frame.grid(column=0, row=0, columnspan=3, rowspan=10)
 
     status_frame = tk.Frame()
     status_frame.grid(column=2, row=0, rowspan=3)

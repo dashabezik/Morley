@@ -30,7 +30,7 @@ from collections import defaultdict
 import time
 import tkinter as tk
 from . import gui
-
+from PIL import ImageTk, Image
 path_to_output_dir = ''
 
 
@@ -716,7 +716,13 @@ def get_state_values(param):
             l.append(tk2int(gui.state[param][i]))
     return l
 
-def search(paper_size, germ_thresh):
+def search(report_area, paper_size, germ_thresh):
+    
+    
+    
+    
+    
+    
     gui.state['paper_area'] = int(paper_size.get())
     gui.state['germ_thresh'] = int(germ_thresh.get())
     ppm = [7.45]
@@ -739,6 +745,7 @@ def search(paper_size, germ_thresh):
     print(get_state_values('leaves'))
     
     ###SEARCH###
+    report_area.insert(1.0, 'SEARCH')
     
     measure_full2 = pd.DataFrame(columns=[],index=np.arange(30))
     # ppm - pixel per metric, массив с коэфам пересчета пикселя в мм, на случай плохого поиска стикера на фото
@@ -752,6 +759,7 @@ def search(paper_size, germ_thresh):
             if filename_in_folder=='.ipynb_checkpoints':
                 continue
             ### CONTOURS ###
+            report_area.insert(1.0, '...LOOKING FOR CONTOURS...')
 
             print('...LOOKING FOR CONTOURS...')
 
@@ -824,6 +832,7 @@ def search(paper_size, germ_thresh):
                 pts_leaves = np.array([[0,0],p1,p2,[0,img.shape[0]]])
                 pts_roots = np.array([[p1[0]+3*w//4,p1[1]],[p2[0]+3*w//4,p2[1]],[img.shape[1],img.shape[0]],[img.shape[1],0]])
                 plt.figure(figsize = (14,14))
+                report_area.image_create(tk.END, image = ImageTk.PhotoImage(Image.fromarray(res)))
                 plt.subplot(121),plt.imshow(res,cmap = 'gray')
                 plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
                 plt.subplot(122),plt.imshow(img,cmap = 'gray')
