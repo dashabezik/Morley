@@ -60,14 +60,19 @@ def main():
     rotation_file_lbl.grid(column=1, row=5)
 
     paper_size = tk.Entry(master=files_frame, text="Paper size, mm^2", width=20)
-    paper_size_lbl = tk.Label(master=files_frame, text="Paper size", width=20)  
+    paper_size_lbl = tk.Label(master=files_frame, text="Paper size, mm^2", width=20)  
     paper_size_lbl.grid(column=1, row=7)
     paper_size.grid(column=0, row=7)
     
-    run_file_btn = tk.Button(master=files_frame, text="RUN", command=partial(Morley.search, paper_size), width=20)
+    germ_threshold = tk.Entry(master=files_frame, text="Germination threshold, mm", width=20)
+    germ_threshold_lbl = tk.Label(master=files_frame, text="Germination threshold, mm", width=20)  
+    germ_threshold_lbl.grid(column=1, row=8)
+    germ_threshold.grid(column=0, row=8)
+    
+    run_file_btn = tk.Button(master=files_frame, text="RUN", command=partial(Morley.search, paper_size, germ_threshold), width=20)
     run_file_btn.grid(column=1, row=9)
 
-    files_frame.grid(column=0, row=0, columnspan=2, rowspan=7)
+    files_frame.grid(column=0, row=0, columnspan=2, rowspan=8)
 
     status_frame = tk.Frame()
     status_frame.grid(column=2, row=0, rowspan=3)

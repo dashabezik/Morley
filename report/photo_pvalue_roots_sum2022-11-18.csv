@@ -1,0 +1,17 @@
+Date and time: 2022-11-18 10:36:05.365580
+Program settings and initial information: 
+path_to_file_folder_fixed = C:/Users/dasha/plants/for_git/Morley/photos
+paper_area = 3221mm2; paper_area_thresold = 5000pixels 
+paper threshold position = photo width/x_pos_divider = img.shape[0]/10
+contour_area_threshold = 1000 pixels 
+template_filename = C:/Users/dasha/plants/for_git/Morley/photos/template/template2.jpg
+leaves parameters[0, 65, 0, 255, 121, 255]
+roots parameters[80, 255, 0, 255, 121, 255]
+seeds parameters[0, 26, 68, 255, 160, 255]
+blur parameters[9, 1, 106]
+
+test_type = Mann Whitney U-test
+
+,1,hg
+1,1.0,
+hg,1.0,1.0

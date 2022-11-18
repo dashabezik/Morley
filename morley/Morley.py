@@ -337,18 +337,15 @@ def bar_plot_function(l_or_r, color_deff, df, columns, pv_table, path_to_file_fo
 # In[ ]:
 
 
-def seed_germination(df,group_names, path_to_file_folder_fixed, threshold = 10, is_save = False, figname = None):
+def seed_germination(df,group_names,path_to_file_folder_fixed, threshold = 10, is_save = False, figname = None):
     non_germinated_table = pd.DataFrame(columns=group_names, index=np.arange(1))
     for i in group_names:
-        l_columns = 'leaves_length_'+path_to_file_folder_fixed+i
-        r_columns = 'roots_max_length_'+path_to_file_folder_fixed+i
-        l = df[[i for i in df.columns if i.startswith(l_columns)]]
-        r = df[[i for i in df.columns if i.startswith(r_columns)]]
+        l = df[[j for j in df.columns if j.startswith('leaves_length_') and j.split('/')[-2].endswith(i)]]
+        r = df[[j for j in df.columns if j.startswith('roots_max_length_') and j.split('/')[-2].endswith(i)]]
         full_number = (np.array((r>=0))*np.array((l>=0))).sum()
-        non_germinated_table[i].loc[0] = 1-(np.array((r<threshold))*np.array((l<threshold))).sum()/full_number
-    
-    
-    
+        if full_number:
+            non_germinated_table[i].loc[0] = 1-(np.array((r<threshold))*np.array((l<threshold))).sum()/full_number
+   
     fig = plt.figure()
     ax = fig.add_subplot(111)    
     plt.xlabel('group label', fontsize = 20)
@@ -363,7 +360,6 @@ def seed_germination(df,group_names, path_to_file_folder_fixed, threshold = 10, 
         plt.savefig(path.join(path_to_output_dir,figname))
     plt.show()
     return non_germinated_table
-
 
 # ### Length calculating
 # 
@@ -720,19 +716,21 @@ def get_state_values(param):
             l.append(tk2int(gui.state[param][i]))
     return l
 
-def search(paper_size):
+def search(paper_size, germ_thresh):
     gui.state['paper_area'] = int(paper_size.get())
+    gui.state['germ_thresh'] = int(germ_thresh.get())
     ppm = [7.45]
     rotate = gui.state['rotation']
     path_to_file_folder_fixed = gui.state['paths']['input']
     path_to_output_dir = gui.state['paths']['out_dir']
     paper_area = gui.state['paper_area']
+    germ_thresh = gui.state['germ_thresh']
     paper_area_thresold = gui.state['paper_area_thresold']
     x_pos_divider = 10
     contour_area_threshold = gui.CONTOUR_AREA_THRESHOLD # look at your img size and evaluate the threshold, 1000 is recomended
     template_filename = gui.state['paths']['template_file']
-    hlb,hlt,slb,slt,vlb,vlt = get_state_values('roots')
-    hrb,hrt,srb,srt,vrb,vrt = get_state_values('leaves')
+    hlb,hlt,slb,slt,vlb,vlt = get_state_values('leaves')
+    hrb,hrt,srb,srt,vrb,vrt = get_state_values('roots')
     hsb,hst,ssb,sst,vsb,vst = get_state_values('seed')
     morph, gs, c_top = get_state_values('settings')
     c_bottom=0
@@ -901,6 +899,7 @@ def search(paper_size):
     # r_max_amaunt - счетчик для максимальной длины корня, ramount - для суммарной длины                
 
                 if step!=0:
+                    
                     for y in range(mean_right_x, right[0],step):#идем по ввертикальным линиям   
                         is_first_r = True
                         is_first_r_max = True
@@ -908,6 +907,7 @@ def search(paper_size):
                             h, s, v = img_hsv[x, y]
                             if (cv.pointPolygonTest(real_conts[i],(x,y), False)):# если точка внутри контура
                                 if (v>vrb)&((h>hrb)&(h<hrt)):# если эта точка = корень, а не фон 
+#                                     print('roots width calc')
                                     ramount = ramount + 1*is_first_r#если это первое вхождение корня, то число корней+=1
                                     r_max_amount=r_max_amount+1*is_first_r_max
                                     is_first_r_max = False
@@ -961,12 +961,12 @@ def search(paper_size):
 
     del res,bl,overlay, img, img2, img_hsv, gr, canny, src, closed, src_black_seeds
     
-    measure_full2.to_csv(path.join(path_to_output_dir,'measure.csv'))
+#     measure_full2.to_csv(path.join(path_to_output_dir,'measure.csv'))
     
     dicts = files_dicts(path_to_file_folder_fixed)
     roots_sum_dict, roots_max_dict, plant_area_dict, leaves_dict = dicts.values()
-    seed_germ = seed_germination(measure_full2, roots_max_dict.keys(), threshold=7,
-                                 path_to_file_folder_fixed = path_to_file_folder_fixed, is_save=True)
+    seed_germ = seed_germination(measure_full2, roots_max_dict.keys(), path_to_file_folder_fixed = path_to_file_folder_fixed,
+                                 threshold=germ_thresh, is_save=True)
     shap =shapiro_test(measure_full2, dicts)
     plant_parameters = ['roots_sum','roots_max','plant_area','leaves']
     v= [0,0,0,0]
@@ -1003,10 +1003,10 @@ def search(paper_size):
                       'paper threshold position = photo width/x_pos_divider = img.shape[0]/'+str(x_pos_divider)+'\n'+
                       'contour_area_threshold = '+str(contour_area_threshold)+' pixels \n'+
                       'template_filename = '+str(template_filename)+'\n'+
-                      'leaves parameters'+ str(group_param_leaves.return_colors()) +'\n'+
-                      'roots parameters'+str(group_param_roots.return_colors())+'\n'+
-                      'seeds parameters'+str(group_param_seeds.return_colors())+'\n'+
-                      'blur parameters'+str(group_param.return_bl_params())+'\n' +'\n' )
+                      'leaves parameters'+ str(get_state_values('leaves')) +'\n'+
+                      'roots parameters'+str(get_state_values('roots'))+'\n'+
+                      'seeds parameters'+str(get_state_values('seed'))+'\n'+
+                      'blur parameters'+str(get_state_values('settings'))+'\n' +'\n' )
 
     for i in result_dict.keys():
         report_table_filename = str(path_to_file_folder_fixed[:-1])+'_'+str(i)+'_'+str(datetime.datetime.now().date())+'.csv'
