@@ -752,6 +752,7 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
             if filename_in_folder=='.ipynb_checkpoints':
                 continue
             ### CONTOURS ###
+            report_area.insert(tk.END, '\n File name ', filename_in_folder, '\n')
             report_area.insert(tk.END, '...LOOKING FOR CONTOURS... \n')
 
             file_name = path.join(path_to_file_folder, filename_in_folder)
@@ -929,7 +930,7 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
                 measure['leaves_width_{0}'.format(file_name)].iloc[i]= leaves_width
 
             ### PIXEL COUNTING ###
-            report_area.insert(tk.END, '...PIXEL COUNTING... \n')
+            report_area.insert(tk.END, '...PIXEL COUNTING... \n', '\n')
             report_area.update() 
             
             for i in range(len(real_conts)):
@@ -1034,7 +1035,8 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
     
     pb.configure(value = 100)
     pb.update()
-    report_area.insert(tk.END, '\n END OF THE SEARCH \n')
+    report_area.insert(tk.END, '\n ...END OF THE SEARCH... \n')
+    report_area.insert(tk.END, '\n  Go to the output directory to see the result \n')
     report_area.update()
     files_frame.update_idletasks()
     files_frame.update()
