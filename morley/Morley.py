@@ -31,7 +31,7 @@ import time
 import tkinter as tk
 from . import gui
 from PIL import ImageTk, Image
-path_to_output_dir = ''
+# path_to_output_dir = ''
 
 
 
@@ -95,14 +95,14 @@ def rotate_pic(img,rotate = None):
 # In[ ]:
 
 
-def pic_filename(plot_type, plant_param, path):
-    report_filename = (str(path[:-1])+'_'+str(plant_param)+'_'+plot_type+
+def pic_filename(plot_type, plant_param, path_to_folder):
+    report_filename = (str(path.basename(path.normpath(path_to_folder)))+'_'+str(plant_param)+'_'+plot_type+
                              '_'+str(datetime.datetime.now().date())+'.jpg')
     return report_filename
 
-def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fixed, is_save = False, figname=None):
+def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fixed,path_to_output_dir, is_save = False, figname=None):
     fig, axes = plt.subplots(len(tmp_l.columns), 4, figsize=(35, 8*len(tmp_l.columns)))
-
+    print('path in hist', path_to_output_dir )
     matplotlib.rcParams.update({'font.size': 20})
     param_type = 0
     fig.suptitle('X axis: Length, mm (root max, root sum and leaves); Area, mm2 (plant area);'
@@ -136,7 +136,9 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
     if is_save:
         if figname is None:
             figname = pic_filename('hist','l_rm_rs',path_to_file_folder_fixed)
-#             report_area.insert(tk.END, path.join(path_to_output_dir,figname)+'\n')
+            print(figname)
+#             report_area.insert(tk.END, str(path.join(path_to_output_dir,figname))+'\n')
+            print(str(path.join(path_to_output_dir,figname))+'\n')
         plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
     plt.show()
 
@@ -254,12 +256,12 @@ def p_value_function (df, columns, is_norm):
 # In[ ]:
 
 
-def pic_filename(plot_type, plant_param, path):
-    report_filename = (str(path[:-1])+'_'+str(plant_param)+'_'+plot_type+
+def pic_filename(plot_type, plant_param, path_to_folder):
+    report_filename = (str(path.basename(path.normpath(path_to_folder)))+'_'+str(plant_param)+'_'+plot_type+
                              '_'+str(datetime.datetime.now().date())+'.jpg')
     return report_filename
 
-def bar_plot_function(l_or_r, color_deff, df, columns, pv_table, path_to_file_folder_fixed,
+def bar_plot_function(l_or_r, color_deff, df, columns, pv_table, path_to_file_folder_fixed, path_to_output_dir,
                       is_save = False, figname=None,  union_DF_length = 500, xlabel = 'group label', ylabel = 'length, mm',
                       param = 'length', auto_or_man = 'automatic',  is_drop_outliers = False):
     
@@ -337,7 +339,7 @@ def bar_plot_function(l_or_r, color_deff, df, columns, pv_table, path_to_file_fo
 # In[ ]:
 
 
-def seed_germination(df,group_names,path_to_file_folder_fixed, threshold = 10, is_save = False, figname = None):
+def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_dir, threshold = 10, is_save = False, figname = None):
     non_germinated_table = pd.DataFrame(columns=group_names, index=np.arange(1))
     for i in group_names:
         l = df[[j for j in df.columns if j.startswith('leaves_length_') and j.split('/')[-2].endswith(i)]]
@@ -504,27 +506,6 @@ def pixel_color_conditions(pixel ,h1=0, h2=255, s1=0, s2=255, v1=0, v2=255):
     full_condition = h_condition*s_condition*v_condition
     return full_condition
 
-def drop_seeds_slow(src, contours, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255):
-    src_hsv  = cv.cvtColor(src, cv.COLOR_BGR2HSV)
-    seeds_square_list = np.zeros(len(contours))
-    h_min = np.array((h1, s1, v1), np.uint8)
-    h_max = np.array((h2, s2, v2), np.uint8)
-    tresh = cv.inRange(src_hsv, h_min, h_max)
-    for i in range(len(contours)):
-        c = contours[i]
-        cimg1 = np.zeros_like(src)
-        cv.drawContours(cimg1, contours, i, color=255, thickness=-1)
-        pts = np.where(cimg1 == 255)
-        for x, y in zip(pts[0], pts[1]):                   
-            if pixel_color_conditions(src_hsv[x, y], h1, h2, s1, s2, v1, v2):
-                src_hsv[x, y] = [0,0,0]
-                seeds_square_list[i]+=1
-    src  = cv.cvtColor(src_hsv, cv.COLOR_HSV2BGR)
-    plt.figure(figsize=(14,14))
-    plt.imshow(tresh)
-    plt.show()
-    return src, seeds_square_list
-
 def drop_seeds(src, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255):
     src_hsv  = cv.cvtColor(src, cv.COLOR_BGR2HSV)
     h_min = np.array((h1, s1, v1), np.uint8)
@@ -584,9 +565,6 @@ def color_range_counter(src, contours, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255)
 
 
 # ### Find_paper
-
-# In[ ]:
-
 
 def find_paper (report_area,src, template_size, square_threshold, position_x_axes, canny_top = 100, canny_bottom = 10, morph = 7, gauss = 3):
     ppm = [7.45]
@@ -736,6 +714,8 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
     ###SEARCH###
     report_area.insert(tk.END, 'SEARCH \n')
     
+    print(path_to_output_dir)
+    
     measure_full2 = pd.DataFrame(columns=[],index=np.arange(30))
     # ppm - pixel per metric, массив с коэфам пересчета пикселя в мм, на случай плохого поиска стикера на фото
 
@@ -752,7 +732,7 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
             if filename_in_folder=='.ipynb_checkpoints':
                 continue
             ### CONTOURS ###
-            report_area.insert(tk.END, '\n File name ', filename_in_folder, '\n')
+            report_area.insert(tk.END, '\n File name '+ str(filename_in_folder)+'\n')
             report_area.insert(tk.END, '...LOOKING FOR CONTOURS... \n')
 
             file_name = path.join(path_to_file_folder, filename_in_folder)
@@ -965,7 +945,7 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
     dicts = files_dicts(path_to_file_folder_fixed)
     roots_sum_dict, roots_max_dict, plant_area_dict, leaves_dict = dicts.values()
     seed_germ = seed_germination(measure_full2, roots_max_dict.keys(), path_to_file_folder_fixed = path_to_file_folder_fixed,
-                                 threshold=germ_thresh, is_save=True)
+                                 path_to_output_dir = path_to_output_dir, threshold=germ_thresh, is_save=True)
     shap =shapiro_test(measure_full2, dicts)
     plant_parameters = ['roots_sum','roots_max','plant_area','leaves']
     v= [0,0,0,0]
@@ -990,10 +970,11 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
     for i in whiskers_dict.keys():
         ylabel = 'length, mm'*(i!='plant_area')+'area, mm2'*(i=='plant_area')
         result_dict[i], whiskers_dict[i] = bar_plot_function(i, 5, measure_full2, dicts[i], p_value_dict[i][0], ylabel=ylabel,
-                                  path_to_file_folder_fixed = path_to_file_folder_fixed, is_save= True, union_DF_length=250)
+                                  path_to_file_folder_fixed = path_to_file_folder_fixed, path_to_output_dir = path_to_output_dir,
+                                                             is_save= True, union_DF_length=250)
     
     hist(result_dict['leaves'],result_dict['roots_max'], result_dict['roots_sum'],result_dict['plant_area'],
-     whiskers_dict, path_to_file_folder_fixed = path_to_file_folder_fixed, is_save = True)
+     whiskers_dict, path_to_file_folder_fixed = path_to_file_folder_fixed, path_to_output_dir = path_to_output_dir, is_save = True)
     
     report_information = ('Date and time: ' + str(datetime.datetime.now())+'\n'+
                       'Program settings and initial information: \n'+ 
@@ -1008,7 +989,7 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
                       'blur parameters'+str(get_state_values('settings'))+'\n' +'\n' )
 
     for i in result_dict.keys():
-        report_table_filename = str(path_to_file_folder_fixed[:-1])+'_'+str(i)+'_'+str(datetime.datetime.now().date())+'.csv'
+        report_table_filename = str(path.basename(path.normpath(path_to_file_folder_fixed)))+'_'+str(i)+'_'+str(datetime.datetime.now().date())+'.csv'
         result_dict[i].to_csv(path.join(path_to_output_dir,report_table_filename))
 
         with open(path.join(path_to_output_dir,report_table_filename), 'r+') as f:
@@ -1019,17 +1000,17 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
             writer = csv.writer(f)
 
 
-    shap_filename = str(path_to_file_folder_fixed[:-1])+'_shapiro_'+str(datetime.datetime.now().date())+'.csv'
+    shap_filename = str(path.basename(path.normpath(path_to_file_folder_fixed)))+'_shapiro_'+str(datetime.datetime.now().date())+'.csv'
     shap.to_csv(path.join(path_to_output_dir,shap_filename))
     add_annotation(path.join(path_to_output_dir,shap_filename), report_information)
 
     for i in whiskers_dict.keys():
-        pval_filename = str(path_to_file_folder_fixed[:-1])+'_pvalue_'+str(i)+str(datetime.datetime.now().date())+'.csv'
+        pval_filename = str(path.basename(path.normpath(path_to_file_folder_fixed)))+'_pvalue_'+str(i)+str(datetime.datetime.now().date())+'.csv'
         p_value_dict[i][0].to_csv(path.join(path_to_output_dir,pval_filename))
         test_type = p_value_dict[i][1]
         add_annotation(path.join(path_to_output_dir,pval_filename), report_information+test_type)
 
-    seed_germ_filename = str(path_to_file_folder_fixed[:-1])+'_seed_germ_'+str(datetime.datetime.now().date())+'.csv'
+    seed_germ_filename = str(path.basename(path.normpath(path_to_file_folder_fixed)))+'_seed_germ_'+str(datetime.datetime.now().date())+'.csv'
     seed_germ.to_csv(path.join(path_to_output_dir,seed_germ_filename))
     add_annotation(path.join(path_to_output_dir,seed_germ_filename), report_information)
     

@@ -270,6 +270,16 @@ def rotation(w):
     window = tk.Toplevel(w)
     window.title('Rotate image')
     window.geometry('300x200')
+    Rotation_frame = tk.Frame(master=window)
+    img_frame = tk.Frame(master=window)
+    img = tk.Label(master=img_frame)
+    img.pack(fill=tk.BOTH, expand=True)
+    img_frame.pack()
+    src = src.astype('uint8')
+    src = imutils.resize(src, height=500)
+    obj = ImageTk.PhotoImage(Image.fromarray(src))
+    img.image = obj
+    img['image'] = obj
     var=tk.IntVar()
     var.set(1)
     rad0 = tk.Radiobutton(window, text="0", variable=var, value=0)
@@ -279,6 +289,7 @@ def rotation(w):
     def get_val(label):
         label['text'] = var.get()
         state['rotation'] = var.get()
+        Rotation_frame.winfo_toplevel().destroy()
     l = tk.Label(window, text = 'initial')
     b = tk.Button(window, text ='Set Value', command = partial(get_val,l))
     l.pack()
@@ -380,7 +391,7 @@ def contours_tab(img, tweak_frame):
 def tweak_image(w):
     window = tk.Toplevel(w)
     window.title('Tweak image')
-    window.geometry('900x700')
+    window.geometry('900x800')
     file_name =  random_file(state['paths']['input'])
     img_arr = cv.imread(file_name)
     img_arr = rotate_pic(img_arr, state['rotation'])

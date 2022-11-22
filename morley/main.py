@@ -73,6 +73,8 @@ def main():
     
     report_area = tk.Text(files_frame, width = 40, height = 20)
     report_area.grid(column = 2, row =0, rowspan = 9)
+    report_area.insert(tk.END,'... LOGGING WINDOW ... \n')
+    report_area.update()
     pb = ttk.Progressbar(files_frame, orient = tk.HORIZONTAL, mode = 'determinate', length = 100)
     pb.grid(column = 2, row = 10)
     

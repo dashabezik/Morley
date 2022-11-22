@@ -1,0 +1,15 @@
+Date and time: 2022-11-22 15:50:31.056819
+Program settings and initial information: 
+path_to_file_folder_fixed = C:/Users/dasha/morley/photos
+paper_area = 3221mm2; paper_area_thresold = 5000pixels 
+paper threshold position = photo width/x_pos_divider = img.shape[0]/10
+contour_area_threshold = 1000 pixels 
+template_filename = C:/Users/dasha/morley/photos/template/template2.jpg
+leaves parameters[0, 47, 0, 255, 163, 255]
+roots parameters[59, 255, 0, 255, 163, 255]
+seeds parameters[0, 26, 91, 255, 130, 255]
+blur parameters[7, 1, 97]
+
+,roots_sum,roots_max,plant_area,leaves
+1,1.5743058611406013e-05,9.338832569483202e-06,3.5525306654737854e-12,2.553515059844358e-06
+hg,0.017884694039821625,0.01619064062833786,0.4591912627220154,0.004201946780085564
