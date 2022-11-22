@@ -819,7 +819,7 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
                 pts_leaves = np.array([[0,0],p1,p2,[0,img.shape[0]]])
                 pts_roots = np.array([[p1[0]+3*w//4,p1[1]],[p2[0]+3*w//4,p2[1]],[img.shape[1],img.shape[0]],[img.shape[1],0]])
                 plt.figure(figsize = (14,14))
-                report_area.image_create(tk.END, image = ImageTk.PhotoImage(Image.fromarray(res)))
+#                 report_area.image_create(tk.END, image = ImageTk.PhotoImage(Image.fromarray(res)))
                 plt.subplot(121),plt.imshow(res,cmap = 'gray')
                 plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
                 plt.subplot(122),plt.imshow(img,cmap = 'gray')
@@ -1033,6 +1033,7 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
     add_annotation(path.join(path_to_output_dir,seed_germ_filename), report_information)
     
     pb.configure(value = 100)
+    pb.update()
     report_area.insert(tk.END, '\n END OF THE SEARCH \n')
     report_area.update()
     files_frame.update_idletasks()
