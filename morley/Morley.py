@@ -120,7 +120,7 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
                      f'shapiro p-value = {scipy.stats.shapiro(pd.Series(tmp[g].values.reshape(-1)).dropna())[1]:.2e}'+
                     '\n'+'mean = '+str(mean)+'$\pm$'+str(ci))
 
-            sns.displot(pd.Series(tmp[g].values.reshape(-1)).dropna(),
+            sns.distplot(pd.Series(tmp[g].values.reshape(-1)).dropna(),
                      color=sns.color_palette("Set2")[iterator],
                                  label=label)
             plt.xlim(left = 0)
@@ -786,10 +786,11 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
             quantity_of_plants = len(real_conts)
             report_area.insert(tk.END, 'Quantity of plants '+str(quantity_of_plants)+'\n')
             report_area.insert(tk.END, 'Pixels per metric '+str(pixelsPerMetric)+'\n')
-
+            
             ### SEEDS ###
             report_area.insert(tk.END, '...LOOKING FOR SEEDS POSITION... \n')
-
+            report_area.update()
+            
             img2 = cv.imread(file_name,0)
             img2 = rotate_pic(img2, rotate)
             template = cv.imread(template_filename,0)
@@ -831,7 +832,8 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
             src_black_seeds = cv.cvtColor(src_black_seeds, cv.COLOR_BGR2HSV)
             ### COLOR ###
             report_area.insert(tk.END, '...MAKING COLOR... \n')
-
+            report_area.update()
+            
             overlay = src.copy()
             cv.drawContours(overlay, [pts_leaves], -1,(0,224,79), -1)
             opacity = 0.25
@@ -847,6 +849,7 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
                               +"Mean right seeds x-coordinate "+str(mean_right_x)+'\n')
             ## WIDTH ###
             report_area.insert(tk.END, '...WIDTH CALCULATION... \n')
+            report_area.update()
             
             measure = pd.DataFrame(columns=['roots_area_{0}'.format(file_name), 'leaves_area_{0}'.format(file_name),
                                             'roots_length_{0}'.format(file_name), 'leaves_length_{0}'.format(file_name),
@@ -927,7 +930,8 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
 
             ### PIXEL COUNTING ###
             report_area.insert(tk.END, '...PIXEL COUNTING... \n')
-
+            report_area.update() 
+            
             for i in range(len(real_conts)):
                 c = real_conts[i]
                 measure.iloc[i]['plant_area_{0}'.format(file_name)] = cv.contourArea(c)
@@ -1030,6 +1034,7 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
     
     pb.configure(value = 100)
     report_area.insert(tk.END, '\n END OF THE SEARCH \n')
+    report_area.update()
     files_frame.update_idletasks()
     files_frame.update()
 
