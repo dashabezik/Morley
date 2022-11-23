@@ -269,35 +269,59 @@ def seed(img_widget, event):
 def rotation(w):
     window = tk.Toplevel(w)
     window.title('Rotate image')
-    window.geometry('300x200')
+    window.geometry('600x600')
     Rotation_frame = tk.Frame(master=window)
+    
     img_frame = tk.Frame(master=window)
-    img = tk.Label(master=img_frame)
-    img.pack(fill=tk.BOTH, expand=True)
+    img1 = tk.Label(master=img_frame)
+    img1.pack(fill=tk.BOTH, expand=True)
+    ethalon = cv.imread('ethalon.png')
+    ethalon = cv.cvtColor(ethalon, cv.COLOR_BGR2RGB)
+    ethalon = ethalon.astype('uint8')
+    ethalon = imutils.resize(ethalon, height=200)
+    obj = ImageTk.PhotoImage(Image.fromarray(ethalon))
+    img1.image = obj
+    img1['image'] = obj
+    
+    img2 = tk.Label(master=img_frame)
+    test_img = cv.imread(random_file(state['paths']['input']))
+    test_img = cv.cvtColor(test_img, cv.COLOR_BGR2RGB)
+    test_img = test_img.astype('uint8')
+    test_img = imutils.resize(test_img, height=200)
+    obj2 = ImageTk.PhotoImage(Image.fromarray(test_img))
+    img2.image = obj2
+    img2['image'] = obj2
     img_frame.pack()
-    src = src.astype('uint8')
-    src = imutils.resize(src, height=500)
-    obj = ImageTk.PhotoImage(Image.fromarray(src))
-    img.image = obj
-    img['image'] = obj
+    
+    img2.pack(fill=tk.BOTH, expand=True)
+    
+    def chose_rotation(angle, img, img_widget):
+        img = rotate_pic(img, angle)
+        print('angle =', angle )
+        i = ImageTk.PhotoImage(Image.fromarray(img))
+        img_widget.image = i
+        img_widget['image'] = i 
+        
+    class Rotation:
+        def __init__(self, val):
+            tk.Radiobutton(Rotation_frame, text=str(val), command=lambda i=val: chose_rotation(i, test_img, img2),variable=var, value=val).pack()
+    
     var=tk.IntVar()
-    var.set(1)
-    rad0 = tk.Radiobutton(window, text="0", variable=var, value=0)
-    rad1 = tk.Radiobutton(window, text="90", variable=var, value=90)
-    rad2 = tk.Radiobutton(window, text="180", variable=var, value=180)
-    rad3 = tk.Radiobutton(window, text="270", variable=var, value=270)
+    var.set(0)
+    Rotation(0)
+    Rotation(90)
+    Rotation(180)
+    Rotation(270)
     def get_val(label):
         label['text'] = var.get()
         state['rotation'] = var.get()
         Rotation_frame.winfo_toplevel().destroy()
+
     l = tk.Label(window, text = 'initial')
     b = tk.Button(window, text ='Set Value', command = partial(get_val,l))
     l.pack()
     b.pack()
-    rad0.pack()
-    rad1.pack()
-    rad2.pack()
-    rad3.pack()
+    Rotation_frame.pack()
     state['rotation'] = var.get()
     print(state['rotation'])
 
