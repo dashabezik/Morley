@@ -4,6 +4,7 @@ from functools import partial
 from . import gui
 from . import Morley
 import time
+import tkinter.scrolledtext as st
 
 
 def main():
@@ -71,7 +72,7 @@ def main():
     germ_threshold_lbl.grid(column=1, row=8)
     germ_threshold.grid(column=0, row=8)
     
-    report_area = tk.Text(files_frame, width = 40, height = 20)
+    report_area = st.ScrolledText(files_frame, width = 40, height = 20)
     report_area.grid(column = 2, row =0, rowspan = 9)
     report_area.insert(tk.END,'... LOGGING WINDOW ... \n')
     report_area.update()
