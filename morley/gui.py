@@ -15,16 +15,16 @@ from functools import partial
 
 state = {
     'settings': {
-        'morph': 0.0,
-        'gauss':0.0,
-        'canny_top': 255.0
+        'morph': 2.0,
+        'gauss':1.0,
+        'canny_top': 160.0
     },
     'color':{
-        'h_bottom':0.0,
+        'h_bottom':50.0,
         'h_top':255.0,
         's_bottom':0.0,
         's_top':255.0,
-        'v_bottom':0.0,
+        'v_bottom':100.0,
         'v_top':255.0,
     },
     'roots':{
@@ -47,10 +47,10 @@ state = {
     
     'seed':{
         'h_bottom':0.0,
-        'h_top':255.0,
-        's_bottom':0.0,
+        'h_top':20.0,
+        's_bottom':100.0,
         's_top':255.0,
-        'v_bottom':0.0,
+        'v_bottom':100.0,
         'v_top':255.0,
     },
     'paths': {
@@ -269,6 +269,8 @@ def rotation(w):
     window.geometry('600x600')
     Rotation_frame = tk.Frame(master=window)
     
+    text_lbl = tk.Label(Rotation_frame, text = 'Choose the angle to rotate your photos, as in the example')
+    text_lbl.pack()
     img_frame = tk.Frame(master=window)
     img1 = tk.Label(master=img_frame)
     img1.pack(fill=tk.BOTH, expand=True)
@@ -292,7 +294,7 @@ def rotation(w):
     
     img2.pack(fill=tk.BOTH, expand=True)
     
-    def chose_rotation(angle, img, img_widget):
+    def choose_rotation(angle, img, img_widget):
         img = rotate_pic(img, angle)
         print('angle =', angle )
         i = ImageTk.PhotoImage(Image.fromarray(img))
@@ -301,7 +303,7 @@ def rotation(w):
         
     class Rotation:
         def __init__(self, val):
-            tk.Radiobutton(Rotation_frame, text=str(val), command=lambda i=val: chose_rotation(i, test_img, img2),variable=var, value=val).pack()
+            tk.Radiobutton(Rotation_frame, text=str(val), command=lambda i=val: choose_rotation(i, test_img, img2),variable=var, value=val).pack()
     
     var=tk.IntVar()
     var.set(0)
@@ -309,14 +311,11 @@ def rotation(w):
     Rotation(90)
     Rotation(180)
     Rotation(270)
-    def get_val(label):
-        label['text'] = var.get()
+    def get_val():
         state['rotation'] = var.get()
         Rotation_frame.winfo_toplevel().destroy()
 
-    l = tk.Label(window, text = 'initial')
-    b = tk.Button(window, text ='Set Value', command = partial(get_val,l))
-    l.pack()
+    b = tk.Button(window, text ='Set Value', command = partial(get_val))
     b.pack()
     Rotation_frame.pack()
     state['rotation'] = var.get()
@@ -351,6 +350,7 @@ def seeds_tab(img, tweak_frame):
     seed(img, None)
 
     color_label = tk.Label(master=tweak_frame, text="Choosing color for seed excluding")
+    color_label.grid(column=0, row=0, columnspan=3)
     row = 1 + add_color_sliders(state['seed'], tweak_frame, partial(seed, img))
     button_b2 = tk.Button(tweak_frame, text='Back', command=partial(colors_tab, img, tweak_frame))
     button_end = tk.Button(tweak_frame, text='Done', command=lambda: tweak_frame.winfo_toplevel().destroy())
