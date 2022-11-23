@@ -76,9 +76,11 @@ def main():
     report_area.insert(tk.END,'... LOGGING WINDOW ... \n')
     report_area.update()
     pb = ttk.Progressbar(files_frame, orient = tk.HORIZONTAL, mode = 'determinate', length = 100)
+    pb_lbl = tk.Label(files_frame, text = '0%')
     pb.grid(column = 2, row = 10)
+    pb_lbl.grid(column = 2, row = 11)
     
-    run_file_btn = tk.Button(master=files_frame, text="RUN", command=partial(Morley.search,files_frame, report_area, pb, paper_size, germ_threshold), width=20)
+    run_file_btn = tk.Button(master=files_frame, text="RUN", command=partial(Morley.search,files_frame, report_area, pb,pb_lbl,  paper_size, germ_threshold), width=20)
     run_file_btn.grid(column=1, row=9)
     
     

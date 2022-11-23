@@ -687,7 +687,7 @@ def get_state_values(param):
             l.append(tk2int(gui.state[param][i]))
     return l
 
-def search(files_frame, report_area, pb, paper_size, germ_thresh):
+def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
     Progress_bar_value = 0
     
     gui.state['paper_area'] = int(paper_size.get())
@@ -728,7 +728,9 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
         for filename_in_folder in listdir(path_to_file_folder):
             Progress_bar_value += 90/(PL*FL)
             pb.configure(value = Progress_bar_value)
+            pb_lbl['text'] = str(round(Progress_bar_value))+'%'
             pb.update()
+            pb_lbl.update()
             if filename_in_folder=='.ipynb_checkpoints':
                 continue
             ### CONTOURS ###
@@ -1015,6 +1017,8 @@ def search(files_frame, report_area, pb, paper_size, germ_thresh):
     add_annotation(path.join(path_to_output_dir,seed_germ_filename), report_information)
     
     pb.configure(value = 100)
+    pb_lbl['text'] = '100%'
+    pb_lbl.update()
     pb.update()
     report_area.insert(tk.END, '\n ...END OF THE SEARCH... \n')
     report_area.insert(tk.END, '\n  Go to the output directory to see the result \n')

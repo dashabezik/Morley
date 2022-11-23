@@ -236,12 +236,9 @@ def color(img_widget, event):
     # накладываем фильтр на кадр в модели HSV
     thresh = cv.inRange(hsv, h_min, h_max)
 
-    #     state['img_color_to_analys'] = src
     thresh = thresh.astype('uint8')
     thresh = imutils.resize(thresh, height=500)
     obj_color = ImageTk.PhotoImage(Image.fromarray(thresh))
-    #     state['img_color_to_analys'] = src
-    # state['img_color_to_show'] = thresh
     img_widget.image = obj_color
     img_widget['image'] = obj_color
 
