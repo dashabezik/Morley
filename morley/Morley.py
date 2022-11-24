@@ -141,7 +141,7 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
 #             report_area.insert(tk.END, str(path.join(path_to_output_dir,figname))+'\n')
             print(str(path.join(path_to_output_dir,figname))+'\n')
         plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
-    plt.show()
+#     plt.show()
 
 
 # ### Shapiro-Wilk test function
@@ -320,7 +320,7 @@ def bar_plot_function(l_or_r, color_deff, df, columns, pv_table, path_to_file_fo
             figname = pic_filename('bar',l_or_r.replace(' ', ''),path_to_file_folder_fixed)
 #             report_area.insert(tk.END, path.join(path_to_output_dir,figname)+'\n')
         plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
-    plt.show()
+#     plt.show()
     
     return tmp, whiskers
 
@@ -361,7 +361,7 @@ def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_di
         if figname is None:
             figname = pic_filename('bar','seed_germ',path_to_file_folder_fixed)
         plt.savefig(path.join(path_to_output_dir,figname))
-    plt.show()
+#     plt.show()
     return non_germinated_table
 
 # ### Length calculating
@@ -620,7 +620,7 @@ def find_paper (report_area,src, template_size, square_threshold, position_x_axe
             break
     plt.figure(figsize=(14,14))
 #     plt.imshow(src)
-    plt.show()
+#     plt.show()
     return pixelsPerMetric
 
 
@@ -809,7 +809,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
 #                 plt.subplot(122),plt.imshow(img,cmap = 'gray')
                 plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
                 plt.suptitle(meth)
-                plt.show()
+#                 plt.show()
 
             src = drop_seeds(src,hsb,hst,ssb,sst,vsb,vst)
             src_black_seeds = src.copy()
@@ -935,7 +935,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
 
             plt.figure(figsize = (14,14))
 #             plt.imshow(src)
-            plt.show()
+#             plt.show()
             
             
             files_frame.update_idletasks()
