@@ -29,7 +29,8 @@ import matplotlib.patches as mpatches
 from collections import defaultdict
 import time
 import tkinter as tk
-from . import gui
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gui
 from PIL import ImageTk, Image
 # path_to_output_dir = ''
 
@@ -618,7 +619,7 @@ def find_paper (report_area,src, template_size, square_threshold, position_x_axe
             cv.drawContours(src,[cont],0,(0,255,0),-2)
             break
     plt.figure(figsize=(14,14))
-    plt.imshow(src)
+#     plt.imshow(src)
     plt.show()
     return pixelsPerMetric
 
@@ -803,9 +804,9 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
                 pts_roots = np.array([[p1[0]+3*w//4,p1[1]],[p2[0]+3*w//4,p2[1]],[img.shape[1],img.shape[0]],[img.shape[1],0]])
                 plt.figure(figsize = (14,14))
 #                 report_area.image_create(tk.END, image = ImageTk.PhotoImage(Image.fromarray(res)))
-                plt.subplot(121),plt.imshow(res,cmap = 'gray')
+#                 plt.subplot(121),plt.imshow(res,cmap = 'gray')
                 plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
-                plt.subplot(122),plt.imshow(img,cmap = 'gray')
+#                 plt.subplot(122),plt.imshow(img,cmap = 'gray')
                 plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
                 plt.suptitle(meth)
                 plt.show()
@@ -933,7 +934,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
             measure_full2 = measure_full2.join(measure, how = 'outer')
 
             plt.figure(figsize = (14,14))
-            plt.imshow(src)
+#             plt.imshow(src)
             plt.show()
             
             

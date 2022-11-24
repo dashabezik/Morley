@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 from functools import partial
+import sys
+import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gui
 import Morley

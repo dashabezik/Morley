@@ -1,8 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 from functools import partial
-from . import gui
-from . import Morley
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gui
+import Morley
 import time
 import tkinter.scrolledtext as st
 
