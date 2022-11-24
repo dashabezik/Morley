@@ -7,10 +7,9 @@ import imutils
 from imutils import contours
 import numpy as np
 import pandas as pd
-import os, random
-from os import path, listdir
+import os
+import random
 from functools import partial
-# from . import Morley
 
 
 state = {
@@ -35,7 +34,6 @@ state = {
         'v_bottom':0.0,
         'v_top':255.0,
     },
-    
     'leaves':{
         'h_bottom':0.0,
         'h_top':255.0,
@@ -44,7 +42,6 @@ state = {
         'v_bottom':0.0,
         'v_top':255.0,
     },
-    
     'seed':{
         'h_bottom':0.0,
         'h_top':20.0,
@@ -57,7 +54,7 @@ state = {
         'out_dir': os.getcwd()
     },
     'rotation': 0,
-    'paper_area_thresold':5000  
+    'paper_area_thresold': 5000
 }
 
 CONTOUR_AREA_THRESHOLD = 1000
@@ -100,13 +97,13 @@ def random_file(path_to_file_folder):
     a=random.choice(os.listdir(path_to_file_folder))
     while (a=='template')|(a=='.ipynb_checkpoints'):
         a=random.choice(os.listdir(path_to_file_folder))
-    path_to_file = path.join(path_to_file_folder, a+'/')
+    path_to_file = os.path.join(path_to_file_folder, a+'/')
     b = random.choice(os.listdir(path_to_file))
     while (b=='.ipynb_checkpoints'):
         b=random.choice(os.listdir(path_to_file))
-    path_to_file = path.join(path_to_file, b)
+    path_to_file = os.path.join(path_to_file, b)
     return path_to_file
-        
+
 def set_state_variables(d):
     for k, v in d.items():
         if isinstance(v, dict):
@@ -268,21 +265,21 @@ def rotation(w):
     window.title('Rotate image')
     window.geometry('600x600')
     Rotation_frame = tk.Frame(master=window)
-    
+
     text_lbl = tk.Label(Rotation_frame, text = 'Choose the angle to rotate your photos, as in the example')
     text_lbl.pack()
     img_frame = tk.Frame(master=window)
     img1 = tk.Label(master=img_frame)
     img1.pack(fill=tk.BOTH, expand=True)
     path_to_ethalon = os.path.dirname(os.path.abspath(__file__))
-    ethalon = cv.imread(path.join(path_to_ethalon, 'ethalon.png'))
+    ethalon = cv.imread(os.path.join(path_to_ethalon, 'ethalon.png'))
     ethalon = cv.cvtColor(ethalon, cv.COLOR_BGR2RGB)
     ethalon = ethalon.astype('uint8')
     ethalon = imutils.resize(ethalon, height=200)
     obj = ImageTk.PhotoImage(Image.fromarray(ethalon))
     img1.image = obj
     img1['image'] = obj
-    
+
     img2 = tk.Label(master=img_frame)
     test_img = cv.imread(random_file(state['paths']['input']))
     test_img = cv.cvtColor(test_img, cv.COLOR_BGR2RGB)
@@ -292,20 +289,20 @@ def rotation(w):
     img2.image = obj2
     img2['image'] = obj2
     img_frame.pack()
-    
+
     img2.pack(fill=tk.BOTH, expand=True)
-    
+
     def choose_rotation(angle, img, img_widget):
         img = rotate_pic(img, angle)
         print('angle =', angle )
         i = ImageTk.PhotoImage(Image.fromarray(img))
         img_widget.image = i
-        img_widget['image'] = i 
-        
+        img_widget['image'] = i
+
     class Rotation:
         def __init__(self, val):
             tk.Radiobutton(Rotation_frame, text=str(val), command=lambda i=val: choose_rotation(i, test_img, img2),variable=var, value=val).pack()
-    
+
     var=tk.IntVar()
     var.set(0)
     Rotation(0)
@@ -331,7 +328,7 @@ def set_params(parameter):
 #     state[parameter]=state['color']
     for i in state[parameter]:
         state[parameter][i] = state['color'][i].get()
-        
+
 def add_color_sliders(d, frame, command, startrow=1):
     for i, param in enumerate('hsv'):
         row = startrow + 2 * i
@@ -357,7 +354,7 @@ def seeds_tab(img, tweak_frame):
     button_end = tk.Button(tweak_frame, text='Done', command=lambda: tweak_frame.winfo_toplevel().destroy())
     button_b2.grid(column=0, row=row)
     button_end.grid(column=2, row=row)
-    
+
 def colors_tab(img, tweak_frame):
     clear(tweak_frame)
     color(img, None)

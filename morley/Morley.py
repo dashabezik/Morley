@@ -1,12 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # Import
-
-# In[ ]:
-
-
-import imutils
 from imutils import contours
 import scipy
 from scipy.spatial import distance as dist
@@ -17,31 +8,24 @@ from matplotlib import pyplot as plt
 import pandas as pd
 from os import path, listdir
 import os, random
-import time
 import seaborn  as sns
-import gc
-import sys
 import datetime
 import csv
 import math
 from sklearn.linear_model import LinearRegression
 import matplotlib.patches as mpatches
 from collections import defaultdict
-import time
 import tkinter as tk
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import gui
-from PIL import ImageTk, Image
-# path_to_output_dir = ''
+from . import gui
 
 
 
 # # Functions
 
-# If you need files which include russian letters in their names, read images with 
-# 
+# If you need files which include russian letters in their names, read images with
+#
 # cv2.imdecode(np.fromfile('изображение.png', dtype=np.uint8), cv2.IMREAD_UNCHANGED)
-# 
+#
 # Look https://www.cyberforum.ru/python/thread2513567.html
 
 # In[1]:
@@ -54,10 +38,10 @@ def nothing(*arg):
 # ### Rotate img
 
 # Function for picture rotation (clockwise). Arguments:
-# 
+#
 # \- img: picture after cv.imread.
-# 
-# \- rotate: int or str, 90,180 or 270. Default None 
+#
+# \- rotate: int or str, 90,180 or 270. Default None
 
 # In[ ]:
 
@@ -74,23 +58,23 @@ def rotate_pic(img,rotate = None):
 
 # ### Function for histogram plot.
 # Arguments:
-# 
+#
 # \- l_or_r: str, leaves or roots(or plants), is used for plot title
-# 
+#
 # \- color_deff: dict, int or seaborn color palette, is used for coloring plot. If the type is int, meaning the quantity of groups on histogram, then seaborn Set2 will be used
-# 
+#
 # \- df: pandas DataFrame, data for histogram plot
-# 
+#
 # \- columns: dict or list, enumeration of needed columns in dataset. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1', 'M_col2'\], 'Friday':\['F_col1', 'F_col2','F_col3'\]}
-# 
+#
 # \- is_save: bool, True or False, means the necessity of saving the plot
-# 
+#
 # \- figname: str, ends with the needed format (jpg, png). Means the name of the file, if you want it to be saved. It also may contain the path to the needed folder.
-# 
+#
 # \- top_border: int or float. Means the top border of the data. If the data has unreal outliers you can drop it using this threshold. The default value is 300
-# 
+#
 # \- xlabel: str. The default is 'length, mm'
-# 
+#
 # \- param: str. Means the measured parameter (for ex. length, square, width).The default is 'length'
 
 # In[ ]:
@@ -111,7 +95,7 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
     param = ['leaves','roots_max','roots_sum', 'plant_area']
     for tmp in [tmp_l,tmp_r_max, tmp_r_sum, tmp_p]:
         iterator = 0
-        
+
         for g in tmp_l.columns:
             tmp[g] = tmp[tmp[g]>0][g]
             plt.subplot(len(tmp.columns), 4, param_type+4*iterator+1)
@@ -133,7 +117,7 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
 #     plt.show()
     for ax in axes.flat:
         ax.set(xlabel='x-label', ylabel='y-label')
-        
+
     if is_save:
         if figname is None:
             figname = pic_filename('hist','l_rm_rs',path_to_file_folder_fixed)
@@ -146,21 +130,21 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
 
 # ### Shapiro-Wilk test function
 # The function is used for checking the normality for the data. Perform the Shapiro-Wilk test for normality.
-# 
+#
 # The Shapiro-Wilk test tests the null hypothesis that the data was drawn from a normal distribution.
-# 
+#
 # The function builds the table with the test results for two type or data: for leaves and for roots. As a result the function returns 1D Pandas table with the results of the test.
-# 
+#
 # Arguments:
-# 
+#
 # \- df: pandas DataFrame. The data for the test
-# 
-# \- columns_l: dict, enumeration of needed columns in dataset with the data for leaves. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1_leaves', 'M_col2_leaves'\], 'Friday':\['F_col1_leaves', 'F_col2_leaves','F_col3_leaves'\]} 
-# 
-# \- columns_r: dict, enumeration of needed columns in dataset with the data for roots. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1_roots', 'M_col2_roots'\], 'Friday':\['F_col1_roots', 'F_col2_roots','F_col3_roots'\]} 
-# 
+#
+# \- columns_l: dict, enumeration of needed columns in dataset with the data for leaves. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1_leaves', 'M_col2_leaves'\], 'Friday':\['F_col1_leaves', 'F_col2_leaves','F_col3_leaves'\]}
+#
+# \- columns_r: dict, enumeration of needed columns in dataset with the data for roots. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1_roots', 'M_col2_roots'\], 'Friday':\['F_col1_roots', 'F_col2_roots','F_col3_roots'\]}
+#
 # \-is_save: bool, True or False, means the necessity of saving the table
-# 
+#
 # \- figname: str, ends with the needed format (csv). Means the name of the file, if you want it to be saved. It also may contain the path to the needed folder.
 
 # In[ ]:
@@ -181,17 +165,17 @@ def shapiro_test (df, columns_dict):
 
 # ### P-value function
 # The function is used for checking the independence of two groups using T-test building the table for two type of the data: for leaves and for roots. As a result the function returns symetric 2D Pandas table with the results of the test containing 2 blocks (leaves and roots). Each cell is the result of the T-test by comparing groups of the column and of the row.
-# 
+#
 # Arguments:
-# 
+#
 # \- df: pandas DataFrame. The data for the test
-# 
-# \- columns_l: dict, enumeration of needed columns in dataset with the data for leaves. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1_leaves', 'M_col2_leaves'\], 'Friday':\['F_col1_leaves', 'F_col2_leaves','F_col3_leaves'\]} 
-# 
-# \- columns_r: dict, enumeration of needed columns in dataset with the data for roots. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1_roots', 'M_col2_roots'\], 'Friday':\['F_col1_roots', 'F_col2_roots','F_col3_roots'\]} 
-# 
+#
+# \- columns_l: dict, enumeration of needed columns in dataset with the data for leaves. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1_leaves', 'M_col2_leaves'\], 'Friday':\['F_col1_leaves', 'F_col2_leaves','F_col3_leaves'\]}
+#
+# \- columns_r: dict, enumeration of needed columns in dataset with the data for roots. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1_roots', 'M_col2_roots'\], 'Friday':\['F_col1_roots', 'F_col2_roots','F_col3_roots'\]}
+#
 # \-is_save: bool, True or False, means the necessity of saving the table
-# 
+#
 # \- figname: str, ends with the needed format (csv). Means the name of the file, if you want it to be saved. It also may contain the path to the needed folder.
 
 # In[ ]:
@@ -205,7 +189,7 @@ def pvalue_calc(df1,df2,is_norm):
         ret = scipy.stats.ttest_ind(df1,df2)
     if method=='Mann Whitney U-test':
         ret = scipy.stats.mannwhitneyu(df1,df2, use_continuity = False ,alternative = 'two-sided')
-    return ret        
+    return ret
 
 def p_value_function (df, columns, is_norm):
     import scipy.stats as sps
@@ -221,38 +205,38 @@ def p_value_function (df, columns, is_norm):
 
 
 # Информация о пакете Annotator взята из ресурса:
-# 
+#
 # https://levelup.gitconnected.com/statistics-on-seaborn-plots-with-statannotations-2bfce0394c00
 
 # ### Bar-plot function
 # Arguments:
-# 
+#
 # \- l_or_r: str, leaves or roots(or plants), is used for plot title
-# 
+#
 # \- color_deff: dict, int or seaborn color palette, is used for coloring plot. If the type is int, meaning the quantity of groups on histogram, then seaborn Set2 will be used
-# 
+#
 # \- df: pandas DataFrame, data for histogram plot
-# 
+#
 # \- columns: dict or 1d list, enumeration of needed columns in dataset. If it is necessary to merge different columns of df, you can use dict, where keys are test groups and values are columns names of df of test groups subsections. Isf you need the same task you also can use 2D list, but int numbers will be as group numbers. For example: columns = {'Monday': \['M_col1', 'M_col2'\], 'Friday':\['F_col1', 'F_col2','F_col3'\]}. // If you don't need to merge df, you can just use 1d list with group names, for example \['Monday', 'Friday'\]
-# 
+#
 # \- pv_table: pandas DataFrame. P-value data to print them on the plot.
-# 
+#
 # \- control_label: int or str. Name of the control group. This value also should be in columns.keys() (or in 1d list of columns). The type is dependent on the columns.keys()s elements type
-# 
-# \- comparison_points: list of str or int. Names of groups for comparison with the control group. The elements of the list must be in columns.keys() (or in 1d list of columns), and types also should coincide. This parametr is optional, the default is all the groups exept control_label. If you don't need all the groups to be compared, define this parametr. 
-# 
+#
+# \- comparison_points: list of str or int. Names of groups for comparison with the control group. The elements of the list must be in columns.keys() (or in 1d list of columns), and types also should coincide. This parametr is optional, the default is all the groups exept control_label. If you don't need all the groups to be compared, define this parametr.
+#
 # \- is_save: bool, True or False, means the necessity of saving the plot.The default is False.
-# 
+#
 # \- figname: str, ends with the needed format (jpg, png). Means the name of the file, if you want it to be saved. It also may contain the path to the needed folder.
-# 
+#
 # \- union_DF_length: int. Means the length of tmp DataFrame. This tmp DataFrame is needed to merge different collumns of the same group (If you have several photos as a part of the same group, you will have several columns in resulted df). The default value is 130
-# 
+#
 # \- xlabel: str. The default is 'group number'
-# 
+#
 # \- ylabel: str. The default is 'length, mm'
-# 
+#
 # \- param: str. Means the measured parameter (for ex. length, square, width).The default is 'length'
-# 
+#
 
 # In[ ]:
 
@@ -265,39 +249,39 @@ def pic_filename(plot_type, plant_param, path_to_folder):
 def bar_plot_function(l_or_r, color_deff, df, columns, pv_table, path_to_file_folder_fixed, path_to_output_dir,
                       is_save = False, figname=None,  union_DF_length = 500, xlabel = 'group label', ylabel = 'length, mm',
                       param = 'length', auto_or_man = 'automatic',  is_drop_outliers = False):
-    
+
     if type(columns)==dict:
         tmp = pd.DataFrame(columns=list(columns.keys()),index=np.arange(union_DF_length))
         for i in columns.keys():
-            tmp[i] = pd.DataFrame(pd.Series(df[columns[i]].values.reshape(-1)).dropna()) 
+            tmp[i] = pd.DataFrame(pd.Series(df[columns[i]].values.reshape(-1)).dropna())
         group_number_names = list(columns.keys())
     elif type(columns)==list: #### still 1D
         tmp = df
         group_number_names = columns ## если 2D массив, то range где кажд индекс +1 range(1, len(columns)+1)
     if is_drop_outliers:
-        tmp = drop_outliers(tmp, tmp.columns)         
+        tmp = drop_outliers(tmp, tmp.columns)
     c = sns.color_palette("Set2")
-        
+
 
     matplotlib.rcParams.update({'font.size': 20})
     fig, axes = plt.subplots(1, 2, figsize=(10, 5))
     fig.suptitle(r'{0}'.format(l_or_r))
-    
-          
+
+
     a = sns.barplot(ax = axes[0], data=tmp[group_number_names], palette=c)
     plt.xlabel(xlabel, fontsize = 20)
     plt.ylabel(ylabel, fontsize = 20)
-    
+
     for ax in axes.flat:
         ax.set( ylabel=ylabel)
-    
+
     whiskers = defaultdict(type(group_number_names[0]))
     i=0
     for j in group_number_names:
         whiskers[j] = ((a.get_lines()[i].get_data()[1][1]-a.get_lines()[i].get_data()[1][0])/2)
         i+=1
-    
-    matplotlib.rcParams.update({'font.size': 20}) 
+
+    matplotlib.rcParams.update({'font.size': 20})
 
     for i in range(0,pv_table.shape[1]):
         for j in range(0,pv_table.shape[1]):
@@ -307,7 +291,7 @@ def bar_plot_function(l_or_r, color_deff, df, columns, pv_table, path_to_file_fo
                 pv_table[pv_table.columns[i]].loc[pv_table.columns[j]] = 1
             if pv_table[pv_table.columns[i]].loc[pv_table.columns[j]]<0.05:
                 pv_table[pv_table.columns[i]].loc[pv_table.columns[j]] = 0.00003
-                
+
     f=np.array(pv_table, dtype='float64')
     a = [[0.247, 0.41176, 0.349],[0.624, 0.8967, 0.81] ]
     sns.heatmap(f, xticklabels=pv_table.columns, yticklabels=pv_table.columns, cbar=False, cmap = a, ax = axes[1])
@@ -321,21 +305,21 @@ def bar_plot_function(l_or_r, color_deff, df, columns, pv_table, path_to_file_fo
 #             report_area.insert(tk.END, path.join(path_to_output_dir,figname)+'\n')
         plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
 #     plt.show()
-    
+
     return tmp, whiskers
 
 
 # ### Seed germination counter
-# 
+#
 # Function for counting the rate of non germinated seeds in all groups. The default value to consider the seed as nongerminated is 10 mm. If any root of leave has appropriate length, the seed is considered germinated (look at the table).
-# 
-# 
+#
+#
 # | l  r || l  r || l  r || l  r || l  r |
 # |   --- || --- ||  --- ||   --- ||   --- |
 # | 16   0 || 9  9 || 9  50 || 16  50 ||  0 5 |
 # |   V || X ||  V ||   V ||   X |
-# 
-# 
+#
+#
 
 # In[ ]:
 
@@ -348,11 +332,11 @@ def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_di
         full_number = (np.array((r>=0))*np.array((l>=0))).sum()
         if full_number:
             non_germinated_table[i].loc[0] = 1-(np.array((r<threshold))*np.array((l<threshold))).sum()/full_number
-   
+
     fig = plt.figure()
-    ax = fig.add_subplot(111)    
+    ax = fig.add_subplot(111)
     plt.xlabel('group label', fontsize = 20)
-    plt.ylabel('distribution density', fontsize = 20)    
+    plt.ylabel('distribution density', fontsize = 20)
     sns.barplot(x=non_germinated_table.columns, y = non_germinated_table.values[0],
                 palette=sns.color_palette("Set2"))
     plt.title('Germination efficiency', fontsize=20)
@@ -365,7 +349,7 @@ def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_di
     return non_germinated_table
 
 # ### Length calculating
-# 
+#
 # The function calculates the plant part length by its width, square and pixel_per_metric coefficient. If the width is zero, functon returns length value as 0.
 
 # In[ ]:
@@ -399,7 +383,7 @@ def folders_list_function(path_to_file_folder):
 
 
 # ### files_dicts
-# 
+#
 # The function builds dicts with names of the columns in df, based on photos filenames. The main feachure is that all the columns names are merged by test groups names. Keys are the test groups names. Returns leaves_dict, roots_dict, roots_area_dict, plant_area_dict -- dicts with columns related to a specific test group.
 
 # In[ ]:
@@ -407,7 +391,7 @@ def folders_list_function(path_to_file_folder):
 
 def files_dicts(path_to_file_folder_fixed):
     plant_parameters = ['roots_sum','roots_max','plant_area','leaves']
-    
+
     folders_list = folders_list_function(path_to_file_folder_fixed)
 
     leaves_dict = dict()
@@ -428,7 +412,7 @@ def files_dicts(path_to_file_folder_fixed):
 
     roots_dict = dict()
     for i in folders_list:
-        roots_dict[i] = []   
+        roots_dict[i] = []
 
     for g in folders_list:
     #     pic_num=0
@@ -444,7 +428,7 @@ def files_dicts(path_to_file_folder_fixed):
 
     roots_max_dict = dict()
     for i in folders_list:
-        roots_max_dict[i] = [] 
+        roots_max_dict[i] = []
 
     for g in folders_list:
         path_to_file_folder = path_to_file_folder_fixed
@@ -456,7 +440,7 @@ def files_dicts(path_to_file_folder_fixed):
 
     plant_area_dict = dict()
     for i in folders_list:
-        plant_area_dict[i] = [] 
+        plant_area_dict[i] = []
 
     for g in folders_list:
         path_to_file_folder = path_to_file_folder_fixed
@@ -465,17 +449,17 @@ def files_dicts(path_to_file_folder_fixed):
             if filename_in_folder!='.ipynb_checkpoints':
                 file_name = path.join(path_to_file_folder, filename_in_folder)
                 plant_area_dict[g].append('plant_area_'+file_name)
-                
+
     dicts = {'roots_sum':roots_dict,
              'roots_max':roots_max_dict,
              'plant_area': plant_area_dict,
              'leaves':leaves_dict}
-    
+
     return dicts
 
 
 # ### Drop outliers
-# 
+#
 # Function drops values lying lower or upper than 25 or 75 quartille.
 
 
@@ -486,7 +470,7 @@ def drop_outliers(df, columns):
 
         max = q75+(1.5*intr_qr)
         min = q25-(1.5*intr_qr)
-        
+
         df.loc[df[x] < min,x] = np.nan
         df.loc[df[x] > max,x] = np.nan
     return df
@@ -536,7 +520,7 @@ def linear_approx(x,y):
 
 # ### Color range counter
 
-# Функция считает, сколько пикселей на картинке лежит в данном цветовом диапазоне внутри каждого контура. На выходе дает массивразмером совпадающим с 
+# Функция считает, сколько пикселей на картинке лежит в данном цветовом диапазоне внутри каждого контура. На выходе дает массивразмером совпадающим с
 
 # In[ ]:
 
@@ -577,9 +561,9 @@ def find_paper (report_area,src, template_size, square_threshold, position_x_axe
     contours0 = cv.findContours(closed.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[0]
     # contours0 = contours0[0] if imutils.is_cv2() else contours0[1]
     (contours0, _) = contours.sort_contours(contours0)
-    
 
-    
+
+
     for cont in contours0:
 #         cv.drawContours(src,[cont],0,(0,255,0),-2)
         center, radius = cv.minEnclosingCircle(cont)
@@ -603,14 +587,14 @@ def find_paper (report_area,src, template_size, square_threshold, position_x_axe
                 (trbrX, trbrY) = midpoint(tr, br)
                 dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
                 dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
-    #             if (dB/template_size > (square_threshold/)):                
+    #             if (dB/template_size > (square_threshold/)):
                 pixelsPerMetric = math.sqrt(cv.contourArea(cont)/(template_size))
                 ppm.append(pixelsPerMetric)
             else:
                 pixelsPerMetric = ppm[-1]
 
-            
-            
+
+
 
             rect = cv.minAreaRect(apd)
             box = cv.boxPoints(rect) # поиск четырех вершин прямоугольника
@@ -664,7 +648,7 @@ def add_annotation(name, text):
         f.write(text)
         f.write(content)
         writer = csv.writer(f)
-    
+
 
 
 def midpoint(ptA, ptB):
@@ -690,7 +674,7 @@ def get_state_values(param):
 
 def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
     Progress_bar_value = 0
-    
+
     gui.state['paper_area'] = int(paper_size.get())
     gui.state['germ_thresh'] = int(germ_thresh.get())
     ppm = [7.45]
@@ -711,18 +695,18 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
     report_area.insert(tk.END, 'Contour search parameters'+str(get_state_values('settings'))+'\n')
     report_area.insert(tk.END, 'Roots color, hsv parameters'+str(get_state_values('roots'))+'\n')
     report_area.insert(tk.END, 'Leaves color, hsv parameters'+str(get_state_values('leaves'))+'\n')
-    
+
     ###SEARCH###
     report_area.insert(tk.END, 'SEARCH \n')
-    
+
     print(path_to_output_dir)
-    
+
     measure_full2 = pd.DataFrame(columns=[],index=np.arange(30))
     # ppm - pixel per metric, массив с коэфам пересчета пикселя в мм, на случай плохого поиска стикера на фото
 
     folders_list = folders_list_function(path_to_file_folder_fixed)
     FL = len(folders_list)
-    
+
     for g in folders_list:
         path_to_file_folder = path.join(path_to_file_folder_fixed, str(g)+'/')
         PL = len(listdir(path_to_file_folder))
@@ -740,7 +724,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
 
             file_name = path.join(path_to_file_folder, filename_in_folder)
 
-            ### Plant contour ####       
+            ### Plant contour ####
 
             src = cv.imread(file_name)
             src = rotate_pic(src, rotate)
@@ -770,11 +754,11 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
             quantity_of_plants = len(real_conts)
             report_area.insert(tk.END, 'Quantity of plants '+str(quantity_of_plants)+'\n')
             report_area.insert(tk.END, 'Pixels per metric '+str(pixelsPerMetric)+'\n')
-            
+
             ### SEEDS ###
             report_area.insert(tk.END, '...LOOKING FOR SEEDS POSITION... \n')
             report_area.update()
-            
+
             img2 = cv.imread(file_name,0)
             img2 = rotate_pic(img2, rotate)
             template = cv.imread(template_filename,0)
@@ -817,7 +801,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
             ### COLOR ###
             report_area.insert(tk.END, '...MAKING COLOR... \n')
             report_area.update()
-            
+
             overlay = src.copy()
             cv.drawContours(overlay, [pts_leaves], -1,(0,224,79), -1)
             opacity = 0.25
@@ -834,7 +818,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
             ## WIDTH ###
             report_area.insert(tk.END, '...WIDTH CALCULATION... \n')
             report_area.update()
-            
+
             measure = pd.DataFrame(columns=['roots_area_{0}'.format(file_name), 'leaves_area_{0}'.format(file_name),
                                             'roots_length_{0}'.format(file_name), 'leaves_length_{0}'.format(file_name),
                                             'roots_width_{0}'.format(file_name), 'leaves_width_{0}'.format(file_name),
@@ -859,7 +843,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
                 bottom = tuple(c[c[:, :, 1].argmax()][0])
                 cv.line(img_hsv, left, right, (255, 255, 255), thickness=2)
                 step = (right[0]-mean_right_x)//3
-                if (mean_right_x-left[0])//3!=0:                
+                if (mean_right_x-left[0])//3!=0:
                     for y in range(left[0],mean_left_x,(mean_right_x-left[0])//3):
                         is_first = True
                         for x in range(top[1],bottom[1]):#иттерация по вертикали, т к img.shape => (height, width), но компонента контура (х,у)
@@ -874,19 +858,19 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
                             else:
                                 is_first = True
                 else:
-                    leaves_width = 0 
+                    leaves_width = 0
 
-    # r_max_amaunt - счетчик для максимальной длины корня, ramount - для суммарной длины                
+    # r_max_amaunt - счетчик для максимальной длины корня, ramount - для суммарной длины
 
                 if step!=0:
-                    
-                    for y in range(mean_right_x, right[0],step):#идем по ввертикальным линиям   
+
+                    for y in range(mean_right_x, right[0],step):#идем по ввертикальным линиям
                         is_first_r = True
                         is_first_r_max = True
                         for x in range(top[1],bottom[1]):#иттерация по вертикали, т к img.shape => (height, width), но компонента контура (х,у)
                             h, s, v = img_hsv[x, y]
                             if (cv.pointPolygonTest(real_conts[i],(x,y), False)):# если точка внутри контура
-                                if (v>vrb)&((h>hrb)&(h<hrt)):# если эта точка = корень, а не фон 
+                                if (v>vrb)&((h>hrb)&(h<hrt)):# если эта точка = корень, а не фон
                                     ramount = ramount + 1*is_first_r#если это первое вхождение корня, то число корней+=1
                                     r_max_amount=r_max_amount+1*is_first_r_max
                                     is_first_r_max = False
@@ -898,7 +882,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
                                 is_first_r = True#если это не в контуре, то вхождения точно нет
                 if (lamount == 0.0)|(lamount == 0):
                     leaves_width = 0
-                else: 
+                else:
                     leaves_width = leaves/lamount
 
                 if (ramount == 0.0)|(ramount == 0)|(step == 0):
@@ -914,8 +898,8 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
 
             ### PIXEL COUNTING ###
             report_area.insert(tk.END, '...PIXEL COUNTING... \n', '\n')
-            report_area.update() 
-            
+            report_area.update()
+
             for i in range(len(real_conts)):
                 c = real_conts[i]
                 measure.iloc[i]['plant_area_{0}'.format(file_name)] = cv.contourArea(c)
@@ -925,8 +909,8 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
             measure['seed_area_{0}'.format(file_name)] =color_range_counter(src_black_seeds, real_conts, 0,1,0,1,0,1)
             measure['plant_area_{0}'.format(file_name)] = measure['plant_area_{0}'.format(file_name)]-measure['seed_area_{0}'.format(file_name)]
             measure['plant_area_{0}'.format(file_name)] = measure.apply(lambda x: x['plant_area_{0}'.format(file_name)]/(pixelsPerMetric*pixelsPerMetric), axis = 1 )
-            measure['roots_length_{0}'.format(file_name)] = measure['roots_area_{0}'.format(file_name)] 
-            measure['leaves_length_{0}'.format(file_name)] = measure['leaves_area_{0}'.format(file_name)] 
+            measure['roots_length_{0}'.format(file_name)] = measure['roots_area_{0}'.format(file_name)]
+            measure['leaves_length_{0}'.format(file_name)] = measure['leaves_area_{0}'.format(file_name)]
 
             measure['roots_length_{0}'.format(file_name)] = measure.apply(lambda x: length(x['roots_width_{0}'.format(file_name)],x['roots_area_{0}'.format(file_name)],pixelsPerMetric), axis = 1 )
             measure['roots_max_length_{0}'.format(file_name)] = measure.apply(lambda x: length(x['roots_max_width_{0}'.format(file_name)],x['roots_area_{0}'.format(file_name)],pixelsPerMetric), axis = 1 )
@@ -936,15 +920,15 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
             plt.figure(figsize = (14,14))
 #             plt.imshow(src)
 #             plt.show()
-            
-            
+
+
             files_frame.update_idletasks()
             files_frame.update()
 
     del res,bl,overlay, img, img2, img_hsv, gr, canny, src, closed, src_black_seeds
-    
+
 #     measure_full2.to_csv(path.join(path_to_output_dir,'measure.csv'))
-    
+
     dicts = files_dicts(path_to_file_folder_fixed)
     roots_sum_dict, roots_max_dict, plant_area_dict, leaves_dict = dicts.values()
     seed_germ = seed_germination(measure_full2, roots_max_dict.keys(), path_to_file_folder_fixed = path_to_file_folder_fixed,
@@ -959,7 +943,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
         test_type = 'test_type = '+str(is_norm*'Unpaired T-test'+is_not_norm*'Mann Whitney U-test')+'\n' +'\n'
 
         p_value_dict[i] = (p_value_function(measure_full2, dicts[i],is_norm),test_type)
-        
+
     whiskers_dict = {'roots_sum': {},
                    'roots_max': {},
                    'plant_area': {},
@@ -975,12 +959,12 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
         result_dict[i], whiskers_dict[i] = bar_plot_function(i, 5, measure_full2, dicts[i], p_value_dict[i][0], ylabel=ylabel,
                                   path_to_file_folder_fixed = path_to_file_folder_fixed, path_to_output_dir = path_to_output_dir,
                                                              is_save= True, union_DF_length=250)
-    
+
     hist(result_dict['leaves'],result_dict['roots_max'], result_dict['roots_sum'],result_dict['plant_area'],
      whiskers_dict, path_to_file_folder_fixed = path_to_file_folder_fixed, path_to_output_dir = path_to_output_dir, is_save = True)
-    
+
     report_information = ('Date and time: ' + str(datetime.datetime.now())+'\n'+
-                      'Program settings and initial information: \n'+ 
+                      'Program settings and initial information: \n'+
                       'path_to_file_folder_fixed = '+ str(path_to_file_folder_fixed)+'\n'+
                       'paper_area = '+str(paper_area)+'mm2; paper_area_thresold = '+str(paper_area_thresold)+'pixels \n'+
                       'paper threshold position = photo width/x_pos_divider = img.shape[0]/'+str(x_pos_divider)+'\n'+
@@ -1016,7 +1000,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
     seed_germ_filename = str(path.basename(path.normpath(path_to_file_folder_fixed)))+'_seed_germ_'+str(datetime.datetime.now().date())+'.csv'
     seed_germ.to_csv(path.join(path_to_output_dir,seed_germ_filename))
     add_annotation(path.join(path_to_output_dir,seed_germ_filename), report_information)
-    
+
     pb.configure(value = 100)
     pb_lbl['text'] = '100%'
     pb_lbl.update()
@@ -1026,14 +1010,3 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
     report_area.update()
     files_frame.update_idletasks()
     files_frame.update()
-
-    
-    
-    
-
-    
-    
-    
-    
-
-
