@@ -104,6 +104,7 @@ def random_file(path_to_file_folder):
     path_to_file = os.path.join(path_to_file, b)
     return path_to_file
 
+
 def set_state_variables(d):
     for k, v in d.items():
         if isinstance(v, dict):
@@ -146,14 +147,6 @@ def get_out_dirname(label):
         state['paths']['out_dir'] = fname
         label['text'] = f'Output directory: {os.path.basename(fname)}.'
 
-def rotate_pic(img,rotate = None):
-    rotate_dict = {90:cv.ROTATE_90_CLOCKWISE,
-              180:cv.ROTATE_180,
-              270:cv.ROTATE_90_COUNTERCLOCKWISE}
-    if rotate!=None:
-        if int(rotate)!=0:
-            img = cv.rotate(img, rotate_dict[int(rotate)])
-    return img
 
 def blur(img_widget, event):
     morph = state['settings']['morph'].get()
@@ -260,64 +253,81 @@ def seed(img_widget, event):
     img_widget.image = obj_color
     img_widget['image'] = obj_color
 
+
+def rotate_pic(img, rotate=None):
+    if rotate is None:
+        return img
+    rotate = int(rotate)
+    if not rotate:
+        return img
+    rotate_dict = {
+        90: cv.ROTATE_90_CLOCKWISE,
+        180: cv.ROTATE_180,
+        270: cv.ROTATE_90_COUNTERCLOCKWISE}
+    img = cv.rotate(img, rotate_dict[rotate])
+    return imutils.resize(img, height=300)
+
+
+def choose_rotation(angle, img, img_widget):
+    img = rotate_pic(img, angle)
+    # print('angle =', angle )
+    i = ImageTk.PhotoImage(Image.fromarray(img))
+    img_widget.image = i
+    img_widget['image'] = i
+    state['rotation'] = angle
+
+
 def rotation(w):
     window = tk.Toplevel(w)
     window.title('Rotate image')
-    window.geometry('600x600')
-    Rotation_frame = tk.Frame(master=window)
+    window.geometry('600x400')
+    control_frame = tk.Frame(master=window)
 
-    text_lbl = tk.Label(Rotation_frame, text = 'Choose the angle to rotate your photos, as in the example')
-    text_lbl.pack()
+    text_lbl = tk.Label(control_frame, text='Choose the angle to rotate your photos, as in the example')
     img_frame = tk.Frame(master=window)
-    img1 = tk.Label(master=img_frame)
-    img1.pack(fill=tk.BOTH, expand=True)
+
     path_to_ethalon = os.path.dirname(os.path.abspath(__file__))
     ethalon = cv.imread(os.path.join(path_to_ethalon, 'ethalon.png'))
     ethalon = cv.cvtColor(ethalon, cv.COLOR_BGR2RGB)
     ethalon = ethalon.astype('uint8')
-    ethalon = imutils.resize(ethalon, height=200)
+    ethalon = imutils.resize(ethalon, height=300)
     obj = ImageTk.PhotoImage(Image.fromarray(ethalon))
-    img1.image = obj
-    img1['image'] = obj
 
-    img2 = tk.Label(master=img_frame)
     test_img = cv.imread(random_file(state['paths']['input']))
     test_img = cv.cvtColor(test_img, cv.COLOR_BGR2RGB)
     test_img = test_img.astype('uint8')
-    test_img = imutils.resize(test_img, height=200)
+    test_img = imutils.resize(test_img, height=300)
     obj2 = ImageTk.PhotoImage(Image.fromarray(test_img))
+
+    maxsize = max(test_img.shape[:2])
+    window.geometry(f'{maxsize * 2}x{maxsize + 100}')
+
+    img1 = tk.Label(master=img_frame, width=maxsize, height=maxsize)
+    img1.image = obj
+    img1['image'] = obj
+
+    img2 = tk.Label(master=img_frame, width=maxsize, height=maxsize)
     img2.image = obj2
     img2['image'] = obj2
-    img_frame.pack()
+    choose_rotation(state['rotation'], test_img, img2)
 
-    img2.pack(fill=tk.BOTH, expand=True)
+    buttons = []
+    for i, val in enumerate([0, 90, 180, 270]):
+        buttons.append(tk.Radiobutton(control_frame, text=str(val), command=partial(
+            choose_rotation, val, test_img, img2), variable=state['rotation'], value=val))
 
-    def choose_rotation(angle, img, img_widget):
-        img = rotate_pic(img, angle)
-        print('angle =', angle )
-        i = ImageTk.PhotoImage(Image.fromarray(img))
-        img_widget.image = i
-        img_widget['image'] = i
+    set_button = tk.Button(window, text='Save', command=window.destroy)
+    img_frame.grid(column=0, row=0, sticky=tk.W + tk.E)
+    control_frame.grid(column=0, row=1)
 
-    class Rotation:
-        def __init__(self, val):
-            tk.Radiobutton(Rotation_frame, text=str(val), command=lambda i=val: choose_rotation(i, test_img, img2),variable=var, value=val).pack()
+    img1.grid(column=0, row=0)
+    img2.grid(column=1, row=0)
 
-    var=tk.IntVar()
-    var.set(0)
-    Rotation(0)
-    Rotation(90)
-    Rotation(180)
-    Rotation(270)
-    def get_val():
-        state['rotation'] = var.get()
-        Rotation_frame.winfo_toplevel().destroy()
-
-    b = tk.Button(window, text ='Set Value', command = partial(get_val))
-    b.pack()
-    Rotation_frame.pack()
-    state['rotation'] = var.get()
-    print(state['rotation'])
+    text_lbl.grid(column=0, row=0, columnspan=4)
+    for i, b in enumerate(buttons):
+        b.grid(column=i, row=1)
+    set_button.grid(column=0, row=2, columnspan=4)
+    window.columnconfigure(0, weight=1)
 
 
 def clear(w): # clear all the wigets
@@ -328,6 +338,7 @@ def set_params(parameter):
 #     state[parameter]=state['color']
     for i in state[parameter]:
         state[parameter][i] = state['color'][i].get()
+
 
 def add_color_sliders(d, frame, command, startrow=1):
     for i, param in enumerate('hsv'):
@@ -354,6 +365,7 @@ def seeds_tab(img, tweak_frame):
     button_end = tk.Button(tweak_frame, text='Done', command=lambda: tweak_frame.winfo_toplevel().destroy())
     button_b2.grid(column=0, row=row)
     button_end.grid(column=2, row=row)
+
 
 def colors_tab(img, tweak_frame):
     clear(tweak_frame)
