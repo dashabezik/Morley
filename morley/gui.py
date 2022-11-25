@@ -109,7 +109,7 @@ def set_state_variables(d):
     for k, v in d.items():
         if isinstance(v, dict):
             set_state_variables(v)
-        if isinstance(v, float):
+        if isinstance(v, (int, float)):
             d[k] = tk.IntVar(value=v)
         # if isinstance(v, str):
         #     d[k] = tk.StringVar(value=v)
@@ -257,7 +257,10 @@ def seed(img_widget, event):
 def rotate_pic(img, rotate=None):
     if rotate is None:
         return img
-    rotate = int(rotate)
+    try:
+        rotate = int(rotate)
+    except TypeError:
+        rotate = rotate.get()
     if not rotate:
         return img
     rotate_dict = {
@@ -270,11 +273,9 @@ def rotate_pic(img, rotate=None):
 
 def choose_rotation(angle, img, img_widget):
     img = rotate_pic(img, angle)
-    # print('angle =', angle )
     i = ImageTk.PhotoImage(Image.fromarray(img))
     img_widget.image = i
     img_widget['image'] = i
-    state['rotation'] = angle
 
 
 def rotation(w):
@@ -311,17 +312,12 @@ def rotation(w):
     img2['image'] = obj2
     choose_rotation(state['rotation'], test_img, img2)
 
-    var=tk.IntVar()
-    var.set(0)
-    def get_val():
-        state['rotation'] = var.get()
-        Rotation_frame.winfo_toplevel().destroy()
     buttons = []
     for i, val in enumerate([0, 90, 180, 270]):
         buttons.append(tk.Radiobutton(control_frame, text=str(val), command=lambda j=val: choose_rotation(j, test_img, img2),
-                                      variable=var, value=val))
+                                      variable=state['rotation'], value=val))
 
-    set_button = tk.Button(window, text='Save', command=partial(get_val))
+    set_button = tk.Button(window, text='Save', command=window.destroy)
     img_frame.grid(column=0, row=0, sticky=tk.W + tk.E)
     control_frame.grid(column=0, row=1)
 
