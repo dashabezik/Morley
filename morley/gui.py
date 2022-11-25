@@ -311,12 +311,17 @@ def rotation(w):
     img2['image'] = obj2
     choose_rotation(state['rotation'], test_img, img2)
 
+    var=tk.IntVar()
+    var.set(0)
+    def get_val():
+        state['rotation'] = var.get()
+        Rotation_frame.winfo_toplevel().destroy()
     buttons = []
     for i, val in enumerate([0, 90, 180, 270]):
-        buttons.append(tk.Radiobutton(control_frame, text=str(val), command=partial(
-            choose_rotation, val, test_img, img2), variable=state['rotation'], value=val))
+        buttons.append(tk.Radiobutton(control_frame, text=str(val), command=choose_rotation(val, test_img, img2),
+                                      variable=var, value=val))
 
-    set_button = tk.Button(window, text='Save', command=window.destroy)
+    set_button = tk.Button(window, text='Save', command=partial(get_val))
     img_frame.grid(column=0, row=0, sticky=tk.W + tk.E)
     control_frame.grid(column=0, row=1)
 
