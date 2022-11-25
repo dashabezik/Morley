@@ -318,7 +318,7 @@ def rotation(w):
         Rotation_frame.winfo_toplevel().destroy()
     buttons = []
     for i, val in enumerate([0, 90, 180, 270]):
-        buttons.append(tk.Radiobutton(control_frame, text=str(val), command=choose_rotation(val, test_img, img2),
+        buttons.append(tk.Radiobutton(control_frame, text=str(val), command=lambda j=val: choose_rotation(j, test_img, img2),
                                       variable=var, value=val))
 
     set_button = tk.Button(window, text='Save', command=partial(get_val))
