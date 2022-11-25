@@ -37,11 +37,11 @@ def main():
     get_out_dir_btn = tk.Button(master=main_frame, text="Select output directory",
         command=partial(gui.get_out_dirname, out_dir_lbl), width=20)
 
-    tweak_file_lbl = tk.Label(master=main_frame, text="Tweaking image", justify='left')
-    tweak_file_btn = tk.Button(master=main_frame, text="Tweak image", command=partial(gui.tweak_image, window), width=20)
+    tweak_lbl = tk.Label(master=main_frame, text="Tweaking image", justify='left')
+    tweak_btn = tk.Button(master=main_frame, text="Tweak image", command=partial(gui.tweak_image, window), width=20)
 
-    rotation_file_lbl = tk.Label(master=main_frame, text="Rotating image" , justify='left')
-    rotation_file_btn = tk.Button(master=main_frame, text="Rotate image", command=partial(gui.rotation, window), width=20)
+    rotation_lbl = tk.Label(master=main_frame, text="Rotating image" , justify='left')
+    rotation_btn = tk.Button(master=main_frame, text="Rotate image", command=partial(gui.rotation, window), width=20)
 
     paper_size = tk.Entry(master=main_frame, text="Paper size, mm^2", width=20)
     paper_size_lbl = tk.Label(master=main_frame, text="Paper size, mm^2", width=20)
@@ -57,10 +57,16 @@ def main():
     pb = ttk.Progressbar(main_frame, orient=tk.HORIZONTAL, mode='determinate', length=100)
     pb_lbl = tk.Label(main_frame, text='0%')
 
-    run_file_btn = tk.Button(master=main_frame, text="RUN", command=partial(
+    run_btn = tk.Button(master=main_frame, text="RUN", command=partial(
         Morley.search, main_frame, report_area, pb, pb_lbl, paper_size, germ_threshold), width=20)
 
-    # main_frame.grid(column=0, row=0, columnspan=3, rowspan=11)
+    gui.conditions.register({
+        'rotate': [rotation_btn],
+        'run': [run_btn],
+        'tweak': [tweak_btn]
+        })
+
+
     main_frame.grid(sticky=tk.N+tk.E+tk.S+tk.W)
     get_raw_dir_btn.grid(column=0, row=0)
     raw_dir_lbl.grid(column=1, row=0)
@@ -71,18 +77,18 @@ def main():
     get_out_dir_btn.grid(column=0, row=2)
     out_dir_lbl.grid(column=1, row=2)
 
-    rotation_file_btn.grid(column=0, row=5)
-    rotation_file_lbl.grid(column=1, row=5)
+    rotation_btn.grid(column=0, row=5)
+    rotation_lbl.grid(column=1, row=5)
 
-    tweak_file_btn.grid(column=0, row=6)
-    tweak_file_lbl.grid(column=1, row=6)
+    tweak_btn.grid(column=0, row=6)
+    tweak_lbl.grid(column=1, row=6)
 
     paper_size_lbl.grid(column=1, row=7)
     paper_size.grid(column=0, row=7)
 
     germ_threshold_lbl.grid(column=1, row=8)
     germ_threshold.grid(column=0, row=8)
-    run_file_btn.grid(column=1, row=9)
+    run_btn.grid(column=1, row=9)
 
     report_area.grid(column=2, row=0, rowspan=9)
     pb.grid(column=2, row=10)

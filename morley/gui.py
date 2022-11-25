@@ -60,6 +60,44 @@ state = {
 CONTOUR_AREA_THRESHOLD = 1000
 FORMAT='{:.0f}'
 
+class ConditionManager:
+    CONDITIONS = {
+        'rotate': ['input'],
+        'tweak': ['input', 'template'],
+        'run': ['input', 'template']
+    }
+    def __init__(self):
+        self.satisfied = set()
+
+    def register(self, widgets):
+        self.widgets = widgets
+        for k, w in widgets.items():
+            if k in self.CONDITIONS:
+                for widget in w:
+                    widget['state'] = tk.DISABLED
+
+    def satisfies(self, condition):
+        """Decorator that makes a function call satisfy the corresponding condition.
+        Changes the status of widgets after a successful call."""
+        def decorator(func):
+            def wrapped(*args, **kwargs):
+                ret = func(*args, **kwargs)
+                if ret is not None:
+                    self.satisfied.add(condition)
+                    self.update_conditions()
+                return ret
+            return wrapped
+        return decorator
+
+    def update_conditions(self):
+        for key, v in self.CONDITIONS.items():
+            if all(w in self.satisfied for w in v) and key in self.widgets:
+                for w in self.widgets[key]:
+                    w['state'] = tk.NORMAL
+
+
+conditions = ConditionManager()
+
 
 class FormatLabel(tk.Label):
 
@@ -115,14 +153,17 @@ def set_state_variables(d):
         #     d[k] = tk.StringVar(value=v)
 
 
+@conditions.satisfies('input')
 def get_image_dirname(label):
     fname = askdirectory(title='Raw image directory')
 
     if fname:
         state['paths']['input'] = fname
         label['text'] = f'Selected image directory: {os.path.basename(fname)}.'
+    return fname
 
 
+@conditions.satisfies('template')
 def get_template_file(label):
     fname = askopenfilename(title='Seed template file')
 
@@ -130,14 +171,7 @@ def get_template_file(label):
         state['paths']['template_file'] = fname
         state['template'] = cv.imread(fname, 0)
         label['text'] = f'Selected seed template: {os.path.basename(fname)}.'
-
-
-def get_file(label):
-    fname = askopenfilename(title='Img file')
-
-    if fname:
-        state['fname'] = fname
-        label['text'] = f'Selected img file: {os.path.basename(fname)}.'
+    return fname
 
 
 def get_out_dirname(label):
@@ -146,6 +180,7 @@ def get_out_dirname(label):
     if fname:
         state['paths']['out_dir'] = fname
         label['text'] = f'Output directory: {os.path.basename(fname)}.'
+    return fname
 
 
 def blur(img_widget, event):
