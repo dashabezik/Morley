@@ -43,10 +43,10 @@ def main():
     rotation_lbl = tk.Label(master=main_frame, text="Rotating image" , justify='left')
     rotation_btn = tk.Button(master=main_frame, text="Rotate image", command=partial(gui.rotation, window), width=20)
 
-    paper_size = tk.Entry(master=main_frame, text="Paper size, mm^2", width=20)
+    paper_size = tk.Entry(master=main_frame, width=20, textvariable=gui.state['paper_area'])
     paper_size_lbl = tk.Label(master=main_frame, text="Paper size, mm^2", width=20)
 
-    germ_threshold = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20)
+    germ_threshold = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20, textvariable=gui.state['germ_thresh'])
     germ_threshold_lbl = tk.Label(master=main_frame, text="Germination threshold, mm", width=28)
 
     report_area = st.ScrolledText(main_frame, width=40, height=20)
@@ -58,14 +58,16 @@ def main():
     pb_lbl = tk.Label(main_frame, text='0%')
 
     run_btn = tk.Button(master=main_frame, text="RUN", command=partial(
-        Morley.search, main_frame, report_area, pb, pb_lbl, paper_size, germ_threshold), width=20)
+        Morley.search, main_frame, report_area, pb, pb_lbl), width=20)
 
     gui.conditions.register({
         'rotate': [rotation_btn],
         'run': [run_btn],
         'tweak': [tweak_btn]
         })
-
+    for name in ['germ_thresh', 'paper_area']:
+        gui.state[name].trace('w', gui.trace_entry(name))
+        gui.state[name].set(gui.state[name].get())  # trigger trace functions
 
     main_frame.grid(sticky=tk.N+tk.E+tk.S+tk.W)
     get_raw_dir_btn.grid(column=0, row=0)

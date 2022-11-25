@@ -46,15 +46,6 @@ def nothing(*arg):
 # In[ ]:
 
 
-def rotate_pic(img,rotate = None):
-    rotate_dict = {90:cv.ROTATE_90_CLOCKWISE,
-              180:cv.ROTATE_180,
-              270:cv.ROTATE_90_COUNTERCLOCKWISE}
-    if rotate!=None:
-        if (int(rotate)!=0)&(int(rotate)!=1):
-            img = cv.rotate(img, rotate_dict[int(rotate)])
-    return img
-
 
 # ### Function for histogram plot.
 # Arguments:
@@ -78,12 +69,6 @@ def rotate_pic(img,rotate = None):
 # \- param: str. Means the measured parameter (for ex. length, square, width).The default is 'length'
 
 # In[ ]:
-
-
-def pic_filename(plot_type, plant_param, path_to_folder):
-    report_filename = (str(path.basename(path.normpath(path_to_folder)))+'_'+str(plant_param)+'_'+plot_type+
-                             '_'+str(datetime.datetime.now().date())+'.jpg')
-    return report_filename
 
 def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fixed,path_to_output_dir, is_save = False, figname=None):
     fig, axes = plt.subplots(len(tmp_l.columns), 4, figsize=(35, 8*len(tmp_l.columns)))
@@ -551,17 +536,16 @@ def color_range_counter(src, contours, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255)
 
 # ### Find_paper
 
-def find_paper (report_area,src, template_size, square_threshold, position_x_axes, canny_top = 100, canny_bottom = 10, morph = 7, gauss = 3):
+def find_paper(report_area, src, template_size, square_threshold, position_x_axes, canny_top=100, canny_bottom=10, morph=7, gauss=3):
     ppm = [7.45]
     gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-    bl=cv.GaussianBlur(src,(gauss,gauss),0)
+    bl = cv.GaussianBlur(src, (gauss,gauss), 0)
     canny = cv.Canny(bl, canny_bottom, canny_top)
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (int(morph), int(morph)))
     closed = cv.morphologyEx(canny, cv.MORPH_CLOSE, kernel)
     contours0 = cv.findContours(closed.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[0]
     # contours0 = contours0[0] if imutils.is_cv2() else contours0[1]
     (contours0, _) = contours.sort_contours(contours0)
-
 
 
     for cont in contours0:
@@ -593,18 +577,13 @@ def find_paper (report_area,src, template_size, square_threshold, position_x_axe
             else:
                 pixelsPerMetric = ppm[-1]
 
-
-
-
             rect = cv.minAreaRect(apd)
             box = cv.boxPoints(rect) # поиск четырех вершин прямоугольника
             box = np.int0(box) # округление координат
             report_area.insert(tk.END, 'Pixels per metric - '+str(pixelsPerMetric)+'\n')
             cv.drawContours(src,[cont],0,(0,255,0),-2)
             break
-    plt.figure(figsize=(14,14))
-#     plt.imshow(src)
-#     plt.show()
+
     return pixelsPerMetric
 
 
@@ -647,7 +626,6 @@ def add_annotation(name, text):
         f.seek(0, 0)
         f.write(text)
         f.write(content)
-        writer = csv.writer(f)
 
 
 
@@ -672,18 +650,17 @@ def get_state_values(param):
             l.append(tk2int(gui.state[param][i]))
     return l
 
-def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
+
+def search(files_frame, report_area, pb, pb_lbl):
     Progress_bar_value = 0
 
-    gui.state['paper_area'] = int(paper_size.get())
-    gui.state['germ_thresh'] = int(germ_thresh.get())
-    ppm = [7.45]
-    rotate = gui.state['rotation']
+    rotate = gui.state['rotation'].get()
     path_to_file_folder_fixed = gui.state['paths']['input']
     path_to_output_dir = gui.state['paths']['out_dir']
-    paper_area = gui.state['paper_area']
-    germ_thresh = gui.state['germ_thresh']
-    paper_area_thresold = gui.state['paper_area_thresold']
+    paper_area = gui.state['paper_area'].get()
+    germ_thresh = gui.state['germ_thresh'].get()
+    paper_area_thresold = gui.state['paper_area_thresold'].get()
+    print(paper_area, germ_thresh, paper_area_thresold)
     x_pos_divider = 10
     contour_area_threshold = gui.CONTOUR_AREA_THRESHOLD # look at your img size and evaluate the threshold, 1000 is recomended
     template_filename = gui.state['paths']['template_file']
@@ -691,7 +668,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
     hrb,hrt,srb,srt,vrb,vrt = get_state_values('roots')
     hsb,hst,ssb,sst,vsb,vst = get_state_values('seed')
     morph, gs, c_top = get_state_values('settings')
-    c_bottom=0
+    c_bottom = 0
     report_area.insert(tk.END, 'Contour search parameters'+str(get_state_values('settings'))+'\n')
     report_area.insert(tk.END, 'Roots color, hsv parameters'+str(get_state_values('roots'))+'\n')
     report_area.insert(tk.END, 'Leaves color, hsv parameters'+str(get_state_values('leaves'))+'\n')
@@ -699,9 +676,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
     ###SEARCH###
     report_area.insert(tk.END, 'SEARCH \n')
 
-    print(path_to_output_dir)
-
-    measure_full2 = pd.DataFrame(columns=[],index=np.arange(30))
+    measure_full2 = pd.DataFrame(columns=[], index=np.arange(30))
     # ppm - pixel per metric, массив с коэфам пересчета пикселя в мм, на случай плохого поиска стикера на фото
 
     folders_list = folders_list_function(path_to_file_folder_fixed)
@@ -727,7 +702,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
             ### Plant contour ####
 
             src = cv.imread(file_name)
-            src = rotate_pic(src, rotate)
+            src = gui.rotate_pic(src, rotate)
             gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
             bl=cv.GaussianBlur(src,(gs,gs),0)
             canny = cv.Canny(bl, c_bottom, c_top)
@@ -740,7 +715,7 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
             quantity_of_plants = 0
             real_conts = []
 
-            pixelsPerMetric = find_paper(report_area, src,paper_area,paper_area_thresold, position_x_axes(src,x_pos_divider),
+            pixelsPerMetric = find_paper(report_area, src, paper_area, paper_area_thresold, position_x_axes(src,x_pos_divider),
                                          canny_top=c_top, canny_bottom=c_bottom,morph=morph)
 
             for cont in contours0:
@@ -760,9 +735,9 @@ def search(files_frame, report_area, pb, pb_lbl, paper_size, germ_thresh):
             report_area.update()
 
             img2 = cv.imread(file_name,0)
-            img2 = rotate_pic(img2, rotate)
+            img2 = gui.rotate_pic(img2, rotate)
             template = cv.imread(template_filename,0)
-            template = rotate_pic(template, rotate)
+            template = gui.rotate_pic(template, rotate)
             w, h = template.shape[::-1]
 
 

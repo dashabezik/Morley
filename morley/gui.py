@@ -54,7 +54,9 @@ state = {
         'out_dir': os.getcwd()
     },
     'rotation': 0,
-    'paper_area_thresold': 5000
+    'paper_area_thresold': 5000,
+    'paper_area': 0,
+    'germ_thresh': 10,
 }
 
 CONTOUR_AREA_THRESHOLD = 1000
@@ -64,7 +66,7 @@ class ConditionManager:
     CONDITIONS = {
         'rotate': ['input'],
         'tweak': ['input', 'template'],
-        'run': ['input', 'template']
+        'run': ['input', 'template', 'paper_area', 'germ_thresh']
     }
     def __init__(self):
         self.satisfied = set()
@@ -92,11 +94,27 @@ class ConditionManager:
     def update_conditions(self):
         for key, v in self.CONDITIONS.items():
             if all(w in self.satisfied for w in v) and key in self.widgets:
-                for w in self.widgets[key]:
-                    w['state'] = tk.NORMAL
+                status = tk.NORMAL
+            else:
+                status = tk.DISABLED
+            for w in self.widgets[key]:
+                w['state'] = status
 
 
 conditions = ConditionManager()
+
+
+def trace_entry(key):
+    def callback(name, index, op):
+        try:
+            assert state[key].get() != 0
+        except (AssertionError, tk.TclError):
+            if key in conditions.satisfied:
+                conditions.satisfied.remove(key)
+        else:
+            conditions.satisfied.add(key)
+        conditions.update_conditions()
+    return callback
 
 
 class FormatLabel(tk.Label):
@@ -221,7 +239,7 @@ def blur(img_widget, event):
 def color(img_widget, event):
     src = state['img_arr'].copy()
     template = state['template']
-    template = rotate_pic(template, state['rotation'])    # TODO: Morley.rotate_pic(template, rotate)
+    template = rotate_pic(template, state['rotation'].get())
     w, h = template.shape[::-1]
 
     method = cv.TM_CCOEFF_NORMED
@@ -289,13 +307,7 @@ def seed(img_widget, event):
     img_widget['image'] = obj_color
 
 
-def rotate_pic(img, rotate=None):
-    if rotate is None:
-        return img
-    try:
-        rotate = int(rotate)
-    except TypeError:
-        rotate = rotate.get()
+def rotate_pic(img, rotate):
     if not rotate:
         return img
     rotate_dict = {
@@ -345,7 +357,7 @@ def rotation(w):
     img2 = tk.Label(master=img_frame, width=maxsize, height=maxsize)
     img2.image = obj2
     img2['image'] = obj2
-    choose_rotation(state['rotation'], test_img, img2)
+    choose_rotation(state['rotation'].get(), test_img, img2)
 
     buttons = []
     for i, val in enumerate([0, 90, 180, 270]):
@@ -461,9 +473,9 @@ def tweak_image(w):
     window.geometry('900x800')
     file_name =  random_file(state['paths']['input'])
     img_arr = cv.imread(file_name)
-    img_arr = rotate_pic(img_arr, state['rotation'])
+    img_arr = rotate_pic(img_arr, state['rotation'].get())
     img_arr_0 = cv.imread(file_name, 0)
-    img_arr_0 = rotate_pic(img_arr_0, state['rotation'])
+    img_arr_0 = rotate_pic(img_arr_0, state['rotation'].get())
     state['img_arr'] = img_arr  #.copy()
     state['img_arr_0'] = img_arr_0
     state['img_resized'] = ImageTk.PhotoImage(Image.fromarray(imutils.resize(img_arr, height=200)))
