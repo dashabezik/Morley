@@ -660,7 +660,6 @@ def search(files_frame, report_area, pb, pb_lbl):
     paper_area = gui.state['paper_area'].get()
     germ_thresh = gui.state['germ_thresh'].get()
     paper_area_thresold = gui.state['paper_area_thresold'].get()
-    print(paper_area, germ_thresh, paper_area_thresold)
     x_pos_divider = 10
     contour_area_threshold = gui.CONTOUR_AREA_THRESHOLD # look at your img size and evaluate the threshold, 1000 is recomended
     template_filename = gui.state['paths']['template_file']

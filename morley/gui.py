@@ -307,19 +307,21 @@ def seed(img_widget, event):
     img_widget['image'] = obj_color
 
 
-def rotate_pic(img, rotate):
-    if not rotate:
-        return img
+def rotate_pic(img, rotate, resize=False):
     rotate_dict = {
         90: cv.ROTATE_90_CLOCKWISE,
         180: cv.ROTATE_180,
         270: cv.ROTATE_90_COUNTERCLOCKWISE}
-    img = cv.rotate(img, rotate_dict[rotate])
-    return imutils.resize(img, height=300)
+
+    if rotate:
+        img = cv.rotate(img, rotate_dict[rotate])
+    if resize:
+        img = imutils.resize(img, height=300)
+    return img
 
 
 def choose_rotation(angle, img, img_widget):
-    img = rotate_pic(img, angle)
+    img = rotate_pic(img, angle, True)
     i = ImageTk.PhotoImage(Image.fromarray(img))
     img_widget.image = i
     img_widget['image'] = i
