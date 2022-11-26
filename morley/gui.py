@@ -236,35 +236,8 @@ def blur(img_widget, event):
     img_widget['image'] = obj
 
 
-def color(img_widget, event):
-    src = state['img_arr'].copy()
-    template = state['template']
-    template = rotate_pic(template, state['rotation'].get())
-    w, h = template.shape[::-1]
-
-    method = cv.TM_CCOEFF_NORMED
-    res = cv.matchTemplate(state['img_arr_0'], template, method)
-    threshold = 0.55
-    loc = np.where(res > threshold)
-    numbers0 = []
-    for pt in zip(*loc[::-1]):
-        if (pt[0] > src.shape[1] / 3) and (pt[0] < 2 * src.shape[1] / 3):
-            numbers0.append(pt[0])
-
-    numbers = pd.Series(numbers0)
-    mode = numbers.mode()[0]
-    mean_left_x = int(mode) - w // 4
-    mean_right_x = int(mode) + 3 * w // 4
-    mean_left_x = round(mean_left_x)
-    mean_right_x = round(mean_right_x)
-
-    overlay = src.copy()
-    cv.rectangle(overlay, (0, src.shape[0]), (mean_left_x, 0), (0,224,79), -1)
-    opacity = 0.25
-    cv.rectangle(overlay, (mean_right_x, src.shape[0]), (src.shape[1], 0), (240, 0, 255), -5)
-    cv.addWeighted(overlay, opacity, src, 1 - opacity, 0, src)
-    hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
-
+def color(img_widget, hsv, event):
+    
     h1 = state['color']['h_bottom'].get()
     s1 = state['color']['s_bottom'].get()
     v1 = state['color']['v_bottom'].get()
@@ -418,12 +391,40 @@ def seeds_tab(img, tweak_frame):
 
 
 def colors_tab(img, tweak_frame):
+    src = state['img_arr'].copy()
+    template = state['template']
+    template = rotate_pic(template, state['rotation'].get())
+    w, h = template.shape[::-1]
+
+    method = cv.TM_CCOEFF_NORMED
+    res = cv.matchTemplate(state['img_arr_0'], template, method)
+    threshold = 0.55
+    loc = np.where(res > threshold)
+    numbers0 = []
+    for pt in zip(*loc[::-1]):
+        if (pt[0] > src.shape[1] / 3) and (pt[0] < 2 * src.shape[1] / 3):
+            numbers0.append(pt[0])
+
+    numbers = pd.Series(numbers0)
+    mode = numbers.mode()[0]
+    mean_left_x = int(mode) - w // 4
+    mean_right_x = int(mode) + 3 * w // 4
+    mean_left_x = round(mean_left_x)
+    mean_right_x = round(mean_right_x)
+
+    overlay = src.copy()
+    cv.rectangle(overlay, (0, src.shape[0]), (mean_left_x, 0), (0,224,79), -1)
+    opacity = 0.25
+    cv.rectangle(overlay, (mean_right_x, src.shape[0]), (src.shape[1], 0), (240, 0, 255), -5)
+    cv.addWeighted(overlay, opacity, src, 1 - opacity, 0, src)
+    hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
+    
     clear(tweak_frame)
-    color(img, None)
+    color(img, hsv, None)
 
     color_label = tk.Label(master=tweak_frame, text="Choosing color for pixel counting")
     color_label.grid(column=0, row=0, columnspan=3)
-    row = add_color_sliders(state['color'], tweak_frame, partial(color, img))+1
+    row = add_color_sliders(state['color'], tweak_frame, partial(color, img, hsv))+1
 
     button_b1 = tk.Button(tweak_frame, text='Set sprouts', command=partial(set_params,'leaves'))
     button_n2 = tk.Button(tweak_frame, text='Set roots', command=partial(set_params,'roots'))
