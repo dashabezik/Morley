@@ -135,6 +135,8 @@ class FormatLabel(tk.Label):
             self._textvariable = kw['textvariable']
             self._textvariable.trace('w', self._update_text)
             del kw['textvariable']
+            
+            
 
         # run `Label.__init__` without `format` and `textvariable`
         super().__init__(master, cnf={}, **kw)
@@ -253,7 +255,7 @@ def color(img_widget, hsv, event):
     thresh = cv.inRange(hsv, h_min, h_max)
 
     thresh = thresh.astype('uint8')
-    thresh = imutils.resize(thresh, height=500)
+    thresh = imutils.resize(thresh, height=420)
     obj_color = ImageTk.PhotoImage(Image.fromarray(thresh))
     img_widget.image = obj_color
     img_widget['image'] = obj_color
@@ -274,7 +276,7 @@ def seed(img_widget, event):
     hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
     thresh = cv.inRange(hsv, h_min, h_max)
     thresh = thresh.astype('uint8')
-    thresh = imutils.resize(thresh, height=500)
+    thresh = imutils.resize(thresh, height=420)
     obj_color = ImageTk.PhotoImage(Image.fromarray(thresh))
     img_widget.image = obj_color
     img_widget['image'] = obj_color
@@ -474,6 +476,7 @@ def tweak_image(w):
     window = tk.Toplevel(w)
     window.title('Tweak image')
     window.geometry('900x800')
+    
     file_name =  random_file(state['paths']['input'])
     img_arr = cv.imread(file_name)
     img_arr = rotate_pic(img_arr, state['rotation'].get())
@@ -490,5 +493,6 @@ def tweak_image(w):
     img_frame.pack()
     tweak_frame = tk.Frame(master=window)
     tweak_frame.pack()
-
+#     sb = tk.Scrollbar(tweak_frame, orient = 'vertical')
+    
     contours_tab(img, tweak_frame)
