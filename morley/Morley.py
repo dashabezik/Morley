@@ -84,16 +84,17 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
         for g in tmp_l.columns:
             tmp[g] = tmp[tmp[g]>0][g]
             plt.subplot(len(tmp.columns), 4, param_type+4*iterator+1)
-            mean = round(pd.Series(tmp[g].values.reshape(-1)).dropna().mean())
+            mean = round(np.percentile(pd.Series(tmp[g].values.reshape(-1)).dropna(),75))
             ci = round(whiskers_dict[param[param_type]][g])
             label = (str(param[param_type])+' '+str(g) +'\n'+
                      f'shapiro p-value = {scipy.stats.shapiro(pd.Series(tmp[g].values.reshape(-1)).dropna())[1]:.2e}'+
                     '\n'+'mean = '+str(mean)+'$\pm$'+str(ci))
 
-            sns.distplot(pd.Series(tmp[g].values.reshape(-1)).dropna(),
+            sns.histplot(pd.Series(tmp[g].values.reshape(-1)).dropna(),
                      color=sns.color_palette("Set2")[iterator],
-                                 label=label)
+                                 label=label, kde = True)
             plt.xlim(left = 0)
+            plt.ylabel('')
             light = mpatches.Patch(color=sns.color_palette("Set2")[param_type], label=r'{param}'.format(param =  param[param_type]))
             plt.legend(loc = 'upper right')
 
@@ -700,7 +701,8 @@ def search(files_frame, report_area, pb, pb_lbl):
 
             ### Plant contour ####
 
-            src = cv.imread(file_name)
+            #src = cv.imread(file_name)
+            src = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_UNCHANGED)
             src = gui.rotate_pic(src, rotate)
             gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
             bl=cv.GaussianBlur(src,(gs,gs),0)
@@ -733,9 +735,11 @@ def search(files_frame, report_area, pb, pb_lbl):
             report_area.insert(tk.END, '...LOOKING FOR SEEDS POSITION... \n')
             report_area.update()
 
-            img2 = cv.imread(file_name,0)
+#             img2 = cv.imread(file_name,0)
+            img2 = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_GRAYSCALE)
             img2 = gui.rotate_pic(img2, rotate)
-            template = cv.imread(template_filename,0)
+#             template = cv.imread(template_filename,0)
+            template = cv.imdecode(np.fromfile(template_filename, dtype=np.uint8), cv.IMREAD_GRAYSCALE)
             template = gui.rotate_pic(template, rotate)
             w, h = template.shape[::-1]
 
@@ -760,14 +764,7 @@ def search(files_frame, report_area, pb, pb_lbl):
                 p2 = [int(slope*img.shape[0]+intercept),img.shape[0]]
                 pts_leaves = np.array([[0,0],p1,p2,[0,img.shape[0]]])
                 pts_roots = np.array([[p1[0]+3*w//4,p1[1]],[p2[0]+3*w//4,p2[1]],[img.shape[1],img.shape[0]],[img.shape[1],0]])
-                plt.figure(figsize = (14,14))
-#                 report_area.image_create(tk.END, image = ImageTk.PhotoImage(Image.fromarray(res)))
-#                 plt.subplot(121),plt.imshow(res,cmap = 'gray')
-                plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
-#                 plt.subplot(122),plt.imshow(img,cmap = 'gray')
-                plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
-                plt.suptitle(meth)
-#                 plt.show()
+
 
             src = drop_seeds(src,hsb,hst,ssb,sst,vsb,vst)
             src_black_seeds = src.copy()

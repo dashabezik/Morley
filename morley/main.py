@@ -8,7 +8,7 @@ from . import gui, Morley
 def main():
     window = tk.Tk()
     window.title('Morley GUI')
-    window.geometry('900x600')
+    window.geometry('900x400')
 
     gui.set_state_variables(gui.state)
 

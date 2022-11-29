@@ -124,6 +124,7 @@ class FormatLabel(tk.Label):
         # default values
         self._format = FORMAT
         self._textvariable = None
+        self.two_n_plus1 = None
 
         # get new format and remove it from `kw` so later `super().__init__` doesn't use them (it would get error message)
         if 'format' in kw:
@@ -135,6 +136,11 @@ class FormatLabel(tk.Label):
             self._textvariable = kw['textvariable']
             self._textvariable.trace('w', self._update_text)
             del kw['textvariable']
+        
+        if 'two_n_plus1' in kw:
+            self.two_n_plus1 = kw['two_n_plus1']
+            self._textvariable.trace('w', self._update_text)
+            del kw['two_n_plus1']
             
             
 
@@ -148,7 +154,11 @@ class FormatLabel(tk.Label):
 
     def _update_text(self, a, b, c):
         """update text in label when variable change value"""
-        self["text"] = self._format.format(self._textvariable.get())
+        if self.two_n_plus1:
+            self["text"] = self._format.format(2*int(self._textvariable.get())+1)
+        else:
+            self["text"] = self._format.format(self._textvariable.get())
+        
 
 
 def random_file(path_to_file_folder):
@@ -189,7 +199,8 @@ def get_template_file(label):
 
     if fname:
         state['paths']['template_file'] = fname
-        state['template'] = cv.imread(fname, 0)
+        state['template'] = cv.imdecode(np.fromfile(fname, dtype=np.uint8), cv.IMREAD_GRAYSCALE)## IMREAD_GRAYSCALE has 0 enum of imread modes
+#         state['template'] = cv.imread(fname, 0)
         label['text'] = f'Selected seed template: {os.path.basename(fname)}.'
     return fname
 
@@ -212,24 +223,24 @@ def blur(img_widget, event):
     canny_top = state['settings']['canny_top'].get()
 
     src = state['img_arr'].copy()
+    
     bl = cv.GaussianBlur(src, (gauss, gauss), 0)
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (morph, morph))
     closed = cv.morphologyEx(bl, cv.MORPH_CLOSE, kernel)
     canny = cv.Canny(closed, canny_bottom, canny_top)
-    # kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (morph, morph))
     closed = cv.morphologyEx(canny, cv.MORPH_CLOSE, kernel)
     contours0 = cv.findContours(closed, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[0]
     (contours0, _) = contours.sort_contours(contours0)
     real_conts = []
-
+    src = cv.cvtColor(src, cv.COLOR_BGR2RGB)
+    
     for cont in contours0:
         center, radius = cv.minEnclosingCircle(cont)
         if ((cv.contourArea(cont) > CONTOUR_AREA_THRESHOLD) and
                 (center[0] > src.shape[1] // 4) & (center[0] < 2 * src.shape[1] // 3)):
-            # sm = cv.arcLength(cont, True)
-            # apd = cv.approxPolyDP(cont, 0.02 * sm, True)
             cv.drawContours(src, [cont], -1, (255, 0, 0), -2)
             real_conts.append(cont)
+
 
     src = src.astype('uint8')
     src = imutils.resize(src, height=500)
@@ -312,13 +323,15 @@ def rotation(w):
     img_frame = tk.Frame(master=window)
 
     path_to_ethalon = os.path.dirname(os.path.abspath(__file__))
-    ethalon = cv.imread(os.path.join(path_to_ethalon, 'ethalon.png'))
+    ethalon = cv.imdecode(np.fromfile(os.path.join(path_to_ethalon, 'ethalon.png'), dtype=np.uint8), cv.IMREAD_UNCHANGED)
+#     ethalon = cv.imread(os.path.join(path_to_ethalon, 'ethalon.png'))
     ethalon = cv.cvtColor(ethalon, cv.COLOR_BGR2RGB)
     ethalon = ethalon.astype('uint8')
     ethalon = imutils.resize(ethalon, height=300)
     obj = ImageTk.PhotoImage(Image.fromarray(ethalon))
-
-    test_img = cv.imread(random_file(state['paths']['input']))
+    
+    test_img = cv.imdecode(np.fromfile(random_file(state['paths']['input']), dtype=np.uint8), cv.IMREAD_UNCHANGED)
+#     test_img = cv.imread(random_file(state['paths']['input']))
     test_img = cv.cvtColor(test_img, cv.COLOR_BGR2RGB)
     test_img = test_img.astype('uint8')
     test_img = imutils.resize(test_img, height=300)
@@ -444,17 +457,17 @@ def contours_tab(img, tweak_frame):
 
     morph_label = tk.Label(master=tweak_frame, text="Choosing parameters for contour recognition")
     morph_label.grid(column=0, row=0, columnspan=3)
-    morph_slider_lbl = FormatLabel(master=tweak_frame, textvariable=state['settings']['morph'])
+    morph_slider_lbl = FormatLabel(master=tweak_frame, textvariable=state['settings']['morph'], two_n_plus1 = True)
     morph_name_lbl = tk.Label(master=tweak_frame, text="morph:")
-    morph_slider = ttk.Scale(master=tweak_frame, from_=1, to=5, command=partial(blur, img),
+    morph_slider = ttk.Scale(master=tweak_frame, from_=0, to=6, command=partial(blur, img),
                              variable=state['settings']['morph'])
     morph_name_lbl.grid(column=0, row=1)
     morph_slider.grid(column=1, row=1)
     morph_slider_lbl.grid(column=2, row=1)
 
-    gauss_slider_lbl = FormatLabel(master=tweak_frame, textvariable=state['settings']['gauss'])
+    gauss_slider_lbl = FormatLabel(master=tweak_frame, textvariable=state['settings']['gauss'], two_n_plus1 = True)
     gauss_name_lbl = tk.Label(master=tweak_frame, text='gauss:')
-    gauss_slider = ttk.Scale(master=tweak_frame, from_=1, to=5, command=partial(blur, img),
+    gauss_slider = ttk.Scale(master=tweak_frame, from_=0, to=6, command=partial(blur, img),
                              variable=state['settings']['gauss'])
     gauss_name_lbl.grid(column=0, row=2)
     gauss_slider.grid(column=1, row=2)
@@ -475,12 +488,14 @@ def contours_tab(img, tweak_frame):
 def tweak_image(w):
     window = tk.Toplevel(w)
     window.title('Tweak image')
-    window.geometry('900x800')
+    window.geometry('900x650')
     
     file_name =  random_file(state['paths']['input'])
-    img_arr = cv.imread(file_name)
+    img_arr = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_UNCHANGED) ## IMREAD_UNCHANGED has -1 enum of imread modes
+#     img_arr = cv.imread(file_name)
     img_arr = rotate_pic(img_arr, state['rotation'].get())
-    img_arr_0 = cv.imread(file_name, 0)
+    img_arr_0 = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_GRAYSCALE)## IMREAD_GRAYSCALE has 0 enum of imread modes
+#     img_arr_0 = cv.imread(file_name, 0)
     img_arr_0 = rotate_pic(img_arr_0, state['rotation'].get())
     state['img_arr'] = img_arr  #.copy()
     state['img_arr_0'] = img_arr_0
