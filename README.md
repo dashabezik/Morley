@@ -16,7 +16,7 @@ Morley requires Python 3.7 or newer. You can install Morley GUI from PyPI:
 ```
 pip install morley
 ```
-\* *use this command in Python compiller or in Bash command line*
+\* *use this command in a Python compiller or in Bash command line*
 
 Alternatively, you can install directly from GitHub:
 
@@ -31,3 +31,5 @@ Run ``` morley ``` command on the command line (or in the compiller), follow the
 
 Morley supports the most popular image files formats (JPEG files, Portable Network Graphics, et al., full list [here](https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga288b8b3da0892bd651fce07b3bbd3a56) ) 
 
+# Example
+Raw photos, which you can use an example are placed [here] (https://github.com/dashabezik/plants)
