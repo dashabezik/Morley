@@ -2,9 +2,11 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.scrolledtext as st
 from functools import partial
-import os
+import os, sys
 from . import gui, Morley
 
+# sys.path.insert(0,os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# import setup
 
 def main():
     window = tk.Tk()
@@ -16,7 +18,7 @@ def main():
     background_label.place(x=0, y=0, relwidth=1, relheight=1)
     background_label.image = background_image
     
-    window.title('Morley GUI')
+    window.title('Morley GUI 0.0.3')
     window.geometry('900x400')
 
     gui.set_state_variables(gui.state)

@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name                 = 'morley',
-    version              = '0.0.2',
+    version              = '0.0.3',
     description          = '''GUI software for plant morphometry''',
     long_description     = None,
     # long_description_content_type="text/markdown",
@@ -17,6 +17,6 @@ setup(
                             'Intended Audience :: End Users/Desktop'],
     license              = 'License :: OSI Approved :: Apache Software License',
     packages             = find_packages(),
-    package_data         = {'morley': ['ethalon.png']},
+    package_data         = {'morley': ['ethalon.png', 'logo.png']},
     entry_points         = {'console_scripts': ['morley=morley.main:main']},
     )
