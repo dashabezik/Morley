@@ -1,5 +1,6 @@
 **.egg-info
+**.ipynb
 **.ipynb_checkpoints
 **__pycache__
-build 
+build
 dist
