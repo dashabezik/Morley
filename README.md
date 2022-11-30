@@ -30,7 +30,7 @@ Run ``` morley ``` command on the command line (or in the compiller), follow the
 
 Raw photos, which you can use an example are placed [here](https://github.com/dashabezik/plants)
 
-![terminal animation](morley/morley_launch.gif)
+![terminal animation](img/morley_launch.gif)
 
 To compare the recieved results you can look through the results recieved by me [here](https://github.com/dashabezik/plants)
 
@@ -39,7 +39,9 @@ To compare the recieved results you can look through the results recieved by me 
 
 Morley supports the most popular image files formats (JPEG files, Portable Network Graphics, et al., full list [here](https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga288b8b3da0892bd651fce07b3bbd3a56) ).
 Folder with photos must have certain structure: head folder contains subfolders with raw photos divided by the groups and template folder, subfolders contain raw photos and template photo contains seed photo.
-
+|![img1](img/folder tree.png)|
+|------------------------------|
+| **Figure 1.** Folders structure.|
 
 head folder will be used as the beggining of the report files name
 
