@@ -34,7 +34,7 @@ Raw photos, which you can use an example are placed [here](https://github.com/da
 
 To compare the recieved results you can look through the results recieved by me [here](https://github.com/dashabezik/plants)
 
-# User Guid
+# User Guide
 ### Input files
 
 Morley supports the most popular image files formats (JPEG files, Portable Network Graphics, et al., full list [here](https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga288b8b3da0892bd651fce07b3bbd3a56) ).
