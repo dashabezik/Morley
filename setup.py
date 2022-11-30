@@ -1,12 +1,27 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
+import os
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith('__version__'):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
 
 setup(
     name                 = 'morley',
-    version              = '0.0.3',
+    version              = get_version('morley/version.py'),
     description          = '''GUI software for plant morphometry''',
-    long_description     = (''.join(open('README.MD').readlines())),
+    long_description     = (''.join(open('README.md').readlines())),
     long_description_content_type="text/markdown",
     author               = 'Daria Emekeeva & Lev Levitsky',
     author_email         = 'dashabezik65@gmail.com',
