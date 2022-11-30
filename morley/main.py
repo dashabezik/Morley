@@ -2,23 +2,21 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.scrolledtext as st
 from functools import partial
-import os, sys
-from . import gui, Morley
+import os
+from . import gui, Morley, version
 
-# sys.path.insert(0,os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# import setup
 
 def main():
     window = tk.Tk()
-    path_to_icon =os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png') 
+    path_to_icon =os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png')
     window.tk.call('wm', 'iconphoto', window._w, tk.PhotoImage(file=path_to_icon))
     # Add image file
     background_image=tk.PhotoImage(path_to_icon)
     background_label = tk.Label(window, image=background_image)
     background_label.place(x=0, y=0, relwidth=1, relheight=1)
     background_label.image = background_image
-    
-    window.title('Morley GUI 0.0.3')
+
+    window.title(f'Morley GUI v{version.version}')
     window.geometry('900x400')
 
     gui.set_state_variables(gui.state)
