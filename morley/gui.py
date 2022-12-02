@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter.filedialog import askopenfilename, askdirectory
+from tkinter.filedialog import askopenfilename, askdirectory, asksaveasfilename
 from PIL import ImageTk, Image
 import cv2 as cv
 import imutils
@@ -10,6 +10,7 @@ import pandas as pd
 import os
 import random
 from functools import partial
+import json
 
 
 state = {
@@ -59,8 +60,75 @@ state = {
     'germ_thresh': 10,
 }
 
+STATE_SYNTAX_VERSION = 1
+STATE_SYNTAX_VERSION_KEY = 'syntax_version'
 CONTOUR_AREA_THRESHOLD = 1000
 FORMAT='{:.0f}'
+
+
+def save_state(fname):
+    state_dict = pythonize_state_dict()
+    for k in ['template', 'img_arr', 'img_arr_0']:
+        state_dict.pop(k, None)
+    state_dict[STATE_SYNTAX_VERSION_KEY] = STATE_SYNTAX_VERSION
+    with open(fname, 'w') as f:
+        json.dump(state_dict, f)
+
+
+def update_dict(old, new):
+    for k, v in new.items():
+        if isinstance(v, dict):
+            update_dict(old[k], v)
+        elif k in old and hasattr(old[k], 'set'):
+            old[k].set(v)
+        else:
+            old[k] = v
+
+
+def load_state(fname, label_dict):
+    with open(fname) as f:
+        d = json.load(f)
+    update_dict(state, d)
+    set_state_variables(state)
+    update_labels(label_dict)
+    conditions.check_conditions()
+    conditions.update_conditions()
+
+
+def update_labels(label_dict):
+    inp = state.get('paths', {}).get('input')
+    if inp:
+        set_label('input', label_dict['input'], inp)
+
+    template = state.get('paths', {}).get('template_file')
+    if template:
+        read_template_file(template, label_dict['template'])
+
+    outdir = state.get('paths', {}).get('out_dir')
+    if outdir:
+        set_label('outdir', label_dict['outdir'], outdir)
+
+
+def set_label(kind, label, value):
+    mapping = {
+        'input': lambda fname: f'Selected image directory: {os.path.basename(fname)}.',
+        'template': lambda fname: f'Selected seed template: {os.path.basename(fname)}.',
+        'outdir': lambda fname: f'Output directory: {os.path.basename(fname)}.'
+    }
+    label['text'] = mapping[kind](value)
+
+
+def load_state_dialog(label_dict):
+    fname = askopenfilename(title="Load settings...", filetypes=[('JSON files', '*.json'), ('All files', '*')])
+    if fname:
+        load_state(fname, label_dict)
+
+
+def save_state_dialog():
+    fname = asksaveasfilename(title="Save settings as...", defaultextension='.json')
+    if fname:
+        save_state(fname)
+
 
 class ConditionManager:
     CONDITIONS = {
@@ -100,6 +168,16 @@ class ConditionManager:
             for w in self.widgets[key]:
                 w['state'] = status
 
+    def check_conditions(self):
+        if state.get('paths', {}).get('input'):
+            self.satisfied.add('input')
+        if state.get('paths', {}).get('template_file'):
+            self.satisfied.add('template')
+        if state.get('paper_area').get():
+            self.satisfied.add('paper_area')
+        if state.get('germ_thresh').get():
+            self.satisfied.add('germ_thresh')
+
 
 conditions = ConditionManager()
 
@@ -134,15 +212,13 @@ class FormatLabel(tk.Label):
         # get `textvariable` to assign own function which set formatted text in Label when variable change value
         if 'textvariable' in kw:
             self._textvariable = kw['textvariable']
-            self._textvariable.trace('w', self._update_text)
+            self._trace_id = self._textvariable.trace('w', self._update_text)
             del kw['textvariable']
-        
+
         if 'two_n_plus1' in kw:
             self.two_n_plus1 = kw['two_n_plus1']
-            self._textvariable.trace('w', self._update_text)
+            # self._textvariable.trace('w', self._update_text)
             del kw['two_n_plus1']
-            
-            
 
         # run `Label.__init__` without `format` and `textvariable`
         super().__init__(master, cnf={}, **kw)
@@ -158,7 +234,11 @@ class FormatLabel(tk.Label):
             self["text"] = self._format.format(2*int(self._textvariable.get())+1)
         else:
             self["text"] = self._format.format(self._textvariable.get())
-        
+
+    def destroy(self):
+        self._textvariable.trace_vdelete('w', self._trace_id)
+        super().destroy()
+
 
 
 def random_file(path_to_file_folder):
@@ -173,44 +253,59 @@ def random_file(path_to_file_folder):
     return path_to_file
 
 
-def set_state_variables(d):
+def set_state_variables(d, master=None):
     for k, v in d.items():
         if isinstance(v, dict):
             set_state_variables(v)
         if isinstance(v, (int, float)):
-            d[k] = tk.IntVar(value=v)
+            d[k] = tk.IntVar(value=v, master=master)
         # if isinstance(v, str):
         #     d[k] = tk.StringVar(value=v)
+
+
+def pythonize_state_dict(d=None):
+    out = {}
+    if d is None:
+        d = state
+    for k, v in d.items():
+        if isinstance(v, dict):
+            out[k] = pythonize_state_dict(v)
+        elif hasattr(v, 'get'):
+            out[k] = v.get()
+        else:
+            out[k] = v
+    return out
 
 
 @conditions.satisfies('input')
 def get_image_dirname(label):
     fname = askdirectory(title='Raw image directory')
-
     if fname:
         state['paths']['input'] = fname
-        label['text'] = f'Selected image directory: {os.path.basename(fname)}.'
+        set_label('input', label, fname)
     return fname
+
+
+def read_template_file(fname, label):
+    state['template'] = cv.imdecode(np.fromfile(fname, dtype=np.uint8), cv.IMREAD_GRAYSCALE)
+    # IMREAD_GRAYSCALE has 0 enum of imread modes
+    set_label('template', label, fname)
 
 
 @conditions.satisfies('template')
 def get_template_file(label):
     fname = askopenfilename(title='Seed template file')
-
     if fname:
         state['paths']['template_file'] = fname
-        state['template'] = cv.imdecode(np.fromfile(fname, dtype=np.uint8), cv.IMREAD_GRAYSCALE)## IMREAD_GRAYSCALE has 0 enum of imread modes
-#         state['template'] = cv.imread(fname, 0)
-        label['text'] = f'Selected seed template: {os.path.basename(fname)}.'
+        read_template_file(fname, label)
     return fname
 
 
 def get_out_dirname(label):
     fname = askdirectory(title='Output directory')
-
     if fname:
         state['paths']['out_dir'] = fname
-        label['text'] = f'Output directory: {os.path.basename(fname)}.'
+        set_label('outdir', label, fname)
     return fname
 
 
@@ -223,7 +318,7 @@ def blur(img_widget, event):
     canny_top = state['settings']['canny_top'].get()
 
     src = state['img_arr'].copy()
-    
+
     bl = cv.GaussianBlur(src, (gauss, gauss), 0)
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (morph, morph))
     closed = cv.morphologyEx(bl, cv.MORPH_CLOSE, kernel)
@@ -233,14 +328,13 @@ def blur(img_widget, event):
     (contours0, _) = contours.sort_contours(contours0)
     real_conts = []
     src = cv.cvtColor(src, cv.COLOR_BGR2RGB)
-    
+
     for cont in contours0:
         center, radius = cv.minEnclosingCircle(cont)
         if ((cv.contourArea(cont) > CONTOUR_AREA_THRESHOLD) and
                 (center[0] > src.shape[1] // 4) & (center[0] < 2 * src.shape[1] // 3)):
             cv.drawContours(src, [cont], -1, (255, 0, 0), -2)
             real_conts.append(cont)
-
 
     src = src.astype('uint8')
     src = imutils.resize(src, height=500)
@@ -250,7 +344,7 @@ def blur(img_widget, event):
 
 
 def color(img_widget, hsv, event):
-    
+
     h1 = state['color']['h_bottom'].get()
     s1 = state['color']['s_bottom'].get()
     v1 = state['color']['v_bottom'].get()
@@ -329,7 +423,7 @@ def rotation(w):
     ethalon = ethalon.astype('uint8')
     ethalon = imutils.resize(ethalon, height=300)
     obj = ImageTk.PhotoImage(Image.fromarray(ethalon))
-    
+
     test_img = cv.imdecode(np.fromfile(random_file(state['paths']['input']), dtype=np.uint8), cv.IMREAD_UNCHANGED)
 #     test_img = cv.imread(random_file(state['paths']['input']))
     test_img = cv.cvtColor(test_img, cv.COLOR_BGR2RGB)
@@ -372,8 +466,8 @@ def clear(w): # clear all the wigets
     for c in w.grid_slaves():
         c.destroy()
 
+
 def set_params(parameter):
-#     state[parameter]=state['color']
     for i in state[parameter]:
         state[parameter][i] = state['color'][i].get()
 
@@ -400,7 +494,7 @@ def seeds_tab(img, tweak_frame):
     color_label.grid(column=0, row=0, columnspan=3)
     row = 1 + add_color_sliders(state['seed'], tweak_frame, partial(seed, img))
     button_b2 = tk.Button(tweak_frame, text='Back', command=partial(colors_tab, img, tweak_frame))
-    button_end = tk.Button(tweak_frame, text='Done', command=lambda: tweak_frame.winfo_toplevel().destroy())
+    button_end = tk.Button(tweak_frame, text='Done', command=tweak_frame.winfo_toplevel().destroy)
     button_b2.grid(column=0, row=row)
     button_end.grid(column=2, row=row)
 
@@ -433,16 +527,16 @@ def colors_tab(img, tweak_frame):
     cv.rectangle(overlay, (mean_right_x, src.shape[0]), (src.shape[1], 0), (240, 0, 255), -5)
     cv.addWeighted(overlay, opacity, src, 1 - opacity, 0, src)
     hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
-    
+
     clear(tweak_frame)
     color(img, hsv, None)
 
     color_label = tk.Label(master=tweak_frame, text="Choosing color for pixel counting")
     color_label.grid(column=0, row=0, columnspan=3)
-    row = add_color_sliders(state['color'], tweak_frame, partial(color, img, hsv))+1
+    row = add_color_sliders(state['color'], tweak_frame, partial(color, img, hsv)) + 1
 
-    button_b1 = tk.Button(tweak_frame, text='Set sprouts', command=partial(set_params,'leaves'))
-    button_n2 = tk.Button(tweak_frame, text='Set roots', command=partial(set_params,'roots'))
+    button_b1 = tk.Button(tweak_frame, text='Set sprouts', command=partial(set_params, 'leaves'))
+    button_n2 = tk.Button(tweak_frame, text='Set roots', command=partial(set_params, 'roots'))
     button_b1.grid(column=0, row=row)
     button_n2.grid(column=2, row=row)
     button_b1 = tk.Button(tweak_frame, text='Back', command=partial(contours_tab, img, tweak_frame))
@@ -489,18 +583,14 @@ def tweak_image(w):
     window = tk.Toplevel(w)
     window.title('Tweak image')
     window.geometry('900x650')
-    
-    file_name =  random_file(state['paths']['input'])
+
+    file_name = random_file(state['paths']['input'])
     img_arr = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_UNCHANGED) ## IMREAD_UNCHANGED has -1 enum of imread modes
-#     img_arr = cv.imread(file_name)
     img_arr = rotate_pic(img_arr, state['rotation'].get())
     img_arr_0 = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_GRAYSCALE)## IMREAD_GRAYSCALE has 0 enum of imread modes
-#     img_arr_0 = cv.imread(file_name, 0)
     img_arr_0 = rotate_pic(img_arr_0, state['rotation'].get())
-    state['img_arr'] = img_arr  #.copy()
+    state['img_arr'] = img_arr
     state['img_arr_0'] = img_arr_0
-    state['img_resized'] = ImageTk.PhotoImage(Image.fromarray(imutils.resize(img_arr, height=200)))
-    state['img_mask'] = np.zeros_like(img_arr)
 
     img_frame = tk.Frame(master=window)
     img = tk.Label(master=img_frame)
@@ -508,6 +598,5 @@ def tweak_image(w):
     img_frame.pack()
     tweak_frame = tk.Frame(master=window)
     tweak_frame.pack()
-#     sb = tk.Scrollbar(tweak_frame, orient = 'vertical')
-    
+
     contours_tab(img, tweak_frame)
