@@ -108,13 +108,18 @@ def update_labels(label_dict):
     outdir = state.get('paths', {}).get('out_dir')
     if outdir:
         set_label('outdir', label_dict['outdir'], outdir)
+        
+    rotate = state.get('rotation')
+    if rotate:
+        set_label('rotation', label_dict['rotation'], rotate)
 
 
 def set_label(kind, label, value):
     mapping = {
         'input': lambda fname: f'Selected image directory: {os.path.basename(fname)}.',
         'template': lambda fname: f'Selected seed template: {os.path.basename(fname)}.',
-        'outdir': lambda fname: f'Output directory: {os.path.basename(fname)}.'
+        'outdir': lambda fname: f'Output directory: {os.path.basename(fname)}.',
+        'rotation': lambda angle: f'Rotation angle: {angle.get()}.'
     }
     label['text'] = mapping[kind](value)
 
@@ -401,14 +406,15 @@ def rotate_pic(img, rotate, resize=False):
     return img
 
 
-def choose_rotation(angle, img, img_widget):
+def choose_rotation(angle, img, img_widget,label):
     img = rotate_pic(img, angle, True)
     i = ImageTk.PhotoImage(Image.fromarray(img))
     img_widget.image = i
     img_widget['image'] = i
+    set_label('rotation', label, state['rotation'])
 
 
-def rotation(w):
+def rotation(w, label):
     window = tk.Toplevel(w)
     window.title('Rotate image')
     window.geometry('600x400')
@@ -442,11 +448,11 @@ def rotation(w):
     img2 = tk.Label(master=img_frame, width=maxsize, height=maxsize)
     img2.image = obj2
     img2['image'] = obj2
-    choose_rotation(state['rotation'].get(), test_img, img2)
+    choose_rotation(state['rotation'].get(), test_img, img2,label)
 
     buttons = []
     for i, val in enumerate([0, 90, 180, 270]):
-        buttons.append(tk.Radiobutton(control_frame, text=str(val), command=lambda j=val: choose_rotation(j, test_img, img2),
+        buttons.append(tk.Radiobutton(control_frame, text=str(val), command=lambda j=val: choose_rotation(j, test_img, img2, label),
                                       variable=state['rotation'], value=val))
 
     set_button = tk.Button(window, text='Save', command=window.destroy)
