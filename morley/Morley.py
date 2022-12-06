@@ -655,7 +655,6 @@ def get_state_values(param):
 
 def search(files_frame, report_area, pb, pb_lbl):
     Progress_bar_value = 0
-
     rotate = gui.state['rotation'].get()
     path_to_file_folder_fixed = gui.state['paths']['input']
     path_to_output_dir = gui.state['paths']['out_dir']
