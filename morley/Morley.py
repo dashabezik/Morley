@@ -359,7 +359,8 @@ def length(width, square, pixel):
 def folders_list_function(path_to_file_folder):
     folders_list=[]
     for filename_in_folder in listdir(path_to_file_folder):
-        folders_list.append(filename_in_folder)
+        if path.isdir(path.join(path_to_file_folder,filename_in_folder)):
+            folders_list.append(filename_in_folder)
 
     if '.ipynb_checkpoints' in folders_list:
         folders_list.remove('.ipynb_checkpoints')
