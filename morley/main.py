@@ -8,18 +8,18 @@ from . import gui, Morley, version
 
 def main():
     window = tk.Tk()
-    path_to_icon =os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png')
+    path_to_icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png')
     window.tk.call('wm', 'iconphoto', window._w, tk.PhotoImage(file=path_to_icon))
     # Add image file
-    background_image=tk.PhotoImage(path_to_icon)
+    background_image = tk.PhotoImage(path_to_icon)
     background_label = tk.Label(window, image=background_image)
     background_label.place(x=0, y=0, relwidth=1, relheight=1)
     background_label.image = background_image
 
     window.title(f'Morley GUI v{version.version}')
-    window.geometry('900x400')
+    window.geometry('900x430')
 
-    gui.set_state_variables(gui.state)
+    gui.set_state_variables(gui.state, window)
 
     # https://stackoverflow.com/a/54068050/1258041
     try:
@@ -46,10 +46,11 @@ def main():
     get_out_dir_btn = tk.Button(master=main_frame, text="Select output directory",
         command=partial(gui.get_out_dirname, out_dir_lbl), width=20)
 
-    tweak_lbl = tk.Label(master=main_frame, text="Tweaking image", justify='left')
-    tweak_btn = tk.Button(master=main_frame, text="Tweak image", command=partial(gui.tweak_image, window), width=20)
+    save_btn = tk.Button(master=main_frame, text="Save settings", command=gui.save_state_dialog)
+    tweak_btn = tk.Button(master=main_frame, text="Recognition settings", command=partial(gui.tweak_image, window), width=20)
 
-    rotation_lbl = tk.Label(master=main_frame, text="Rotating image" , justify='left')
+    label_dict = {'input': raw_dir_lbl, 'template': template_lbl, 'outdir': out_dir_lbl}
+    load_btn = tk.Button(master=main_frame, text="Load settings", command=partial(gui.load_state_dialog, label_dict))
     rotation_btn = tk.Button(master=main_frame, text="Rotate image", command=partial(gui.rotation, window), width=20)
 
     paper_size = tk.Entry(master=main_frame, width=20, textvariable=gui.state['paper_area'])
@@ -89,10 +90,10 @@ def main():
     out_dir_lbl.grid(column=1, row=2)
 
     rotation_btn.grid(column=0, row=5)
-    rotation_lbl.grid(column=1, row=5)
+    load_btn.grid(column=1, row=5)
 
     tweak_btn.grid(column=0, row=6)
-    tweak_lbl.grid(column=1, row=6)
+    save_btn.grid(column=1, row=6)
 
     paper_size_lbl.grid(column=1, row=7)
     paper_size.grid(column=0, row=7)
