@@ -8,6 +8,7 @@ from imutils import contours
 import numpy as np
 import pandas as pd
 import os
+from os import path, listdir
 import random
 from functools import partial
 import json
@@ -243,7 +244,7 @@ class FormatLabel(tk.Label):
 
 def random_file(path_to_file_folder):
     a=random.choice(os.listdir(path_to_file_folder))
-    while (a=='template')|(a=='.ipynb_checkpoints'):
+    while (a=='template')|(a=='.ipynb_checkpoints')|(not path.isdir(path.join(path_to_file_folder,a))):
         a=random.choice(os.listdir(path_to_file_folder))
     path_to_file = os.path.join(path_to_file_folder, a+'/')
     b = random.choice(os.listdir(path_to_file))
