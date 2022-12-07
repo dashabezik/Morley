@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Appendix B. MORLEY installation and GUI operation guide for Windows system users.</title>
+    <style>
+        .img-right {
+            transform: rotate(90deg);
+        }
+
+        .left {
+            float: left;
+            padding: 0 20px 20px 0;
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body bgcolor="#bfbff2">
+<h1>Installation: </h1>
+<ol>
+    <li> MORLEY GUI requires Python 3.7 or newer. The easiest way is to install it as a part of the Anaconda
+        environment. Download .exe file from <a href="https://www.anaconda.com/products/individual#Downloads"> here </a>
+    </li>
+    <img src="https://s1.1zoom.ru/b5050/260/Cats_Kittens_Ginger_452265_1920x1200.jpg" width=50% height=50%>
+    <li> Install Anaconda running the downloaded .exe file</li>
+    <li> Together with Anaconda, the Anaconda Powershell Prompt has been installed, which has a
+        python package installer called pip. Type “Anaconda Powershell Prompt” in the search area
+        of the “Start” menu and click on an application called Anaconda Powershell Promt.
+        This action will run the command line window
+    </li>
+    <li> To install MORLEY, type in Anaconda Prompt window the command and press “enter”: pip install morley</li>
+    <img src="https://s1.1zoom.ru/b5050/260/Cats_Kittens_Ginger_452265_1920x1200.jpg" width=50% height=50%>
+    <li> After successful installation you will see:</li>
+    <img src="https://s1.1zoom.ru/b5050/260/Cats_Kittens_Ginger_452265_1920x1200.jpg" width=50% height=50%>
+    <li> To open MORLEY GUI, type morley in command line and press “enter”</li>
+    <img src="https://s1.1zoom.ru/b5050/260/Cats_Kittens_Ginger_452265_1920x1200.jpg" width=50% height=50%>
+</ol>
+After that, the window with MORLEY GUI will be opened:
+<p><img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_1.PNG" width=50% height=50%></p>
+<b> NOTION: </b> Before running MORLEY.
+Prepare a directory with raw photos. Folders with photos must have a certain structure: head folder contains subfolders
+named after the plant groups to be compared with raw photos and template folder, subfolders contain
+raw photos and template folder contains seed photo. Head folder must be selected as the
+“Image directory”. A seed photo contains the seed only and is created as a fragment of plant image.
+<div class="container">
+    <div class="row align-items-start">
+        <div class="col">
+            <img src="https://s1.1zoom.ru/b5050/260/Cats_Kittens_Ginger_452265_1920x1200.jpg" width=60% height=60%>
+        </div>
+        <div class="col">
+            <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_22.png" width=60% height=60%>
+        </div>
+
+    </div>
+
+</div>
+<p> Ensure the seed image has the same resolution, not higher than the original photo, do not use
+    programs that can increase the resolution (for example, Photoshop ), just cut a seed from any
+    image using a simple image redactor (for example, Paint). We recommend you to choose the seed
+    that will not be covered by the roots of the plant or turned in a strange way. Cut the image as
+    close to the edges of the seed as possible.</p>
+<h1> USAGE: </h1>
+
+<ol>
+    <li> For quick start, download the example photos folder from
+        <a href="https://github.com/dashabezik/Morley/tree/main/"> here </a> or select your own photos.
+        To test the program you can run it using bigger photo sets placed
+        <a href="https://github.com/dashabezik/plants"> here </a>
+    </li>
+    <img src="https://s1.1zoom.ru/b5050/260/Cats_Kittens_Ginger_452265_1920x1200.jpg" width=50% height=50%>
+    <li> Select directory with folders containing raw photos:</li>
+    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_3.png" width=50% height=50%>
+    <p> Remember rules from the NOTION from the previous preparation part.</p>
+    <li> Select file with seed template:</li>
+    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_4.png" width=50% height=50%>
+    <li> Select output directory:</li>
+    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_5.png" width=50% height=50%>
+    <li> Rotate images by clicking the “Rotate image” button. Select the angle so that the location of
+        the objects and the sprout-root orientation correspond to these characteristics in the schematic
+        image on the left.
+    </li>
+    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_6.PNG" width=50% height=50%>
+    <p> NOTION: For correct processing, the paper sticker should be the most left contour, the seeds must compile
+        a vertical line in the center, and the leaves and the roots must be on the left and right from that vertical
+        line,
+        respectively. All the original photos should have the same orientation of sprouts and roots.
+        After setting, all the photos will be properly rotated, including the seed template image.</p>
+    <li> Tweak image button is for setting parameters for plant, root, sprout and seed recognition.
+        Initial parameters are set by default
+        (see the table with examples for different datasets).
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col"> Wheat 4-7 days</th>
+                <th scope="col"> Peas treated with ferrum salt</th>
+                <th scope="col"> Wheat treated with Fe nanoparticles</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row">Blurring</th>
+                <td> Morph = 9, gauss = 7, canny_top = 179</td>
+                <td> Morph = 7, gauss = 3, canny_top = 118</td>
+                <td> Morph = 5, gauss = 3, canny_top = 130</td>
+            </tr>
+            <tr>
+                <th scope="row"> Leaves color</th>
+                <td> h:(0, 43); s:(0,255); v:(102,255)</td>
+                <td> h:(0, 50); s:(0,255); v:(94,255)</td>
+                <td> h:(0, 71); s:(0,255); v:(120,255)</td>
+            </tr>
+            <tr>
+                <th scope="row"> Roots color</th>
+                <td> h:(54, 255); s:(0,255); v:(118,255)</td>
+                <td> h:(61, 255); s:(0,255); v:(94,255)</td>
+                <td> h:(51, 255); s:(0,255); v:(134,255)</td>
+            </tr>
+            <tr>
+                <th scope="row"> Seed color</th>
+                <td> h:(0, 21); s:(88,255); v:(179,255)
+                <td> h:(0, 28); s:(111,255); v:(132,255)</td>
+                <td> h:(0, 31); s:(35,255); v:(156,255)</td>
+            </tr>
+            </tbody>
+        </table>
+        On this step your goal is to find the values of the parameters to reach covering plants with contours
+        and avoid their merging. Initial values of the parameters are setted, you should just fix them a little
+        bit if it will be needed. See the picture below to understand possible problems*.
+    </li>
+    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_7.png" width=50% height=50%>
+    <p>* The parameter values for these pictures are chosen to be extreme. When choosing options, the appearance of
+        the
+        contours will change less contrast. You can see similar patterns if the contour detection parameters are not
+        suitable for your data. The default parameters that are now in the program are approximate parameters that
+        approximately fit all the photosets we used </p>
+
+    <b> NOTION: </b>
+    <p> What are the blurring parameters?</p>
+    <p>‘morph’ is a size of structuring element for morphological transformation, </p>
+    <p> ‘gauss’ is the parameter of gaussian blurring, </p>
+    <p> ‘canny_top’ is the threshold for contours’ identification: any edges with intensity gradient more than </p>
+    <p> ‘canny_top’ are detected as edge</p>
+    <p> Move the trackers to achieve the best recognition of whole plant contour:</p>
+    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_8.PNG" width=50% height=50%>
+
+    <li> Color range parameters. In the search we use the HSV color coding. The window displays 6 trackers:
+        lower and upper bounds for each of the 3 encoding components (h, s, v). The result of the selection
+        will be the color range of pixels that correspond to the object that we want to highlight in the picture.
+        The window also shows the binary mask of the photo: white pixels are shown that fall into the selected
+        range, black - pixels that do not fall into the range. Your task at this stage is to choose 2 ranges
+        (for sprouts and for roots) that will successfully display the desired objects.
+
+
+        <div class="container">
+            <div class="row align-items-start">
+                <div class="col">
+                    <img src="https://s1.1zoom.ru/b5050/260/Cats_Kittens_Ginger_452265_1920x1200.jpg" width=70%
+                         height=70%>
+                </div>
+                <div class="col">
+                    For a clearer separation of roots from sprouts, during the search we color the image with a block
+                    type: green block for sprouts and pink for roots, so the hue(h - hue ) for roots and sprouts will
+                    lie in opposite separated ranges (roots - (125, 165) or wider and seedlings - (20, 55) or wider).
+                    At this stage, the saturation parameter (s - saturation) does not affect anything (so far we have
+                    not met such plants or photographs in the course of work), therefore its limits cover the entire
+                    range (0.255).
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <p> The brightness parameter (v - value, or brightness) selects only light areas to exclude the dark background,
+            so its approximate values range from 100 to 255.</p>
+        <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_color.png" width=30% height=30%>
+        <p><img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/hsv.PNG" width=30%
+                height=30%></p>
+
+        <p> In the first step, as soon as you get to this tab, the default values
+            for the color components of the roots are displayed. Customize them or leave them as they
+            are and click the "Set roots" button on the right. Next, you need to choose a color range
+            for the sprouts. To do this, move the hue sliders to a range of yellow-green hues (for example, from 0 to
+            60). At this point, the exact numbers are not so important, because the shades are spaced in
+            a range of hue in non-overlapping areas, so you can easily take a wider range, focusing only
+            on the picture you see.
+        </p>
+        <div class="container">
+            <div class="row align-items-start">
+                <div class="col">
+                    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_9.png" width=90%
+                         height=90%>
+                </div>
+                <div class="col">
+                    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_10.png" width=90%
+                         height=90%>
+                </div>
+            </div>
+        </div>
+    </li>
+
+    <li> The next step of seed segmentation is quite similar to the previous one. Here your goal is to find the color
+        range for the seeds. The window displays the same trackers and a binary mask for an uncolored photo (without any
+        filters). The difference is that you should choose the range for natural seed color. The default parameters are
+        selected for yellow seed.
+        Hue has only a yellow range (0, 20). The top value is 20 to exclude green pixels of sprouts.
+        Saturation scale has a saturated range (100, 255) to exclude white-close unsaturated pixels of roots and
+        sprouts.
+        <p> Brightness scale has a light range (100, 255) to exclude a dark background and in some cases you can
+            increase the bottom board to exclude some roots and sprouts areas</p>
+    </li>
+    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_11.png" width=50%
+         height=50%>
+
+    <li> Set paper sticker size in mm2, value = width (mm) x length (mm), and germination threshold in mm (seedlings
+        with both sprout and root lengths below that threshold will be counted together with non-germinated seeds). For
+        example dataset, use 6241 for paper size in mm2 and germination threshold you prefer. Press the ‘RUN’ button to
+        start processing.
+    </li>
+    <img src="https://raw.githubusercontent.com/TomirisKusainova/pictures/master/B_12.png" width=50%
+         height=50%>
+
+    <li> Program has accomplished evaluation when progress bar shows 100% and logging window will notify you when the
+        search is over:
+    </li>
+    <img src="https://s1.1zoom.ru/b5050/260/Cats_Kittens_Ginger_452265_1920x1200.jpg" width=50%
+         height=50%>
+
+    <li> The output files can be found in the output directory. Program generates the following files:
+        <ol>
+            <li> the .csv tables with p-values corresponding to all pairwise comparisons between sample groups, the
+                calculated germination efficiency, sprout and root lengths, total plant areas and the summary table with
+                all digital measurements.
+            </li>
+            <li>the figures characterizing distributions of measured plant sizes, bar plots with mean values and
+                standard deviations, and heatmaps visualizing the conclusions on statistical significance of the
+                morphometric changes.
+            </li>
+
+        </ol>
+
+
+    </li>
+
+
+</ol>
+</body>
+</html>
