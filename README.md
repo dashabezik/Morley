@@ -38,18 +38,29 @@ To compare the recieved results you can look through the results recieved by me 
 ### Input files
 
 Morley supports the most popular image files formats (JPEG files, Portable Network Graphics, et al., full list is [here](https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga288b8b3da0892bd651fce07b3bbd3a56) ).
+
+
 All the photos should be equally oriented (sproughts->roots line should have the same direction).
-To convert pixels into millimeters you should locate a size standard near the plants on the sptoughts side. More information in the [Appendix A](https://github.com/dashabezik/Morley/blob/main/img/appendix_a.md).
+To convert pixels into millimeters you should locate a size standard near the plants on the spoughts side. More information in the [Appendix A](https://github.com/dashabezik/Morley/blob/main/img/appendix_a.md).
 
-Folder with photos must have certain structure: head folder contains subfolders with raw photos divided by the groups and template folder, subfolders contain raw photos and template photo contains seed photo.
-<img src="https://github.com/dashabezik/Morley/blob/main/img/folder_tree_wo_template.png" width=50% height=50%>
- **Figure 1.** Folders structure.
+Folder with photos must have certain structure: head folder contains subfolders with raw photos divided by the groups. Read more [here](https://github.com/dashabezik/Morley/blob/main/img/appendix_b.md#before-running-morley)
 
-Head folder will be used as the beggining of the report files name (for example HeadFolderName_MeasuringParameter_Date.csv  -->  4567days_seed_germ_2022-09-21.csv). Names of subfolders will be used as group labels in visualisation part. 
+<p align="center">
+<img src="https://github.com/dashabezik/Morley/blob/main/img/folder_tree_wo_template.png" width=50% height=50% title = "Folders structure." >
+
+  **Figure 1** Folders structure.
+
+</p>
+
+
+
 
 ### Search parameters
 
 Before the measurement start choose:
+* input directory
+* seed template file
+* output directory
 * angle of photo rotation;
 * bluring parameters;
 * sproughts and roots color ranges;
