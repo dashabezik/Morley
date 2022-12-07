@@ -8,17 +8,17 @@ Morley is an open-sourse software for plants morphometry: measuring sprouts, roo
 
 Morley is a software for measuring morphology parameters of plants using plants photo, which is noninvasive for plants. Morley calculates sprouths length, length of the longest root, summ of the length all the roots and plant area, represents statistical analysis with plots: bar plots of the parameters of different groups, their comparison on heatmap and histogramms with distribution of the parameters in different groups.
 
-You and use GUI, that is plased here, or learn the algorithm deeper using Jupyter Notebook placed [here] (https://github.com/dashabezik/plants)
+You and use GUI, that is plased here, or learn the algorithm deeper using Jupyter Notebook placed [here](https://github.com/dashabezik/plants)
 
 # Installation
 
-Morley requires Python 3.7 or newer. You can install Morley GUI from PyPI:
+Morley requires Python 3.7 or newer. Read how to install Python [here](). You can install Morley GUI from PyPI:
 ```
 pip install morley
 ```
-\* *use this command in a Python compiller or in Bash command line*
+\* *use this command in a Python compiller or in Bash command line (for example, in Anaconda Promp)*
 
-Alternatively, you can install directly from GitHub:
+Alternatively, you can install morley directly from GitHub:
 
 ```
 pip install git+https://github.com/dashabezik/Morley.git
@@ -26,7 +26,7 @@ pip install git+https://github.com/dashabezik/Morley.git
 
 # Example
 
-Run ``` morley ``` command on the command line (or in the compiller), follow the instructions in the User Guide (more detailed instruction is in [supplementary material]()). Check the results in the chosen output folder. 
+Run ``` morley ``` command on the command line (or in Anaconda Promp), follow the instructions in the User Guide (more detailed instruction is in [Appendix B]()). Check the results in the chosen output folder. 
 
 Raw photos, which you can use an example are placed [here](https://github.com/dashabezik/plants)
 
