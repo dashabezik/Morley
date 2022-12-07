@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import ttk
 from tkinter.filedialog import askopenfilename, askdirectory, asksaveasfilename
 from PIL import ImageTk, Image
 import cv2 as cv
@@ -8,7 +7,6 @@ from imutils import contours
 import numpy as np
 import pandas as pd
 import os
-from os import path, listdir
 import random
 from functools import partial
 import json
@@ -16,41 +14,41 @@ import json
 
 state = {
     'settings': {
-        'morph': 2.0,
-        'gauss':1.0,
-        'canny_top': 160.0
+        'morph': 5,
+        'gauss': 3,
+        'canny_top': 160
     },
-    'color':{
-        'h_bottom':50.0,
-        'h_top':255.0,
-        's_bottom':0.0,
-        's_top':255.0,
-        'v_bottom':100.0,
-        'v_top':255.0,
+    'color': {
+        'h_bottom': 50,
+        'h_top': 255,
+        's_bottom': 0,
+        's_top': 255,
+        'v_bottom': 100,
+        'v_top': 255,
     },
-    'roots':{
-        'h_bottom':0.0,
-        'h_top':255.0,
-        's_bottom':0.0,
-        's_top':255.0,
-        'v_bottom':0.0,
-        'v_top':255.0,
+    'roots': {
+        'h_bottom': 0,
+        'h_top': 255,
+        's_bottom': 0,
+        's_top': 255,
+        'v_bottom': 0,
+        'v_top': 255,
     },
-    'leaves':{
-        'h_bottom':0.0,
-        'h_top':255.0,
-        's_bottom':0.0,
-        's_top':255.0,
-        'v_bottom':0.0,
-        'v_top':255.0,
+    'leaves': {
+        'h_bottom': 0,
+        'h_top': 255,
+        's_bottom': 0,
+        's_top': 255,
+        'v_bottom': 0,
+        'v_top': 255,
     },
-    'seed':{
-        'h_bottom':0.0,
-        'h_top':20.0,
-        's_bottom':100.0,
-        's_top':255.0,
-        'v_bottom':100.0,
-        'v_top':255.0,
+    'seed': {
+        'h_bottom': 0,
+        'h_top': 20,
+        's_bottom': 100,
+        's_top': 255,
+        'v_bottom': 100,
+        'v_top': 255,
     },
     'paths': {
         'out_dir': os.getcwd()
@@ -108,7 +106,7 @@ def update_labels(label_dict):
     outdir = state.get('paths', {}).get('out_dir')
     if outdir:
         set_label('outdir', label_dict['outdir'], outdir)
-        
+
     rotate = state.get('rotation')
     if rotate:
         set_label('rotation', label_dict['rotation'], rotate)
@@ -201,55 +199,9 @@ def trace_entry(key):
     return callback
 
 
-class FormatLabel(tk.Label):
-
-    def __init__(self, master=None, cnf={}, **kw):
-
-        # default values
-        self._format = FORMAT
-        self._textvariable = None
-        self.two_n_plus1 = None
-
-        # get new format and remove it from `kw` so later `super().__init__` doesn't use them (it would get error message)
-        if 'format' in kw:
-            self._format = kw['format']
-            del kw['format']
-
-        # get `textvariable` to assign own function which set formatted text in Label when variable change value
-        if 'textvariable' in kw:
-            self._textvariable = kw['textvariable']
-            self._trace_id = self._textvariable.trace('w', self._update_text)
-            del kw['textvariable']
-
-        if 'two_n_plus1' in kw:
-            self.two_n_plus1 = kw['two_n_plus1']
-            # self._textvariable.trace('w', self._update_text)
-            del kw['two_n_plus1']
-
-        # run `Label.__init__` without `format` and `textvariable`
-        super().__init__(master, cnf={}, **kw)
-
-        # update text after running `Label.__init__`
-        if self._textvariable:
-            #self._update_text(None, None, None)
-            self._update_text(self._textvariable, '', 'w')
-
-    def _update_text(self, a, b, c):
-        """update text in label when variable change value"""
-        if self.two_n_plus1:
-            self["text"] = self._format.format(2*int(self._textvariable.get())+1)
-        else:
-            self["text"] = self._format.format(self._textvariable.get())
-
-    def destroy(self):
-        self._textvariable.trace_vdelete('w', self._trace_id)
-        super().destroy()
-
-
-
 def random_file(path_to_file_folder):
     a=random.choice(os.listdir(path_to_file_folder))
-    while (a=='template')|(a=='.ipynb_checkpoints')|(not path.isdir(path.join(path_to_file_folder,a))):
+    while (a=='template')|(a=='.ipynb_checkpoints')|(not os.path.isdir(os.path.join(path_to_file_folder,a))):
         a=random.choice(os.listdir(path_to_file_folder))
     path_to_file = os.path.join(path_to_file_folder, a+'/')
     b = random.choice(os.listdir(path_to_file))
@@ -317,9 +269,7 @@ def get_out_dirname(label):
 
 def blur(img_widget, event):
     morph = state['settings']['morph'].get()
-    morph = 2 * morph + 1
     gauss = state['settings']['gauss'].get()
-    gauss = 2 * gauss + 1
     canny_bottom = 0
     canny_top = state['settings']['canny_top'].get()
 
@@ -486,8 +436,8 @@ def add_color_sliders(d, frame, command, startrow=1):
         name.grid(column=0, row=row, rowspan=2)
         for j, suffix in enumerate(['bottom', 'top']):
             var = d[f'{param}_{suffix}']
-            label = FormatLabel(master=frame, textvariable=var)
-            slider = ttk.Scale(master=frame, from_=0, to=255, variable=var, command=command)
+            label = tk.Label(master=frame, textvariable=var)
+            slider = tk.Scale(master=frame, from_=0, to=255, variable=var, orient='horizontal', resolution=1, showvalue=False, command=command)
             slider.grid(column=j + 1, row=row)
             label.grid(column=j + 1, row=row + 1)
     return row + 1
@@ -558,25 +508,25 @@ def contours_tab(img, tweak_frame):
 
     morph_label = tk.Label(master=tweak_frame, text="Choosing parameters for contour recognition")
     morph_label.grid(column=0, row=0, columnspan=3)
-    morph_slider_lbl = FormatLabel(master=tweak_frame, textvariable=state['settings']['morph'], two_n_plus1 = True)
+    morph_slider_lbl = tk.Label(master=tweak_frame, textvariable=state['settings']['morph'])
     morph_name_lbl = tk.Label(master=tweak_frame, text="morph:")
-    morph_slider = ttk.Scale(master=tweak_frame, from_=0, to=6, command=partial(blur, img),
+    morph_slider = tk.Scale(master=tweak_frame, from_=1, to=13, resolution=2, orient='horizontal', showvalue=False, command=partial(blur, img),
                              variable=state['settings']['morph'])
     morph_name_lbl.grid(column=0, row=1)
     morph_slider.grid(column=1, row=1)
     morph_slider_lbl.grid(column=2, row=1)
 
-    gauss_slider_lbl = FormatLabel(master=tweak_frame, textvariable=state['settings']['gauss'], two_n_plus1 = True)
+    gauss_slider_lbl = tk.Label(master=tweak_frame, textvariable=state['settings']['gauss'])
     gauss_name_lbl = tk.Label(master=tweak_frame, text='gauss:')
-    gauss_slider = ttk.Scale(master=tweak_frame, from_=0, to=6, command=partial(blur, img),
+    gauss_slider = tk.Scale(master=tweak_frame, from_=1, to=13, resolution=2, orient='horizontal', showvalue=False, command=partial(blur, img),
                              variable=state['settings']['gauss'])
     gauss_name_lbl.grid(column=0, row=2)
     gauss_slider.grid(column=1, row=2)
     gauss_slider_lbl.grid(column=2, row=2)
 
-    canny_top_slider_lbl = FormatLabel(master=tweak_frame, textvariable=state['settings']['canny_top'])
+    canny_top_slider_lbl = tk.Label(master=tweak_frame, textvariable=state['settings']['canny_top'])
     canny_top_name_lbl = tk.Label(master=tweak_frame, text='canny_top:')
-    canny_top_slider = ttk.Scale(master=tweak_frame, from_=0, to=255, command=partial(blur, img),
+    canny_top_slider = tk.Scale(master=tweak_frame, from_=0, to=255, orient='horizontal', showvalue=False, command=partial(blur, img),
                                  variable=state['settings']['canny_top'])
     canny_top_name_lbl.grid(column=0, row=3)
     canny_top_slider.grid(column=1, row=3)
