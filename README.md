@@ -42,7 +42,7 @@ All the photos should be equally oriented (sproughts->roots line should have the
 To convert pixels into millimeters you should locate a size standard near the plants on the sptoughts side. More information in [article](some_link).
 
 Folder with photos must have certain structure: head folder contains subfolders with raw photos divided by the groups and template folder, subfolders contain raw photos and template photo contains seed photo.
-<img src="https://github.com/dashabezik/Morley/blob/main/img/folder_tree.png" width=50% height=50%>
+<img src="https://github.com/dashabezik/Morley/blob/main/img/folder_tree_wo_template.png" width=50% height=50%>
  **Figure 1.** Folders structure.
 
 Head folder will be used as the beggining of the report files name (for example HeadFolderName_MeasuringParameter_Date.csv  -->  4567days_seed_germ_2022-09-21.csv). Names of subfolders will be used as group labels in visualisation part. 
