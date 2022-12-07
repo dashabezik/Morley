@@ -644,8 +644,8 @@ def tk2int(var):
 def get_state_values(param):
     l=[]
     if param=='settings':
-        l.append(2*tk2int(gui.state[param]['morph'])+1)
-        l.append(2*tk2int(gui.state[param]['gauss'])+1)
+        l.append(tk2int(gui.state[param]['morph']))
+        l.append(tk2int(gui.state[param]['gauss']))
         l.append(tk2int(gui.state[param]['canny_top']))
     else:
         for i in gui.state[param]:
