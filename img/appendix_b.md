@@ -25,8 +25,8 @@ Table of contents
 
 ### Before running morley
 Prepare a directory with raw photos. Folders with photos must have a certain structure: head folder contains subfolders named after the plant groups to be 
-compared with raw photos and template folder, subfolders contain raw photos and template folder contains seed photo. Head folder must be selected as the 
-“Image directory”. A seed photo contains the seed only and is created as a fragment of plant image.
+compared with raw photos. Head folder must be selected as the 
+“Image directory”. Head folder will be used as the beggining of the report files name (for example HeadFolderName_MeasuringParameter_Date.csv --> 4567days_seed_germ_2022-09-21.csv). Names of subfolders will be used as group labels in visualisation part. A seed photo contains the seed only and is created as a fragment of plant image.
 
 <p align="center">
 <img src="https://github.com/dashabezik/Morley/blob/main/img/folder_tree_wo_template.png" width=50% height=50%>
@@ -76,13 +76,13 @@ Move the trackers to achieve the best recognition of whole plant contour:
 Color range parameters. In the search we use the HSV color coding. The window displays 6 trackers: lower and upper bounds for each of the 3 encoding components (h, s, v). The result of the selection will be the color range of pixels that correspond to the object that we want to highlight in the picture. The window also shows the binary mask of the photo: white pixels are shown that fall into the selected range, black - pixels that do not fall into the range. Your task at this stage is to choose 2 ranges (for sprouts and for roots) that will successfully display the desired objects.
 For a clearer separation of roots from sprouts, during the search we color the image with a block type: green block for sprouts and pink for roots, so the hue(h - hue ) for roots and sprouts will lie in opposite separated ranges (roots - (125, 165) or wider and seedlings - (20, 55) or wider).
 At this stage, the saturation parameter (s - saturation) does not affect anything (so far we have not met such plants or photographs in the course of work), therefore its limits cover the entire range (0.255).
-The brightness parameter (v - value, or brightness) selects only light areas to exclude the dark background, so its approximate values ​​range from 100 to 255.
+The brightness parameter (v - value, or brightness) selects only light areas to exclude the dark background, so its approximate values range from 100 to 255.
 H 
 S  
 V 
 
 
-In the first step, as soon as you get to this tab, the default values ​​for the color components of the roots are displayed. Customize them or leave them as they are and click the "Set roots" button on the right. Next, you need to choose a color range for the sprouts. To do this, move the hue sliders to a range of yellow-green hues (for example, from 0 to 60). At this point, the exact numbers are not so important, because the shades are spaced in a range of hue in non-overlapping areas, so you can easily take a wider range, focusing only on the picture you see.
+In the first step, as soon as you get to this tab, the default values for the color components of the roots are displayed. Customize them or leave them as they are and click the "Set roots" button on the right. Next, you need to choose a color range for the sprouts. To do this, move the hue sliders to a range of yellow-green hues (for example, from 0 to 60). At this point, the exact numbers are not so important, because the shades are spaced in a range of hue in non-overlapping areas, so you can easily take a wider range, focusing only on the picture you see.
 
 The next step of seed segmentation is quite similar to the previous one. Here your goal is to find the color range for the seeds. The window displays the same trackers and a binary mask for an uncolored photo (without any filters). The difference is that you should choose the range for natural seed color. The default parameters are selected for yellow seed. 
 Hue has only a yellow range (0, 20). The top value is 20 to exclude green pixels of sprouts.
