@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 import tkinter.scrolledtext as st
-import tklogging
 import logging
 from functools import partial
 import os
@@ -9,7 +8,7 @@ import sys
 import threading
 from . import gui, Morley, version
 
-logger = tklogging.getLogger('')
+logger = logging.getLogger()
 
 
 def main():
@@ -70,20 +69,23 @@ def main():
     germ_threshold_lbl = tk.Label(master=main_frame, text="Germination threshold, mm", width=28)
 
     report_area = st.ScrolledText(main_frame, width=60, height=20, state=tk.DISABLED)
-    Handler = tklogging.get_handler(report_area)
-
-    log_t = threading.Thread(target=tklogging.socket_listener_worker,
-        args=(logger, logging.handlers.DEFAULT_TCP_LOGGING_PORT, Handler),
-        name='morley-listener')
-    log_t.start()
+    handler = gui.LoggingToGUI(report_area)
+    formatter = logging.Formatter('{levelname:>8}: {asctime} {message}',
+                datefmt='[%H:%M:%S]', style='{')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.DEBUG)
+    logger.addHandler(stream_handler)
+    stream_handler.setFormatter(formatter)
+    logging.getLogger('matplotlib').setLevel(logging.WARNING)
 
     pb = ttk.Progressbar(main_frame, orient=tk.HORIZONTAL, mode='determinate', length=100, variable=gui.state['progress'])
     pb_lbl = gui.FormatLabel(main_frame, textvariable=gui.state['progress'], format='{}%')
 
-    run_t = threading.Thread(target=Morley.search, name='morley-worker')
-    run_t.daemon = True
-
-    run_btn = tk.Button(master=main_frame, text="RUN", command=run_t.start, width=20)
+    worker = threading.Thread(target=Morley.search, name='morley-worker')
+    run_btn = tk.Button(master=main_frame, text="RUN", command=worker.start, width=20)
 
     gui.conditions.register({
         'rotate': [rotation_btn],
@@ -129,9 +131,7 @@ def main():
     window.rowconfigure(0, weight=1)
     window.columnconfigure(0, weight=1)
     window.mainloop()
-
-    tklogging.tklogging.tcpserver.abort = 1
-    tklogging.tklogging.tcpserver.server_close()
+    worker.join()
     sys.exit()
 
 

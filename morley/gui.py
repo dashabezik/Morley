@@ -10,6 +10,7 @@ import os
 import random
 from functools import partial
 import json
+import logging
 
 
 state = {
@@ -100,6 +101,21 @@ class FormatLabel(tk.Label):
     def destroy(self):
         self._textvariable.trace_vdelete('w', self._trace_id)
         super().destroy()
+
+
+class LoggingToGUI(logging.Handler):
+    # https://stackoverflow.com/a/18194597/1258041
+    def __init__(self, console):
+        logging.Handler.__init__(self)
+        self.console = console
+
+    def emit(self, message):
+        formattedMessage = self.format(message)
+
+        self.console.configure(state=tk.NORMAL)
+        self.console.insert(tk.END, formattedMessage + '\n')
+        self.console.configure(state=tk.DISABLED)
+        self.console.see(tk.END)
 
 
 def save_state(fname):
