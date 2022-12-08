@@ -40,15 +40,15 @@ Cut the image as close to the edges of the seed as possible.
 
 ## USAGE:
 ### 
-0. Run ``` morley``` command on the command line (or in Anaconda Promp). 
+1. Run ``` morley``` command on the command line (or in Anaconda Promp). 
 <p align="center">
 <img src="https://github.com/dashabezik/Morley/blob/main/img/load button.PNG" width=50% height=50%>
 </p>
 
-1. For quick start, download the example photos folder from https://github.com/dashabezik/Morley/tree/main/ or select your own photos. To test the program you can run it using bigger photo sets placed here: https://github.com/dashabezik/plants
+*For quick start, download the example photos folder from https://github.com/dashabezik/Morley/tree/main/ or select your own photos. To test the program you can run it using bigger photo sets placed here: https://github.com/dashabezik/plants*
 
 
-2. Select directory with folders containing raw photos. Remember rules from the [NOTION](#Before-running-morley) above.
+2. Select directory with folders containing raw photos. Remember rules from the [notion](#Before-running-morley) above.
 
 3. Select file with seed template.
 
@@ -56,20 +56,37 @@ Cut the image as close to the edges of the seed as possible.
 
 5. Rotate images by clicking the “Rotate image” button. Select the angle so that the location of the objects and the sprout-root orientation correspond to these characteristics in the schematic image on the left.
 
-NOTION: For correct processing, the paper sticker should be the most left contour, the seeds must compile a vertical line in the center, and the leaves and the roots must be on the left and right from that vertical line, respectively. All the original photos should have the same orientation of sprouts and roots. 
-After setting, all the photos will be properly rotated, including the seed template image.
+<p align="center">
+<img src="https://github.com/dashabezik/Morley/blob/main/img/rotation.PNG" width=50% height=50%>
+</p>
 
-Tweak image button is for setting parameters for plant, root, sprout and seed recognition. Initial parameters are set by default (see the table with examples for different datasets). 
+
+
+  ***NOTION:** For correct processing, the paper sticker should be the most left contour, the seeds must compile a vertical line in the center, and the leaves and the roots must be on the left and right from that vertical line, respectively. All the original photos should have the same orientation of sprouts and roots.*
+
+After setting the rotation angle, all the photos will be properly rotated, including the seed template image.
+
+6. Push "Recognition settings" button to set parameters for plant, root, sprout and seed recognition. Initial parameters, that on average should be suitable for any dataset, are set by default. 
 
  On this step your goal is to find the values of the parameters to reach covering plants with contours and avoid their merging. Initial values of the parameters are setted, you should just fix them a little bit if it will be needed. See the picture below to understand possible problems*. 
 
+<p align="center">
+<img src="https://github.com/dashabezik/Morley/blob/main/img/bluring_modified.png" width=50% height=50% bgcolor=#800000>
+</p>
 
-* The parameter values for these pictures are chosen to be extreme. When choosing options, the appearance of the contours will change less contrast. You  can see similar patterns if the contour detection parameters are not suitable for your data. The default parameters that are now in the program are approximate parameters that approximately fit all the photosets we used
-NOTION:
-What are the blurring parameters?
-‘morph’ is a size of structuring element for morphological transformation, 
-‘gauss’ is the parameter of gaussian blurring, 
-‘canny_top’ is the threshold for contours’ identification: any edges with intensity gradient more than ‘canny_top’ are detected as edges 
+* *The parameter values for these pictures are chosen to be extreme. When choosing options, the appearance of the contours will change less contrast. You  can see similar patterns if the contour detection parameters are not suitable for your data. The default parameters that are now in the program are approximate parameters that approximately fit all the photosets we used.*
+
+
+  **NOTION:**
+  What are the blurring parameters?
+  
+  ‘morph’ is a size of structuring element for morphological transformation, 
+  
+  ‘gauss’ is the parameter of gaussian blurring, 
+  
+  ‘canny_top’ is the threshold for contours’ identification: any edges with intensity gradient more than ‘canny_top’ are detected as edges 
+
+
 Move the trackers to achieve the best recognition of whole plant contour:
 
 
