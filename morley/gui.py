@@ -10,6 +10,7 @@ import os
 import random
 from functools import partial
 import json
+import logging
 
 
 state = {
@@ -57,6 +58,7 @@ state = {
     'paper_area_thresold': 5000,
     'paper_area': 0,
     'germ_thresh': 10,
+    'progress': 0,
 }
 
 STATE_SYNTAX_VERSION = 1
@@ -64,10 +66,61 @@ STATE_SYNTAX_VERSION_KEY = 'syntax_version'
 CONTOUR_AREA_THRESHOLD = 1000
 FORMAT='{:.0f}'
 
+class FormatLabel(tk.Label):
+
+    def __init__(self, master=None, cnf={}, **kw):
+
+        # default values
+        self._format = FORMAT
+        self._textvariable = None
+        self.two_n_plus1 = None
+
+        # get new format and remove it from `kw` so later `super().__init__` doesn't use them (it would get error message)
+        if 'format' in kw:
+            self._format = kw['format']
+            del kw['format']
+
+        # get `textvariable` to assign own function which set formatted text in Label when variable change value
+        if 'textvariable' in kw:
+            self._textvariable = kw['textvariable']
+            self._trace_id = self._textvariable.trace('w', self._update_text)
+            del kw['textvariable']
+
+        # run `Label.__init__` without `format` and `textvariable`
+        super().__init__(master, cnf={}, **kw)
+
+        # update text after running `Label.__init__`
+        if self._textvariable:
+            #self._update_text(None, None, None)
+            self._update_text(self._textvariable, '', 'w')
+
+    def _update_text(self, a, b, c):
+        """update text in label when variable change value"""
+        self["text"] = self._format.format(self._textvariable.get())
+
+    def destroy(self):
+        self._textvariable.trace_vdelete('w', self._trace_id)
+        super().destroy()
+
+
+class LoggingToGUI(logging.Handler):
+    # https://stackoverflow.com/a/18194597/1258041
+    def __init__(self, console):
+        logging.Handler.__init__(self)
+        self.console = console
+
+    def emit(self, message):
+        formattedMessage = self.format(message)
+
+        self.console.configure(state=tk.NORMAL)
+        self.console.insert(tk.END, formattedMessage + '\n')
+        self.console.configure(state=tk.DISABLED)
+        self.console.see(tk.END)
+
 
 def save_state(fname):
     state_dict = pythonize_state_dict()
-    for k in ['template', 'img_arr', 'img_arr_0']:
+    for k in ['template', 'img_arr', 'img_arr_0', 'progress']:
         state_dict.pop(k, None)
     state_dict[STATE_SYNTAX_VERSION_KEY] = STATE_SYNTAX_VERSION
     with open(fname, 'w') as f:

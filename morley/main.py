@@ -1,9 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
 import tkinter.scrolledtext as st
+import logging
 from functools import partial
 import os
+import sys
+import threading
 from . import gui, Morley, version
+
+logger = logging.getLogger()
 
 
 def main():
@@ -17,7 +22,7 @@ def main():
     background_label.image = background_image
 
     window.title(f'Morley GUI v{version.version}')
-    window.geometry('900x430')
+    window.geometry('960x430')
 
     gui.set_state_variables(gui.state, window)
 
@@ -49,10 +54,10 @@ def main():
     save_btn = tk.Button(master=main_frame, text="Save settings", command=gui.save_state_dialog)
     tweak_lbl = tk.Label(master=main_frame, text="Set recognition parameters: \n blur and color ranges", justify='left')
     tweak_btn = tk.Button(master=main_frame, text="Recognition settings", command=partial(gui.tweak_image, window), width=20)
-    
+
     rotation_lbl = tk.Label(master=main_frame, text="Rotation angle: " + str(gui.state['rotation'].get()), justify='left')
     rotation_btn = tk.Button(master=main_frame, text="Rotate image", command=partial(gui.rotation, window, rotation_lbl), width=20)
-    
+
     label_dict = {'input': raw_dir_lbl, 'template': template_lbl, 'outdir': out_dir_lbl, 'rotation': rotation_lbl}
     load_btn = tk.Button(master=main_frame, text="Load settings", command=partial(gui.load_state_dialog, label_dict))
 
@@ -63,16 +68,24 @@ def main():
     germ_threshold = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20, textvariable=gui.state['germ_thresh'])
     germ_threshold_lbl = tk.Label(master=main_frame, text="Germination threshold, mm", width=28)
 
-    report_area = st.ScrolledText(main_frame, width=40, height=20)
+    report_area = st.ScrolledText(main_frame, width=60, height=20, state=tk.DISABLED)
+    handler = gui.LoggingToGUI(report_area)
+    formatter = logging.Formatter('{levelname:>8}: {asctime} {message}',
+                datefmt='[%H:%M:%S]', style='{')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.DEBUG)
+    logger.addHandler(stream_handler)
+    stream_handler.setFormatter(formatter)
+    logging.getLogger('matplotlib').setLevel(logging.WARNING)
 
-    report_area.insert(tk.END,'... LOGGING WINDOW ... \n')
-    report_area.update()
+    pb = ttk.Progressbar(main_frame, orient=tk.HORIZONTAL, mode='determinate', length=100, variable=gui.state['progress'])
+    pb_lbl = gui.FormatLabel(main_frame, textvariable=gui.state['progress'], format='{}%')
 
-    pb = ttk.Progressbar(main_frame, orient=tk.HORIZONTAL, mode='determinate', length=100)
-    pb_lbl = tk.Label(main_frame, text='0%')
-
-    run_btn = tk.Button(master=main_frame, text="RUN", command=partial(
-        Morley.search, main_frame, report_area, pb, pb_lbl), width=20)
+    worker = threading.Thread(target=Morley.search, name='morley-worker')
+    run_btn = tk.Button(master=main_frame, text="RUN", command=worker.start, width=20)
 
     gui.conditions.register({
         'rotate': [rotation_btn],
@@ -118,6 +131,8 @@ def main():
     window.rowconfigure(0, weight=1)
     window.columnconfigure(0, weight=1)
     window.mainloop()
+    worker.join()
+    sys.exit()
 
 
 if __name__ == '__main__':

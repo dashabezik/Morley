@@ -1,9 +1,9 @@
 from imutils import contours
 import scipy
-from scipy.spatial import distance as dist
 import cv2 as cv
 import numpy as np
 import matplotlib
+matplotlib.use('agg')
 from matplotlib import pyplot as plt
 import pandas as pd
 from os import path, listdir
@@ -16,9 +16,11 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.patches as mpatches
 from collections import defaultdict
 import tkinter as tk
+import logging
 from . import gui
 
 
+logger = logging.getLogger(__name__)
 
 # # Functions
 
@@ -72,7 +74,7 @@ def nothing(*arg):
 
 def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fixed,path_to_output_dir, is_save = False, figname=None):
     fig, axes = plt.subplots(len(tmp_l.columns), 4, figsize=(35, 8*len(tmp_l.columns)))
-    print('path in hist', path_to_output_dir )
+    logger.debug('path in hist: %s', path_to_output_dir )
     matplotlib.rcParams.update({'font.size': 20})
     param_type = 0
     fig.suptitle('X axis: Length, mm (root max, root sum and leaves); Area, mm2 (plant area);'
@@ -107,9 +109,9 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
     if is_save:
         if figname is None:
             figname = pic_filename('hist','l_rm_rs',path_to_file_folder_fixed)
-            print(figname)
+            logger.debug(figname)
 #             report_area.insert(tk.END, str(path.join(path_to_output_dir,figname))+'\n')
-            print(str(path.join(path_to_output_dir,figname))+'\n')
+            logger.debug(str(path.join(path_to_output_dir,figname))+'\n')
         plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
 #     plt.show()
 
@@ -538,9 +540,9 @@ def color_range_counter(src, contours, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255)
 
 # ### Find_paper
 
-def find_paper(report_area, src, template_size, square_threshold, position_x_axes, canny_top=100, canny_bottom=10, morph=7, gauss=3):
+def find_paper(src, template_size, square_threshold, position_x_axes, canny_top=100, canny_bottom=10, morph=7, gauss=3):
     ppm = [7.45]
-    gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+    # gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
     bl = cv.GaussianBlur(src, (gauss,gauss), 0)
     canny = cv.Canny(bl, canny_bottom, canny_top)
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (int(morph), int(morph)))
@@ -559,8 +561,8 @@ def find_paper(report_area, src, template_size, square_threshold, position_x_axe
             center, radius = cv.minEnclosingCircle(cont)
             cv.drawContours(src, [cont], -1, (0,255,0), -2)
             if len(apd) == 4:
-                is_paper_founded = True
-                paper = cont
+                # is_paper_founded = True
+                # paper = cont
                 cv.drawContours(src, [cont], -1, (0,255,0), -2)
                 pixelsPerMetric = 7.6
                 box = cv.minAreaRect(cont)
@@ -571,8 +573,8 @@ def find_paper(report_area, src, template_size, square_threshold, position_x_axe
                 (blbrX, blbrY) = midpoint(bl, br)
                 (tlblX, tlblY) = midpoint(tl, bl)
                 (trbrX, trbrY) = midpoint(tr, br)
-                dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
-                dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
+                # dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
+                # dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
     #             if (dB/template_size > (square_threshold/)):
                 pixelsPerMetric = math.sqrt(cv.contourArea(cont)/(template_size))
                 ppm.append(pixelsPerMetric)
@@ -582,7 +584,7 @@ def find_paper(report_area, src, template_size, square_threshold, position_x_axe
             rect = cv.minAreaRect(apd)
             box = cv.boxPoints(rect) # поиск четырех вершин прямоугольника
             box = np.int0(box) # округление координат
-            report_area.insert(tk.END, 'Pixels per metric - '+str(pixelsPerMetric)+'\n')
+            logger.info('Pixels per metric - %.3f', pixelsPerMetric)
             cv.drawContours(src,[cont],0,(0,255,0),-2)
             break
 
@@ -653,7 +655,7 @@ def get_state_values(param):
     return l
 
 
-def search(files_frame, report_area, pb, pb_lbl):
+def search():
     Progress_bar_value = 0
     rotate = gui.state['rotation'].get()
     path_to_file_folder_fixed = gui.state['paths']['input']
@@ -669,12 +671,12 @@ def search(files_frame, report_area, pb, pb_lbl):
     hsb,hst,ssb,sst,vsb,vst = get_state_values('seed')
     morph, gs, c_top = get_state_values('settings')
     c_bottom = 0
-    report_area.insert(tk.END, 'Contour search parameters'+str(get_state_values('settings'))+'\n')
-    report_area.insert(tk.END, 'Roots color, hsv parameters'+str(get_state_values('roots'))+'\n')
-    report_area.insert(tk.END, 'Leaves color, hsv parameters'+str(get_state_values('leaves'))+'\n')
+    logger.info('Contour search parameters: %s', get_state_values('settings'))
+    logger.info('Roots color, hsv parameters: %s', get_state_values('roots'))
+    logger.info('Leaves color, hsv parameters: %s', get_state_values('leaves'))
 
     ###SEARCH###
-    report_area.insert(tk.END, 'SEARCH \n')
+    logger.info('SEARCH')
 
     measure_full2 = pd.DataFrame(columns=[], index=np.arange(30))
     # ppm - pixel per metric, массив с коэфам пересчета пикселя в мм, на случай плохого поиска стикера на фото
@@ -686,16 +688,17 @@ def search(files_frame, report_area, pb, pb_lbl):
         path_to_file_folder = path.join(path_to_file_folder_fixed, str(g)+'/')
         PL = len(listdir(path_to_file_folder))
         for filename_in_folder in listdir(path_to_file_folder):
-            Progress_bar_value += 90/(PL*FL)
-            pb.configure(value = Progress_bar_value)
-            pb_lbl['text'] = str(round(Progress_bar_value))+'%'
-            pb.update()
-            pb_lbl.update()
+            Progress_bar_value += 90 // (PL * FL)
+            gui.state['progress'].set(Progress_bar_value)
+            # pb.configure(value = Progress_bar_value)
+            # pb_lbl['text'] = str(round(Progress_bar_value))+'%'
+            # pb.update()
+            # pb_lbl.update()
             if filename_in_folder=='.ipynb_checkpoints':
                 continue
             ### CONTOURS ###
-            report_area.insert(tk.END, '\n File name '+ str(filename_in_folder)+'\n')
-            report_area.insert(tk.END, '...LOOKING FOR CONTOURS... \n')
+            logger.debug('File name: %s', filename_in_folder)
+            logger.info('LOOKING FOR CONTOURS ...')
 
             file_name = path.join(path_to_file_folder, filename_in_folder)
 
@@ -716,7 +719,7 @@ def search(files_frame, report_area, pb, pb_lbl):
             quantity_of_plants = 0
             real_conts = []
 
-            pixelsPerMetric = find_paper(report_area, src, paper_area, paper_area_thresold, position_x_axes(src,x_pos_divider),
+            pixelsPerMetric = find_paper(src, paper_area, paper_area_thresold, position_x_axes(src,x_pos_divider),
                                          canny_top=c_top, canny_bottom=c_bottom,morph=morph)
 
             for cont in contours0:
@@ -725,15 +728,14 @@ def search(files_frame, report_area, pb, pb_lbl):
                     if ((cv.contourArea(cont) > contour_area_threshold)&
                         (center[0] > src.shape[1]//3)&(center[0] < src.shape[1]*2//3)):
                         real_conts.append(cont)
-    #                     cv.drawContours(src,[cont],0,(255,255,5),2)
+            #                     cv.drawContours(src,[cont],0,(255,255,5),2)
 
             quantity_of_plants = len(real_conts)
-            report_area.insert(tk.END, 'Quantity of plants '+str(quantity_of_plants)+'\n')
-            report_area.insert(tk.END, 'Pixels per metric '+str(pixelsPerMetric)+'\n')
+            logger.info('Quantity of plants: %d', quantity_of_plants)
+            logger.info('Pixels per metric: %.3f', pixelsPerMetric)
 
             ### SEEDS ###
-            report_area.insert(tk.END, '...LOOKING FOR SEEDS POSITION... \n')
-            report_area.update()
+            logger.info('LOOKING FOR SEEDS POSITION ...')
 
 #             img2 = cv.imread(file_name,0)
             img2 = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_GRAYSCALE)
@@ -770,8 +772,7 @@ def search(files_frame, report_area, pb, pb_lbl):
             src_black_seeds = src.copy()
             src_black_seeds = cv.cvtColor(src_black_seeds, cv.COLOR_BGR2HSV)
             ### COLOR ###
-            report_area.insert(tk.END, '...MAKING COLOR... \n')
-            report_area.update()
+            logger.info('MAKING COLOR ...')
 
             overlay = src.copy()
             cv.drawContours(overlay, [pts_leaves], -1,(0,224,79), -1)
@@ -784,11 +785,10 @@ def search(files_frame, report_area, pb, pb_lbl):
             cv.imwrite('colored/{0}'.format(filename_in_folder), src)
             mean_right_x = p1[0]+3*w//4
             mean_left_x = p1[0]
-            report_area.insert(tk.END, "Mean left seeds x-coordinate "+str(mean_left_x)+'\n'
-                              +"Mean right seeds x-coordinate "+str(mean_right_x)+'\n')
+            logger.info("Mean left seeds x-coordinate %d", mean_left_x)
+            logger.info("Mean right seeds x-coordinate %d", mean_right_x)
             ## WIDTH ###
-            report_area.insert(tk.END, '...WIDTH CALCULATION... \n')
-            report_area.update()
+            logger.info('WIDTH CALCULATION...')
 
             measure = pd.DataFrame(columns=['roots_area_{0}'.format(file_name), 'leaves_area_{0}'.format(file_name),
                                             'roots_length_{0}'.format(file_name), 'leaves_length_{0}'.format(file_name),
@@ -831,7 +831,7 @@ def search(files_frame, report_area, pb, pb_lbl):
                 else:
                     leaves_width = 0
 
-    # r_max_amaunt - счетчик для максимальной длины корня, ramount - для суммарной длины
+                # r_max_amaunt - счетчик для максимальной длины корня, ramount - для суммарной длины
 
                 if step!=0:
 
@@ -868,8 +868,7 @@ def search(files_frame, report_area, pb, pb_lbl):
                 measure['leaves_width_{0}'.format(file_name)].iloc[i]= leaves_width
 
             ### PIXEL COUNTING ###
-            report_area.insert(tk.END, '...PIXEL COUNTING... \n', '\n')
-            report_area.update()
+            logger.info('PIXEL COUNTING ...')
 
             for i in range(len(real_conts)):
                 c = real_conts[i]
@@ -888,13 +887,13 @@ def search(files_frame, report_area, pb, pb_lbl):
             measure['leaves_length_{0}'.format(file_name)] = measure.apply(lambda x: length(x['leaves_width_{0}'.format(file_name)],x['leaves_area_{0}'.format(file_name)],pixelsPerMetric), axis = 1 )
             measure_full2 = measure_full2.join(measure, how = 'outer')
 
-            plt.figure(figsize = (14,14))
+            # plt.figure(figsize = (14,14))
 #             plt.imshow(src)
 #             plt.show()
 
 
-            files_frame.update_idletasks()
-            files_frame.update()
+            # files_frame.update_idletasks()
+            # files_frame.update()
 
     del res,bl,overlay, img, img2, img_hsv, gr, canny, src, closed, src_black_seeds
 
@@ -972,12 +971,13 @@ def search(files_frame, report_area, pb, pb_lbl):
     seed_germ.to_csv(path.join(path_to_output_dir,seed_germ_filename))
     add_annotation(path.join(path_to_output_dir,seed_germ_filename), report_information)
 
-    pb.configure(value = 100)
-    pb_lbl['text'] = '100%'
-    pb_lbl.update()
-    pb.update()
-    report_area.insert(tk.END, '\n ...END OF THE SEARCH... \n')
-    report_area.insert(tk.END, '\n  Go to the output directory to see the result \n')
-    report_area.update()
-    files_frame.update_idletasks()
-    files_frame.update()
+    # pb.configure(value = 100)
+    # pb_lbl['text'] = '100%'
+    # pb_lbl.update()
+    # pb.update()
+    Progress_bar_value = 100
+    gui.state['progress'].set(Progress_bar_value)
+    logger.info('SEARCH FINISHED.')
+    logger.info('Go to the output directory to see the result')
+    # files_frame.update_idletasks()
+    # files_frame.update()
