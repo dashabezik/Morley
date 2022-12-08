@@ -12,7 +12,7 @@ You and use GUI, that is plased here, or learn the algorithm deeper using Jupyte
 
 # Installation
 
-Morley requires Python 3.7 or newer. Read how to install Python [here](). You can install Morley GUI from PyPI:
+Morley requires Python 3.9 or newer. Read how to install Python [here](). You can install Morley GUI from PyPI:
 ```
 pip install morley
 ```
@@ -26,7 +26,7 @@ pip install git+https://github.com/dashabezik/Morley.git
 
 # Example
 
-Run ``` morley ``` command on the command line (or in Anaconda Promp), follow the instructions in the User Guide (more detailed instruction is in [Appendix B]()). Check the results in the chosen output folder. 
+Run ``` morley ``` command on the command line (or in Anaconda Promp), follow the instructions in the User Guide (more detailed instruction is in [Appendix B](https://github.com/dashabezik/Morley/blob/main/img/appendix_b.md)). Check the results in the chosen output folder. 
 
 Raw photos, which you can use an example are placed [here](https://github.com/dashabezik/plants)
 
@@ -37,11 +37,12 @@ To compare the recieved results you can look through the results recieved by me 
 # User Guide
 ### Input files
 
+As input, the program takes photographs of plants placed in a row on a plain contrasting background and an example of a seed photo.
 Morley supports the most popular image files formats (JPEG files, Portable Network Graphics, et al., full list is [here](https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga288b8b3da0892bd651fce07b3bbd3a56) ).
 
 
 All the photos should be equally oriented (sproughts->roots line should have the same direction).
-To convert pixels into millimeters you should locate a size standard near the plants on the spoughts side. More information in the [Appendix A](https://github.com/dashabezik/Morley/blob/main/img/appendix_a.md).
+To convert pixels into millimeters you should locate a size standard near the plants on the spoughts side. Read more about how to prepare photos in the [Appendix A](https://github.com/dashabezik/Morley/blob/main/img/appendix_a.md).
 
 Folder with photos must have certain structure: head folder contains subfolders with raw photos divided by the groups. Read more [here](https://github.com/dashabezik/Morley/blob/main/img/appendix_b.md#before-running-morley)
 
