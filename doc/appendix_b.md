@@ -6,19 +6,12 @@ Table of contents
 <!--ts-->
    * [Before running morley](#Before-running-morley)
    * [USAGE](#USAGE)
-      * [Launch](#stdin)
-      * [Local files](#local-files)
-      * [Remote files](#remote-files)
-      * [Multiple files](#multiple-files)
-      * [Combo](#combo)
-      * [Auto insert and update TOC](#auto-insert-and-update-toc)
-      * [GitHub token](#github-token)
-      * [TOC generation with Github Actions](#toc-generation-with-github-actions)
-   * [Tests](#tests)
-   * [Dependency](#dependency)
-   * [Docker](#docker)
-     * [Local](#local)
-     * [Public](#public)
+      * [Launch](#1.)
+      * [Rotation](#Rotation)
+      * [Contours recognition](#Contours-recognition)
+      * [Color ranges](#Color-ranges)
+      * [Output](#Output)
+
 <!--te-->
 
 
@@ -39,7 +32,8 @@ Cut the image as close to the edges of the seed as possible.
 
 
 ## USAGE:
-### 
+
+#### Launch
 1. Run ``` morley``` command on the command line (or in Anaconda Prompt). 
 <p align="center">
 <img src="load button.PNG" width=50% height=50%>
@@ -54,6 +48,7 @@ Cut the image as close to the edges of the seed as possible.
 
 4. Select output directory.
 
+#### Rotation
 5. Rotate images by clicking the “Rotate image” button. Select the angle so that the location of the objects and the sprout-root orientation correspond to these characteristics in the schematic image on the left.
 
 <p align="center">
@@ -66,6 +61,8 @@ Cut the image as close to the edges of the seed as possible.
 
 After setting the rotation angle, all the photos will be properly rotated, including the seed template image.
 
+
+#### Contours recognition
 6. Push "Recognition settings" button to set parameters for plant, root, sprout and seed recognition. Initial parameters, that on average should be suitable for any dataset, are set by default. 
 
  On this step your goal is to find the values of the parameters to reach covering plants with contours and avoid their merging. Initial values of the parameters are setted, you should just fix them a little bit if it will be needed. See the picture below to understand possible problems*. 
@@ -93,6 +90,7 @@ Move the trackers to achieve the best recognition of whole plant contour:
 <img src="2.PNG" width=50% height=50%>
 </p>
 
+#### Color ranges
 7. Color range parameters. In the search we use the HSV color coding. The window displays 6 trackers: lower and upper bounds for each of the 3 encoding components (h, s, v). The result of the selection will be the color range of pixels that correspond to the object that we want to highlight in the picture. The window also shows the binary mask of the photo: white pixels are shown that fall into the selected range, black - pixels that do not fall into the range. Your task at this stage is to choose 2 ranges (for sprouts and for roots) that will successfully display the desired objects.
   
  <p>
@@ -108,15 +106,15 @@ The brightness parameter (v - value, or brightness) selects only light areas to 
   
 
  <p> 
-  H
-   <img src="h.PNG" width=40% />
+  
+   <img src="h.png" width=40% />
  </p>
  <p>
-   S
-  <img src="s.PNG" width=40% />
+   
+  <img src="s.png" width=40% />
  </p>
 <p>
-   V <img src="v.PNG" width=40% />
+    <img src="v.png" width=40% />
  </p>
 
 
@@ -127,11 +125,13 @@ The brightness parameter (v - value, or brightness) selects only light areas to 
  </p>
 In the first step, as soon as you get to this tab, the default values for the color components of the roots are displayed. Customize them or leave them as they are and click the "Set roots" button on the right. Next, you need to choose a color range for the sprouts. To do this, move the hue sliders to a range of yellow-green hues (for example, from 0 to 60). At this point, the exact numbers are not so important, because the shades are spaced in a range of hue in non-overlapping areas, so you can easily take a wider range, focusing only on the picture you see.
 
+<br clear="left"/>
+
 <p align="center">
 <img src="2tab.png" width=50% height=50%>
 </p>
 
-8. The next step of seed segmentation is quite similar to the previous one. Here your goal is to find the color range for the seeds. The window displays the same trackers and a binary mask for an uncolored photo (without any filters). The difference is that you should choose the range for natural seed color. The default parameters are selected for yellow seed. 
+8. The next step of seed segmentation is quite similar to the previous one. Here your goal is to find the color range for the seeds. The window displays the same trackers and a binary mask for an uncolored photo (without any filters). The difference is that you should choose the range for natural seed color. The default parameters are selected for yellow seed (seeds of wheat and peas, that were used are yellow). 
 >Hue has only a yellow range (0, 20). The top value is 20 to exclude green pixels of sprouts.
 >Saturation scale has a saturated range (100, 255) to exclude white-close unsaturated pixels of roots and sprouts.
 >Brightness scale has a light range (100, 255) to exclude a dark background and in some cases you can increase the bottom board to exclude some roots and sprouts areas.
@@ -140,11 +140,13 @@ In the first step, as soon as you get to this tab, the default values for the co
 <img src="3tab.png" width=50% height=50%>
 </p>
 
-9. Set paper sticker size in $mm^2$, value =  width (mm) x length (mm), and germination threshold in mm (seedlings with both sprout and root lengths below that threshold will be counted together with non-germinated seeds). For example dataset, use 6241 for paper size in $mm^2$ and germination threshold you prefer. Press the ‘RUN’ button to start processing.
- 
-10. Program has accomplished evaluation when progress bar shows 100% and logging window will notify you when the search is over.
+9. Set paper sticker size in $mm^2$, value =  width (mm) x length (mm), and germination threshold in mm (seedlings with both sprout and root lengths below that threshold will be counted together with non-germinated seeds). For example dataset, use 6241 for paper size in $mm^2$ and germination threshold you prefer. 
+germination threshold is a parameter for evaluating germination rate. Plants with sprout and roots lengths below the threshold value (simultaneously) will be considered as non-germinated seeds.
 
  
+10. Press the ‘RUN’ button to start processing. Program has accomplished evaluation when progress bar shows 100% and logging window will notify you when the search is over.
+
+#### Output
 11. The output files can be found  in the output directory.  Program generates the following files:
 
   - the .csv tables with p-values corresponding to all pairwise comparisons between sample groups, the calculated germination efficiency, sprout and root lengths, total plant areas and the summary table with all digital measurements.
