@@ -25,7 +25,7 @@ Table of contents
 
 
 2. Install Anaconda running the downloaded .exe file
-3. Together with Anaconda, the Anaconda Powershell Prompt has been installed, which has a python package installer called pip. Type “Anaconda Powershell Prompt” in the search area of the “Start” menu and click on an application called Anaconda Powershell Promt. This action will run the command line window.
+3. Together with Anaconda, the Anaconda Powershell Prompt has been installed, which has a python package installer called pip. Type “Anaconda Powershell Prompt” in the search area of the “Start” menu and click on an application called Anaconda Powershell Prompt. This action will run the command line window.
 
 ### Morley installation
 
