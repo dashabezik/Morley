@@ -26,10 +26,16 @@ To achieve correct object recognition:
 
 To achieve most accurate measurements:
 1) all roots should be thoroughly split from each other to ensurepossess their maximum visibility for the camera as in the example below:
+
+<p align="center">
+  <img src="https://github.com/dashabezik/Morley/blob/main/img/separated.png" width=50% height=50% >
+</p>
  
 
 2) plants should be aligned along the seeds as in the example below:
 
-
+<p align="center">
+  <img src="https://github.com/dashabezik/Morley/blob/main/img/aligned.png" width=50% height=50% >
+</p>
 
 Optimize exposure to exclude excessively bright spots and take an image (automatic adjustmentfocusing iscan be recommended). Visually ensure that thean image has sufficient sharpness.
