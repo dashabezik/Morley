@@ -20,7 +20,7 @@ Table of contents
 1. MORLEY GUI requires Python 3.9 or newer. The easiest way is to install it as a part of the Anaconda environment. Download .exe file from https://www.anaconda.com/products/individual#Downloads
 
 <p align="center">
-<img src="https://github.com/dashabezik/Morley/blob/main/img/anaconda_install.PNG" width=90% height=90%>
+<img src="anaconda_install.PNG" width=90% height=90%>
 </p>
 
 
@@ -35,12 +35,12 @@ Table of contents
 pip install morley 
 ```  
 <p align="center">
-<img src="https://github.com/dashabezik/Morley/blob/main/img/anac_prompt.PNG" width=90% height=90%>
+<img src="anac_prompt.PNG" width=90% height=90%>
 </p>
 
 5. After successful installation you will see:
 <p align="center">
-<img src="https://github.com/dashabezik/Morley/blob/main/img/anac_morley_install.PNG" width=90% height=90%>
+<img src="anac_morley_install.PNG" width=90% height=90%>
 </p>
 
 ## Launch
@@ -48,11 +48,11 @@ pip install morley
 1. To open MORLEY GUI, type morley in command line and press “enter”
 
 <p align="center">
-<img src="https://github.com/dashabezik/Morley/blob/main/img/anac_morley_run.PNG" width=90% height=90%>
+<img src="anac_morley_run.PNG" width=90% height=90%>
 </p>
 
 2. After that, the window with MORLEY GUI will be opened:
 
 <p align="center">
-<img src="https://github.com/dashabezik/Morley/blob/main/img/load button.PNG" width=80% height=80%>
+<img src="load button.PNG" width=80% height=80%>
 </p>
