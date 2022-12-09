@@ -25,9 +25,24 @@ compared with raw photos. Head folder must be selected as the
 <img src="folder_tree_wo_template.png" width=50% height=50%>
 </p>
 
+
+ <p>
+   <img src="template.JPG" width=10% align="left" />
+ </p>
+ 
+ 
+<!-- 
+<p>
+  <figure><img src="template.jpg" align="left"/><figcaption>caption</figcaption></figure>
+<!--   <figure><img src="img2.jpg" /><figcaption>caption2</figcaption></figure> -->
+<!-- </p> -->
+
+<!-- <figure class="class1" align="left"><img src="template.JPG" title="title" align="left"/><figcaption align="left">caption</figcaption></figure> -->
+
+
 Ensure the seed image has the same resolution,
 not higher than the original photo, do not use programs that can increase the resolution (for example, Photoshop ), just cut a seed from any image using 
-a simple image redactor (for example, Paint).  We recommend you to choose the seed that will not be covered by the roots of the plant or turned in a strange way.
+a simple image redactor (for example, Paint).  We recommend you to choose the seed that will not be covered by the roots of the plant or turned in a strange way (see an example on the left).
 Cut the image as close to the edges of the seed as possible.
 
 
@@ -121,9 +136,11 @@ The brightness parameter (v - value, or brightness) selects only light areas to 
 <br clear="left"/>
 
  <p>
-   <img src="hsv.PNG" width=30% align="left" />
+   <img src="hsv.PNG" width=20% align="left" />
  </p>
 In the first step, as soon as you get to this tab, the default values for the color components of the roots are displayed. Customize them or leave them as they are and click the "Set roots" button on the right. Next, you need to choose a color range for the sprouts. To do this, move the hue sliders to a range of yellow-green hues (for example, from 0 to 60). At this point, the exact numbers are not so important, because the shades are spaced in a range of hue in non-overlapping areas, so you can easily take a wider range, focusing only on the picture you see.
+
+
 
 <br clear="left"/>
 
