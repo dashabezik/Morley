@@ -147,6 +147,13 @@ def load_state(fname, label_dict):
     conditions.update_conditions()
 
 
+def load_state_headless(fname):
+    set_state_variables(state, headless=True)
+    with open(fname) as f:
+        d = json.load(f)
+    update_dict(state, d)
+
+
 def update_labels(label_dict):
     inp = state.get('paths', {}).get('input')
     if inp:
@@ -209,7 +216,7 @@ class ConditionManager:
         def decorator(func):
             def wrapped(*args, **kwargs):
                 ret = func(*args, **kwargs)
-                if ret is not None:
+                if ret:
                     self.satisfied.add(condition)
                     self.update_conditions()
                 return ret
@@ -264,14 +271,30 @@ def random_file(path_to_file_folder):
     return path_to_file
 
 
-def set_state_variables(d, master=None):
+def set_state_variables(d, headless=False):
+    if not headless:
+        factory = tk.IntVar
+    else:
+        factory = PseudoIntVar
+
     for k, v in d.items():
         if isinstance(v, dict):
-            set_state_variables(v)
+            set_state_variables(v, headless)
         if isinstance(v, (int, float)):
-            d[k] = tk.IntVar(value=v, master=master)
+            d[k] = factory(value=v)
         # if isinstance(v, str):
         #     d[k] = tk.StringVar(value=v)
+
+
+class PseudoIntVar:
+    def __init__(self, value):
+        self.value = value
+
+    def get(self):
+        return self.value
+
+    def set(self, value):
+        self.value = value
 
 
 def pythonize_state_dict(d=None):

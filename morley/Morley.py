@@ -632,16 +632,15 @@ def add_annotation(name, text):
         f.write(content)
 
 
-
 def midpoint(ptA, ptB):
     return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 
+
 def tk2int(var):
-    if type(var)==tk.IntVar:
-        var = int(var.get())
-    else:
-        var = int(var)
-    return var
+    if isinstance(var, (tk.IntVar, gui.PseudoIntVar)):
+        return var.get()
+    return int(var)
+
 
 def get_state_values(param):
     l=[]
