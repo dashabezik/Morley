@@ -70,7 +70,7 @@ Before the measurement start choose:
 
 >1) To choose the needed angle rotate the photo up to the example condition: sptoughts are on the left and roots are on the right. See the gif above or read the 5th point of [user guide](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md#Rotation)
 
->2) Bluring parameters are 'morph', 'gauss', 'canny_top'. Examples of these parameters you can look in the [**Table 1**](https://github.com/dashabezik/plants), how to set them read in the [user guide](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md#Сontours-recognition). On this step your goal is to find the values of the parameters to reach covering plants with contours and avoid their merging. Initial values of the parameters are setted, you should just fix them a little bit if it will be needed.
+>2) Bluring parameters are 'morph', 'gauss', 'canny_top'. Examples of these parameters you can look in the [**Table 1**](https://github.com/dashabezik/plants), how to set them read in the [user guide](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md#Contours-recognition). On this step your goal is to find the values of the parameters to reach covering plants with contours and avoid their merging. Initial values of the parameters are setted, you should just fix them a little bit if it will be needed.
 
 
 
