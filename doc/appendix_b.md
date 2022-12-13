@@ -6,7 +6,7 @@ Table of contents
 <!--ts-->
    * [Before running morley](#Before-running-morley)
    * [USAGE](#USAGE)
-      * [Launch](#1.)
+      * [Launch](#Launch)
       * [Rotation](#Rotation)
       * [Contours recognition](#Contours-recognition)
       * [Color ranges](#Color-ranges)
