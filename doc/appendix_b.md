@@ -218,6 +218,12 @@ morley path\to\configuration\file\set1.json -i path\to\the\second\dataset
 ## Output
  &emsp; The output files can be found  in the output directory.  Program generates the following files:
 
-  - the .csv tables with p-values corresponding to all pairwise comparisons between sample groups, the calculated germination efficiency, sprout and root lengths, total plant areas and the summary table with all digital measurements.
+  - the .csv tables with p-values <sup>1</sup> corresponding to all pairwise comparisons between sample groups, the calculated germination efficiency <sup>2</sup>, sprout and root lengths<sup>3</sup>, total plant areas and the summary table with all digital measurements<sup>4</sup>.
 
  - the figures characterizing distributions of measured plant sizes, bar plots with mean values and standard deviations, and heatmaps visualizing the conclusions on statistical significance of the morphometric changes.
+  
+  > 1. ***Statistical analysis.*** Each sample group was tested for Gauss distribution using the Shapiro-Wilk test, with a p-value threshold of 0.05.  Next, the null hypothesis that the means for two sample groups are equal was tested using either parametric Unpaired T-test or nonparametric Mann-Whitney test, depending on the results of normality testing. The p-value below 0.05 is used as default criteria for rejecting the null hypothesis.
+  > 2. ***Germination efficiency.*** Germination efficiency is calculated as the ratio of the number of plants with a length of roots and sprouts above the germination threshold (simultaneously) divided by the total number of plants.
+  > 3. ***Roots length***. The programm calculates two parameters for roots: "roots sum" and "roots max". The first parameter is the sum of the lengths of all the roots of a plant. The second parameter is the length of the longest root of a plant.
+  > 4. ***Tabels***. Tables with individual parameters: a table in which the columns are the names of the groups, and the rows are the plant number, the values are presented in $mm$ for lengths and in $mm^2$ for area. There may be gaps in this table, such situations mean that this parameter for a particular plant is null, which does not mean a null value for another parameter (for example, the plant already has a root, but does not yet have a sprout). Thus, you do not lose information about the correspondence of one parameter to another. The summary table is a table, the columns of which contain all the parameters for each photo (therefore, the number of rows in each column is the number of plants in this photo)
+
