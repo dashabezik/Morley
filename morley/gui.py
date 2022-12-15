@@ -450,14 +450,14 @@ def rotation(w, label):
     img_frame = tk.Frame(master=window)
 
     path_to_ethalon = os.path.dirname(os.path.abspath(__file__))
-    ethalon = cv.imdecode(np.fromfile(os.path.join(path_to_ethalon, 'ethalon.png'), dtype=np.uint8), cv.IMREAD_UNCHANGED)
+    ethalon = cv.imdecode(np.fromfile(os.path.join(path_to_ethalon, 'ethalon.png'), dtype=np.uint8), cv.IMREAD_COLOR)
 #     ethalon = cv.imread(os.path.join(path_to_ethalon, 'ethalon.png'))
     ethalon = cv.cvtColor(ethalon, cv.COLOR_BGR2RGB)
     ethalon = ethalon.astype('uint8')
     ethalon = imutils.resize(ethalon, height=300)
     obj = ImageTk.PhotoImage(Image.fromarray(ethalon))
 
-    test_img = cv.imdecode(np.fromfile(random_file(state['paths']['input']), dtype=np.uint8), cv.IMREAD_UNCHANGED)
+    test_img = cv.imdecode(np.fromfile(random_file(state['paths']['input']), dtype=np.uint8), cv.IMREAD_COLOR)
 #     test_img = cv.imread(random_file(state['paths']['input']))
     test_img = cv.cvtColor(test_img, cv.COLOR_BGR2RGB)
     test_img = test_img.astype('uint8')
@@ -618,7 +618,7 @@ def tweak_image(w):
     window.geometry('900x650')
 
     file_name = random_file(state['paths']['input'])
-    img_arr = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_UNCHANGED) ## IMREAD_UNCHANGED has -1 enum of imread modes
+    img_arr = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_COLOR) ## IMREAD_UNCHANGED has -1 enum of imread modes
     img_arr = rotate_pic(img_arr, state['rotation'].get())
     img_arr_0 = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_GRAYSCALE)## IMREAD_GRAYSCALE has 0 enum of imread modes
     img_arr_0 = rotate_pic(img_arr_0, state['rotation'].get())
