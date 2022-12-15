@@ -10,13 +10,21 @@ Morley is a software for measuring morphological parameters of plants using plan
 
 You and use GUI, that is plased here, or learn the algorithm deeper using Jupyter Notebook placed [here](https://github.com/dashabezik/plants)
 
+# Usefull links
+
+Read the following information before the **first usage**.
+* [Python and Morley installation.](https://github.com/dashabezik/Morley/blob/main/doc/installation.md)
+* [Protocol for image acquisition. Rules to make plant photos suitable for morley.](https://github.com/dashabezik/Morley/blob/main/doc/appendix_a.md)
+* [Expanded user guide. Detailed description with explanation of the values of the selected parameters: rotation angle, blurring settings, color ranges.](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md)
+
+
 # Installation
 
 Morley requires Python 3.9 or newer. Read how to install Python [here](https://github.com/dashabezik/Morley/blob/main/doc/installation.md#Python-installation). You can install Morley GUI from PyPI:
 ```
 pip install morley
 ```
-\* *use this command in a Python compiller or in Bash command line (for example, in [Anaconda Prompt](https://github.com/dashabezik/Morley/blob/main/doc/installation.md#Morley-installation))*
+\* *use this command in a Python compiller or in the command line (for example, in [Anaconda Prompt](https://github.com/dashabezik/Morley/blob/main/doc/installation.md#Morley-installation))*
 
 Alternatively, you can install morley directly from GitHub:
 
@@ -26,7 +34,7 @@ pip install git+https://github.com/dashabezik/Morley.git
 
 # Example
 
-Run ``` morley ``` command on the command line (or in [Anaconda Prompt](https://github.com/dashabezik/Morley/blob/main/doc/installation.md#Launch)), follow the instructions in the User Guide (more detailed instruction is in [Appendix B](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md)). For quickstart you can use [example file](https://github.com/dashabezik/Morley/blob/main/photos.rar). Bigger raw photos dataset, which you can use an advanced example, is placed [here](https://github.com/dashabezik/plants).
+Run ``` morley ``` command on the command line (or in [Anaconda Prompt](https://github.com/dashabezik/Morley/blob/main/doc/installation.md#Launch)), follow the instructions in the User Guide (more detailed instruction is in [the expanded user guide](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md)). For quickstart you can use [example file](https://github.com/dashabezik/Morley/blob/main/photos.rar). Bigger raw photos dataset, which you can use an advanced example, is placed [here](https://github.com/dashabezik/plants).
 
 ![terminal animation](doc/morley_launch.gif)
 
@@ -40,7 +48,7 @@ Morley supports the most popular image files formats (JPEG files, Portable Netwo
 
 
 All the photos should be equally oriented (sprouts->roots line should have the same direction).
-To convert pixels into millimeters you should locate a size standard near the plants on the spoughts side. Read more about how to prepare photos in the [Appendix A](https://github.com/dashabezik/Morley/blob/main/doc/appendix_a.md).
+To convert pixels into millimeters you should locate a size standard near the plants on the spoughts side. Read more about how to prepare photos in the [protocol for image acquisition](https://github.com/dashabezik/Morley/blob/main/doc/appendix_a.md).
 
 Folder with photos must have certain structure: head folder contains subfolders with raw photos divided by the groups. Read more [here](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md#before-running-morley)
 
@@ -68,13 +76,13 @@ Before the measurement start choose:
 * germination threshold, mm.
 
 
->1) To choose the needed angle rotate the photo up to the example condition: sptoughts are on the left and roots are on the right. See the gif above or read the 5th point of [user guide](https://github.com/dashabezik/Morley/edit/main/doc/appendix_b.md#rotatione)
+>1) To choose the needed angle rotate the photo up to the example condition: sptoughts are on the left and roots are on the right. See the gif above or read the 5th point of [user guide](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md#Rotation)
 
->2) Bluring parameters are 'morph', 'gauss', 'canny_top'. Examples of these parameters you can look in the [**Table 1**](https://github.com/dashabezik/plants), how to set them read in the [user guide](https://github.com/dashabezik/Morley/edit/main/doc/appendix_b.md#contours-recognition). On this step your goal is to find the values of the parameters to reach covering plants with contours and avoid their merging. Initial values of the parameters are setted, you should just fix them a little bit if it will be needed.
+>2) Bluring parameters are 'morph', 'gauss', 'canny_top'. Examples of these parameters you can look in the [**Table 1**](https://github.com/dashabezik/plants), how to set them read in the [user guide](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md#Contours-recognition). On this step your goal is to find the values of the parameters to reach covering plants with contours and avoid their merging. Initial values of the parameters are setted, you should just fix them a little bit if it will be needed.
 
 
 
->3) Color ranges for sprouts and roots should be chosen as light-green and light-violet colors in HSV system. Color range for seeds should be chosen as their natural color (light-yellow for wheat and peas in HSV system). How to set them read in the [user guide](https://github.com/dashabezik/Morley/edit/main/doc/appendix_b.md#color-ranges). Initial values of the parameters are setted, you should just fix them a little bit if it will be needed.
+>3) Color ranges for sprouts and roots should be chosen as light-green and light-violet colors in HSV system. Color range for seeds should be chosen as their natural color (light-yellow for wheat and peas in HSV system). How to set them read in the [user guide](https://github.com/dashabezik/Morley/blob/main/doc/appendix_b.md#Color-ranges). Initial values of the parameters are setted, you should just fix them a little bit if it will be needed.
 
 
 
