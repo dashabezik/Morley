@@ -18,19 +18,20 @@ Place plants and paper sticker on black mat background as shown in the example b
 </p>
 
 
-### Important: 
-To achieve correct object recognition: 
-1) the seedlings should be aligned along the seeds and consistentlyequally oriented; 
+### Important:
+To achieve correct object recognition:
+1) the seedlings should be aligned along the seeds and consistently oriented;
 2) neighboring plants must not cross each other;
 3) the paper sticker should be placed above the sprouts.
 
 To achieve most accurate measurements:
-1) all roots should be thoroughly split from each other to ensurepossess their maximum visibility for the camera as in the example below:
+1) all roots should be thoroughly split from each other to ensure their maximum visibility for the camera,
+as in the example below:
 
 <p align="center">
   <img src="separated.png" width=50% height=50% >
 </p>
- 
+
 
 2) plants should be aligned along the seeds as in the example below:
 
@@ -38,4 +39,5 @@ To achieve most accurate measurements:
   <img src="aligned.png" width=50% height=50% >
 </p>
 
-Optimize exposure to exclude excessively bright spots and take an image (automatic adjustmentfocusing iscan be recommended). Visually ensure that thean image has sufficient sharpness.
+Optimize exposure to exclude excessively bright spots and take an image (automatic adjustment is recommended).
+Visually ensure that the image has sufficient sharpness.
