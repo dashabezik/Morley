@@ -311,6 +311,9 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
     light = mpatches.Patch(color=color_def[1], label='p_value>0.05')
     plt.legend(handles=[dark, light])
 
+    for ax in axes.flat:
+        ax.set( xlabel=xlabel)
+        
     if is_save:
         if figname is None:
             figname = pic_filename('bar',l_or_r.replace(' ', ''),path_to_file_folder_fixed)
@@ -347,8 +350,11 @@ def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_di
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
+    matplotlib.rcParams.update({'font.size': 20})
     plt.xlabel('Group label', fontsize = 20)
-    plt.ylabel('1-NG/TN', fontsize = 20)
+    plt.ylabel('1-NG/TN', fontsize = 20)     
+    plt.xticks(fontsize = 20)
+    plt.yticks(fontsize = 20)
     sns.barplot(x=non_germinated_table.columns, y = non_germinated_table.values[0],
                 palette=sns.color_palette("Set2"))
     plt.title('Germination efficiency', fontsize=20)
@@ -356,7 +362,7 @@ def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_di
     if is_save:
         if figname is None:
             figname = pic_filename('bar','seed_germ',path_to_file_folder_fixed)
-        plt.savefig(path.join(path_to_output_dir,figname))
+        plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
 #     plt.show()
     return non_germinated_table
 

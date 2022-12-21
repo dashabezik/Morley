@@ -68,6 +68,9 @@ def start_gui():
 
     germ_threshold = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20, textvariable=gui.state['germ_thresh'])
     germ_threshold_lbl = tk.Label(master=main_frame, text="Germination threshold, mm", width=28)
+    
+    indent_width_calc = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20, textvariable=gui.state['indent_width_calc'])
+    indent_width_calc_lbl = tk.Label(master=main_frame, text="Indent to calculate plants width", width=28)
 
     report_area = st.ScrolledText(main_frame, width=60, height=20, state=tk.DISABLED)
     handler = gui.LoggingToGUI(report_area)
@@ -120,11 +123,15 @@ def start_gui():
 
     germ_threshold_lbl.grid(column=1, row=9)
     germ_threshold.grid(column=0, row=9)
-    run_btn.grid(column=1, row=10)
+    
+    indent_width_calc_lbl.grid(column=1, row=10)
+    indent_width_calc.grid(column=0, row=10)
+    
+    run_btn.grid(column=1, row=11)
 
-    report_area.grid(column=2, row=0, rowspan=10)
-    pb.grid(column=2, row=11)
-    pb_lbl.grid(column=2, row=12)
+    report_area.grid(column=2, row=0, rowspan=11)
+    pb.grid(column=2, row=12)
+    pb_lbl.grid(column=2, row=13)
 
     for col in range(3):
         main_frame.columnconfigure(col, weight=1)
