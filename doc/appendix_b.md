@@ -57,8 +57,19 @@ To test the program you can run it using bigger photo sets placed here: https://
 - Select output directory.
 - Set paper sticker size in $mm^2$, value = width (mm) x length (mm), and germination threshold in mm
   (seedlings with both sprout and root lengths below that threshold will be counted together with non-germinated seeds).
-  For the example dataset, use 6241 for paper size in $mm^2$ and any germination threshold you prefer.
+- The indent from the seed boundary for calculating the width of a plant parts is used to avoid including the seed in the width calculation . The value is a divider for the width of the seed template, the value of the indentation will be the width of the seed divided by the entered number.
+
+$Indentation =$ $\dfrac{\text{seed template width}}{\text{the value you've entered}}$
+<p>
+  <img src="indent@4x.png" width=30% align="left" />
+</p>
+
+*For large seeds and short sprouts, it is recommended to take a value of 10 or more; for small seeds, it is recommended to take a value of 1. For large seeds whose parameters are comparable to the length of the seedlings, a large indentation may lead to the exclusion of a large part of the seedling from calculations. For the length of seedlings and grains that are small compared to the parameters of seedlings, it is recommended to completely avoid seed ingress by setting the full width of the grain as an indent, that is, setting the indent parameter 1.*
+
+  For the example dataset, use 6241 for paper size in $mm^2$, indent value 1 for wheat datasets and 10 for the peas dataset and any germination threshold you prefer.
   Germination threshold is a parameter for evaluating germination rate.
+  
+<br clear="left"/>
 
 #### Rotation
 Rotate images by clicking the “Rotate image” button.
