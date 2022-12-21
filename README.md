@@ -86,7 +86,8 @@ Before starting the analysis, you must set:
 * sprouts and roots color ranges<sup>3</sup>;
 * seeds color range<sup>3</sup>;
 * area of the size standerd, $mm^2$;
-* germination threshold, mm.
+* germination threshold, mm;
+* indent to calculate plants width <sup>4</sup>, integer.
 
 
 >1) To choose the needed angle rotate the photo to match the example: sprouts on the left and roots on the right.
@@ -102,3 +103,5 @@ Initial values of the parameters are set, you should just fix them a little bit 
 Color range for seeds should be chosen as their natural color (light-yellow for wheat and peas in HSV system).
 How to set them read in the [user guide](doc/appendix_b.md#Color-ranges).
 Initial values of the parameters are set, you should just fix them a little bit if needed.
+
+>4)  The indent from the seed boundary for calculating the width of a plant parts is used to avoid including the seed in the width calculation . The value is a divider for the width of the seed template, the value of the indentation will be the width of the seed divided by the entered number. See recommended values [here](doc/appendix_b.md#Parameters-setting). 
