@@ -57,16 +57,21 @@ To test the program you can run it using bigger photo sets placed here: https://
 - Select output directory.
 - Set paper sticker size in $mm^2$, value = width (mm) x length (mm), and germination threshold in mm
   (seedlings with both sprout and root lengths below that threshold will be counted together with non-germinated seeds).
-- The indent from the seed boundary for calculating the width of a plant parts is used to avoid including the seed in the width calculation . The value is a divider for the width of the seed template, the value of the indentation will be the width of the seed divided by the entered number.
+- Seed margin width. The margin from the seed boundary for calculating the width of a plant parts is used to avoid including the seed in the width calculation . The value is a persent of the width of the seed template, the value of the margin will be calculated as follows:
 
-$Indentation =$ $\dfrac{\text{seed template width}}{\text{the value you've entered}}$
-<p>
+$$
+\begin{aligned}
+Margin =\dfrac{\text{seed template width}\cdot \text{the value you've entered in \\%}}{\text{100}\\%}
+\end{aligned}
+$$
+
+<!-- <p>
   <img src="indent@4x.png" width=30% align="left" />
 </p>
+ -->
+*For large seeds and short sprouts, it is recommended to take a value of 10% or less; for small seeds, it is recommended to take a value of 100%. For large seeds whose parameters are comparable to the length of the seedlings, a large margin may lead to the exclusion of a large part of the seedling from calculations. For long seedlings and small seeds, in comparison with the parameters of seedlings, it is recommended to completely avoid seed inclusion by setting the full width of the seed,  by setting the margin parameter 100.*
 
-*For large seeds and short sprouts, it is recommended to take a value of 10 or more; for small seeds, it is recommended to take a value of 1. For large seeds whose parameters are comparable to the length of the seedlings, a large indentation may lead to the exclusion of a large part of the seedling from calculations. For the length of seedlings and grains that are small compared to the parameters of seedlings, it is recommended to completely avoid seed ingress by setting the full width of the grain as an indent, that is, setting the indent parameter 1.*
-
-  For the example dataset, use 6241 for paper size in $mm^2$, indent value 1 for wheat datasets and 10 for the peas dataset and any germination threshold you prefer.
+  For the example dataset, use 6241 for paper size in $mm^2$, indent value 100 for wheat datasets and 10 for the peas dataset and any germination threshold you prefer.
   Germination threshold is a parameter for evaluating germination rate.
   
 <br clear="left"/>
