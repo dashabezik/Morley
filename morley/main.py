@@ -70,7 +70,7 @@ def start_gui():
     germ_threshold_lbl = tk.Label(master=main_frame, text="Germination threshold, mm", width=28)
     
     indent_width_calc = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20, textvariable=gui.state['indent_width_calc'])
-    indent_width_calc_lbl = tk.Label(master=main_frame, text="Indent to calculate plants width", width=28)
+    indent_width_calc_lbl = tk.Label(master=main_frame, text="Indent, part of seed width, %", width=28)
 
     report_area = st.ScrolledText(main_frame, width=60, height=20, state=tk.DISABLED)
     handler = gui.LoggingToGUI(report_area)

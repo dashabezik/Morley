@@ -691,7 +691,7 @@ def search():
     germ_thresh = gui.state['germ_thresh'].get()
     paper_area_threshold = gui.state['paper_area_thresold'].get()
     x_pos_divider = 11
-    indent_width_calc = gui.state['indent_width_calc'].get() #indent from the grain to calculate the width of the parts of the plants, so as not to take into account the width of the grain. For large grains and short sprouts, it is recommended to take a value of 10; for small grains, it is recommended to take a value of 1.
+    indent_width_calc = gui.state['indent_width_calc'].get() #indent from the grain to calculate the width of the parts of the plants, so as not to take into account the width of the grain. For large grains and short sprouts, it is recommended to take a value of 10%; for small grains, it is recommended to take a value of 100%.
     contour_area_threshold = gui.CONTOUR_AREA_THRESHOLD # look at your img size and evaluate the threshold, 1000 is recomended
     template_filename = gui.state['paths']['template_file']
     hlb,hlt,slb,slt,vlb,vlt = get_state_values('leaves')
@@ -856,7 +856,7 @@ def search():
                 cv.line(img_hsv, left, right, (255, 255, 255), thickness=2)
                 step = (right[0]-mean_right_x)//3
                 if (mean_left_x-left[0])//3!=0:
-                    for y in range(left[0],mean_left_x-w//indent_width_calc,(mean_left_x-left[0])//3):
+                    for y in range(left[0],int(mean_left_x-w*indent_width_calc/100),(mean_left_x-left[0])//3):
                         is_first = True
                         for x in range(top[1],bottom[1]):#иттерация по вертикали, т к img.shape => (height, width), но компонента контура (х,у)
                             h, s, v = img_hsv[x, y]
@@ -876,7 +876,7 @@ def search():
 
                 if step!=0:
 
-                    for y in range(mean_right_x+w//indent_width_calc, right[0],step):#идем по ввертикальным линиям
+                    for y in range(int(mean_right_x+w*indent_width_calc/100), right[0],step):#идем по ввертикальным линиям
                         is_first_r = True
                         is_first_r_max = True
                         for x in range(top[1],bottom[1]):#иттерация по вертикали, т к img.shape => (height, width), но компонента контура (х,у)
