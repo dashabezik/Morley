@@ -59,7 +59,7 @@ state = {
     'paper_area': 0,
     'germ_thresh': 10,
     'progress': 0,
-    'indent_width_calc':1
+    'seed_margin_width':1
 }
 
 STATE_SYNTAX_VERSION = 1

@@ -691,7 +691,7 @@ def search():
     germ_thresh = gui.state['germ_thresh'].get()
     paper_area_threshold = gui.state['paper_area_thresold'].get()
     x_pos_divider = 11
-    indent_width_calc = gui.state['indent_width_calc'].get() #indent from the grain to calculate the width of the parts of the plants, so as not to take into account the width of the grain. For large grains and short sprouts, it is recommended to take a value of 10%; for small grains, it is recommended to take a value of 100%.
+    indent_width_calc = gui.state['seed_margin_width'].get() #indent from the grain to calculate the width of the parts of the plants, so as not to take into account the width of the grain. For large grains and short sprouts, it is recommended to take a value of 10%; for small seeds, it is recommended to take a value of 100%.
     contour_area_threshold = gui.CONTOUR_AREA_THRESHOLD # look at your img size and evaluate the threshold, 1000 is recomended
     template_filename = gui.state['paths']['template_file']
     hlb,hlt,slb,slt,vlb,vlt = get_state_values('leaves')
