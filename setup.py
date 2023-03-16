@@ -21,7 +21,7 @@ setup(
     name                 = 'morley',
     version              = get_version('morley/version.py'),
     description          = '''GUI software for plant morphometry''',
-    long_description     = (''.join(open('README.md').readlines())),
+    long_description     = (''.join(open('pypi_md.md').readlines())),
     long_description_content_type="text/markdown",
     author               = 'Daria Emekeeva & Lev Levitsky',
     author_email         = 'dashabezik65@gmail.com',
