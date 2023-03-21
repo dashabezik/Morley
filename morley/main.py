@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import tkinter.scrolledtext as st
+from idlelib.tooltip import Hovertip
 import logging
 from functools import partial
 import os
@@ -135,6 +136,9 @@ def start_gui():
     for name in ['germ_thresh', 'paper_area']:
         gui.state[name].trace('w', gui.trace_entry(name))
         gui.state[name].set(gui.state[name].get())  # trigger trace functions
+
+    for w in [paper_size, germ_threshold, seed_margin_width]:
+        Hovertip(w,'Enter an integer number.')
 
     main_frame.grid(sticky=tk.N+tk.E+tk.S+tk.W)
     get_raw_dir_btn.grid(column=0, row=1)
