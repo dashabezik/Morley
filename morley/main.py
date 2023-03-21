@@ -7,9 +7,45 @@ import os
 import sys
 import threading
 import argparse
+import traceback
 from . import gui, Morley, version
 
 logger = logging.getLogger()
+
+
+def run_morley():
+    try:
+        Morley.search()
+    except Exception as e:
+        for line in traceback.format_exception(e):
+            logger.critical(line)
+        logger.critical('Fatal error occurred. Execution stopped.')
+
+
+def reset(button):
+    button['state'] = tk.NORMAL
+    button['text'] = 'RUN'
+    button['command'] = partial(start_morley, button)
+
+
+def stop_morley(button, worker):
+    gui.state['abort_flag'] = 1
+    button['state'] = tk.DISABLED
+
+
+def monitor(button, worker):
+    worker.join()
+    reset(button)
+
+
+def start_morley(button):
+    gui.state['abort_flag'] = 0
+    worker = threading.Thread(target=run_morley, name='morley-worker')
+    worker.start()
+    button['text'] = 'STOP'
+    button['command'] = partial(stop_morley, button, worker)
+    mon_t = threading.Thread(target=monitor, args=(button, worker), name='morley-monitor')
+    mon_t.start()
 
 
 def start_gui():
@@ -68,7 +104,7 @@ def start_gui():
 
     germ_threshold = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20, textvariable=gui.state['germ_thresh'])
     germ_threshold_lbl = tk.Label(master=main_frame, text="Germination threshold, mm", width=28)
-    
+
     seed_margin_width = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20, textvariable=gui.state['seed_margin_width'])
     seed_margin_width_lbl = tk.Label(master=main_frame, text="Seed margin width, %", width=28)
 
@@ -88,8 +124,8 @@ def start_gui():
     pb = ttk.Progressbar(main_frame, orient=tk.HORIZONTAL, mode='determinate', length=100, variable=gui.state['progress'])
     pb_lbl = gui.FormatLabel(main_frame, textvariable=gui.state['progress'], format='{}%')
 
-    worker = threading.Thread(target=Morley.search, name='morley-worker')
-    run_btn = tk.Button(master=main_frame, text="RUN", command=worker.start, width=20)
+    run_btn = tk.Button(master=main_frame, text="RUN", width=20)
+    run_btn['command'] = partial(start_morley, run_btn)
 
     gui.conditions.register({
         'rotate': [rotation_btn],
@@ -123,10 +159,10 @@ def start_gui():
 
     germ_threshold_lbl.grid(column=1, row=9)
     germ_threshold.grid(column=0, row=9)
-    
+
     seed_margin_width_lbl.grid(column=1, row=10)
     seed_margin_width.grid(column=0, row=10)
-    
+
     run_btn.grid(column=1, row=11)
 
     report_area.grid(column=2, row=0, rowspan=11)
@@ -139,8 +175,6 @@ def start_gui():
     window.rowconfigure(0, weight=1)
     window.columnconfigure(0, weight=1)
     window.mainloop()
-    if worker.is_alive():
-        worker.join()
     sys.exit()
 
 

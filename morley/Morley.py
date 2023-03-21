@@ -74,7 +74,7 @@ def nothing(*arg):
 # In[ ]:
 
 
- 
+
 
 def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fixed,path_to_output_dir, is_save = False, figname=None):
     fig, axes = plt.subplots(len(tmp_l.columns), 4, figsize=(35, 8*len(tmp_l.columns)))
@@ -206,11 +206,11 @@ def p_value_function (df, columns, is_norm):
     for i in (list(columns.keys())):
         for j in (list(columns.keys())):
 #             a = pd.DataFrame(pd.Series(df[columns[i]].values.reshape(-1), dtype=np.float64).dropna())
-#             a = drop_outliers(a,a.columns)            
+#             a = drop_outliers(a,a.columns)
 #             b = pd.DataFrame(pd.Series(df[columns[j]].values.reshape(-1), dtype=np.float64).dropna())
 #             b = drop_outliers(b,b.columns)
 #             pvalue_table[str(i)].loc[str(j)] = pvalue_calc(a,b,is_norm)[1]
-            
+
             pvalue_table[str(i)].loc[str(j)] = pvalue_calc(pd.Series(df[columns[i]].values.reshape(-1), dtype=np.float64).dropna(),
                                                             pd.Series(df[columns[j]].values.reshape(-1), dtype=np.float64).dropna(),is_norm)[1]
     pvalue_table.fillna(value=1, inplace = True)
@@ -268,13 +268,13 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
     if type(columns)==dict:
         tmp = pd.DataFrame(columns=list(columns.keys()),index=np.arange(union_DF_length))
         for i in columns.keys():
-            tmp[i] = pd.DataFrame(pd.Series(df[columns[i]].values.reshape(-1), dtype=np.float64).dropna()) 
+            tmp[i] = pd.DataFrame(pd.Series(df[columns[i]].values.reshape(-1), dtype=np.float64).dropna())
         group_number_names = list(columns.keys())
     elif type(columns)==list: #### still 1D
         tmp = df
         group_number_names = columns ## если 2D массив, то range где кажд индекс +1 range(1, len(columns)+1)
     if is_drop_outliers:
-        tmp = drop_outliers(tmp, tmp.columns)         
+        tmp = drop_outliers(tmp, tmp.columns)
     c = sns.color_palette("Set2")
 
 
@@ -284,13 +284,13 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
     fig.tight_layout() #add space between subplots
 #     for i in list(tmp.columns):
 #         tmp[i] = pd.Series(tmp[i].values.reshape(-1)).dropna()
-    
+
 
     a = sns.barplot(ax = axes[0], data=tmp[group_number_names], palette=c)
     plt.xlabel(xlabel, fontsize = 20)
     plt.ylabel(ylabel, fontsize = 20)
-    
-    
+
+
     for ax in axes.flat:
         ax.set( ylabel=ylabel)
 
@@ -299,11 +299,11 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
     for j in group_number_names:
         whiskers[j] = ((a.get_lines()[i].get_data()[1][1]-a.get_lines()[i].get_data()[1][0])/2)
         i+=1
-    
-    matplotlib.rcParams.update({'font.size': 20}) 
-    
+
+    matplotlib.rcParams.update({'font.size': 20})
+
     for i in list(pv_tmp.columns):
-        
+
         for j in list(pv_tmp.columns):
             pv_tmp[str(i)].loc[str(j)] = scipy.stats.mannwhitneyu(tmp[i],tmp[j],
                                                                  use_continuity = False ,alternative = 'two-sided')[1]
@@ -318,10 +318,10 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
                 pv_tmp[pv_tmp.columns[i]].loc[pv_tmp.columns[j]] = 1
             elif pv_tmp[pv_tmp.columns[i]].loc[pv_tmp.columns[j]]<0.05:
                 pv_tmp[pv_tmp.columns[i]].loc[pv_tmp.columns[j]] = 0.00003
-                
+
     f=np.array(pv_tmp, dtype='float64')
     color_def = [[0.247, 0.41176, 0.349],[0.624, 0.8967, 0.81]]
-    sns.heatmap(f, xticklabels=pv_tmp.columns, yticklabels=pv_tmp.columns, cbar=False, cmap = color_def, 
+    sns.heatmap(f, xticklabels=pv_tmp.columns, yticklabels=pv_tmp.columns, cbar=False, cmap = color_def,
                 ax = axes[1],vmin = 0, vmax = 1.5)
     dark = mpatches.Patch(color=color_def[0], label='p_value<0.05')
     light = mpatches.Patch(color=color_def[1], label='p_value>0.05')
@@ -330,7 +330,7 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
     for ax in axes.flat:
         ax.set( xlabel=xlabel)
     axes[1].set(ylabel=xlabel) #heatplot has group label on y scale
-    
+
     if is_save:
         if figname is None:
             figname = pic_filename('bar',l_or_r.replace(' ', ''),path_to_file_folder_fixed)
@@ -369,7 +369,7 @@ def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_di
     ax = fig.add_subplot(111)
     matplotlib.rcParams.update({'font.size': 20})
     plt.xlabel('Group label', fontsize = 20)
-    plt.ylabel('1-NG/TN', fontsize = 20)     
+    plt.ylabel('1-NG/TN', fontsize = 20)
     plt.xticks(fontsize = 20)
     plt.yticks(fontsize = 20)
     sns.barplot(x=non_germinated_table.columns, y = non_germinated_table.values[0],
@@ -572,7 +572,7 @@ def color_range_counter(src, contours, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255)
 # ### Find_paper
 
 def find_paper(src, template_size, square_threshold, position_x_axes, ppm, canny_top=100, canny_bottom=10, morph=7, gauss=3):
-    
+
     # gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
     bl = cv.GaussianBlur(src, (gauss,gauss), 0)
     canny = cv.Canny(bl, canny_bottom, canny_top)
@@ -661,7 +661,7 @@ def add_annotation(name, text):
         f.seek(0, 0)
         f.write(text)
         f.write(content)
-        
+
 def clean_table(df):
     d = defaultdict(str)
     for i in list(df.columns):
@@ -717,16 +717,16 @@ def search():
     morph, gs, c_top = get_state_values('settings')
     c_bottom = 0
     ppm = [7.45]
-    
+
     if 'color_block_separation' not in listdir(path_to_output_dir):
         os.mkdir(path.join(path_to_output_dir,'color_block_separation'))
     if 'seeds_search' not in listdir(path_to_output_dir):
         os.mkdir(path.join(path_to_output_dir,'seeds_search'))
     if 'contours' not in listdir(path_to_output_dir):
         os.mkdir(path.join(path_to_output_dir,'contours'))
-    
+
     # ppm - pixel per metric, массив с коэфам пересчета пикселя в мм, на случай плохого поиска стикера на фото
-    
+
     logger.info('Contour search parameters: %s', get_state_values('settings'))
     logger.info('Roots color, hsv parameters: %s', get_state_values('roots'))
     logger.info('Leaves color, hsv parameters: %s', get_state_values('leaves'))
@@ -743,6 +743,9 @@ def search():
         path_to_file_folder = path.join(path_to_file_folder_fixed, str(g)+'/')
         PL = len(listdir(path_to_file_folder))
         for filename_in_folder in listdir(path_to_file_folder):
+            if gui.state['abort_flag']:
+                logger.critical('SEARCH ABORTED.')
+                return
             Progress_bar_value += 90 // (PL * FL)
             gui.state['progress'].set(Progress_bar_value)
             # pb.configure(value = Progress_bar_value)
@@ -776,7 +779,7 @@ def search():
 
             pixelsPerMetric, ppm = find_paper(src, paper_area, paper_area_threshold, position_x_axes(src,x_pos_divider), ppm,
                                          canny_top=c_top, canny_bottom=c_bottom,morph=morph)
-            
+
             i=0
             src_to_save = src.copy()
             for cont in contours0:
@@ -791,7 +794,7 @@ def search():
                         i+=1
             #                     cv.drawContours(src,[cont],0,(255,255,5),2)
             cv.imwrite(path.join(path_to_output_dir,'contours',filename_in_folder.split('.')[0]+'_contours.jpg'), src_to_save)
-            
+
             quantity_of_plants = len(real_conts)
             logger.info('Quantity of plants: %d', quantity_of_plants)
             logger.info('Pixels per metric: %.3f', pixelsPerMetric)
@@ -826,21 +829,21 @@ def search():
                         x=np.append(x,pt[0])
                         y=np.append(y,pt[1])
                 slope, intercept = linear_approx(y,x)
-                
-                
+
+
                 p1 = [int(intercept)-int(w*indent_width_calc/100),0]
                 p2 = [int(slope*img.shape[0]+intercept)-int(w*indent_width_calc/100),img.shape[0]]
                 pts_leaves = np.array([[0,0],p1,p2,[0,img.shape[0]]])
                 pts_roots = np.array([[p1[0]+3*w//4+int(w*indent_width_calc/100),p1[1]],[p2[0]+3*w//4+int(w*indent_width_calc/100),p2[1]],[img.shape[1],img.shape[0]],[img.shape[1],0]])
-                
+
                 cv.imwrite(path.join(path_to_output_dir,'seeds_search',filename_in_folder.split('.')[0]+'_seeds_search.jpg'),img)
-           
-            Mode =pd.Series(x).mode()[0]   
+
+            Mode =pd.Series(x).mode()[0]
             mean_left_x = int(Mode)-w//4
             mean_right_x = int(Mode) + 3*w//4
             mean_left_x = round(mean_left_x)
             mean_right_x = round(mean_right_x)
-            
+
             src = drop_seeds(src,hsb,hst,ssb,sst,vsb,vst)
             src_black_seeds = src.copy()
             src_black_seeds = cv.cvtColor(src_black_seeds, cv.COLOR_BGR2HSV)
@@ -989,8 +992,8 @@ def search():
         test_type = 'test_type = '+str(is_norm*'Unpaired T-test'+is_not_norm*'Mann Whitney U-test')+'\n' +'\n'
 
         p_value_dict[i] = (p_value_function(measure_full2, dicts[i],is_norm),test_type)
-    
-    
+
+
     whiskers_dict = {'roots_sum': {},
                    'roots_max': {},
                    'plant_area': {},
@@ -1025,9 +1028,9 @@ def search():
                       'roots parameters'+str(get_state_values('roots'))+'\n'+
                       'seeds parameters'+str(get_state_values('seed'))+'\n'+
                       'blur parameters'+str(get_state_values('settings'))+'\n' +'\n' )
-    
+
     result_dict['full_file_photo_separated'] = clean_table(measure_full2)
-    
+
     for i in result_dict.keys():
         report_table_filename = str(path.basename(path.normpath(path_to_file_folder_fixed)))+'_'+str(i)+'_'+str(datetime.datetime.now().date())+'.csv'
         result_dict[i].to_csv(path.join(path_to_output_dir,report_table_filename))

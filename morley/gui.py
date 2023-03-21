@@ -121,7 +121,7 @@ class LoggingToGUI(logging.Handler):
 
 def save_state(fname):
     state_dict = pythonize_state_dict()
-    for k in ['template', 'img_arr', 'img_arr_0', 'progress']:
+    for k in ['template', 'img_arr', 'img_arr_0', 'progress', 'abort_flag']:
         state_dict.pop(k, None)
     state_dict[STATE_SYNTAX_VERSION_KEY] = STATE_SYNTAX_VERSION
     with open(fname, 'w') as f:
