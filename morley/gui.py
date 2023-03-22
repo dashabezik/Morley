@@ -64,7 +64,7 @@ state = {
 
 STATE_SYNTAX_VERSION = 1
 STATE_SYNTAX_VERSION_KEY = 'syntax_version'
-CONTOUR_AREA_THRESHOLD = 1000
+CONTOUR_AREA_THRESHOLD = 1000  
 FORMAT='{:.0f}'
 
 class FormatLabel(tk.Label):
@@ -332,7 +332,7 @@ def get_template_file(label):
     fname = askopenfilename(title='Seed template file')
     if fname:
         state['paths']['template_file'] = fname
-        read_template_file(fname, label)
+        read_template_file(fname, label)   
     return fname
 
 
@@ -616,8 +616,18 @@ def contours_tab(img, tweak_frame):
 def tweak_image(w):
     window = tk.Toplevel(w)
     window.title('Tweak image')
-    window.geometry('900x650')
+    window.geometry('900x650')        
 
+    template = cv.imdecode(np.fromfile(state['paths']['template_file'] , dtype=np.uint8), cv.IMREAD_COLOR) 
+    bl_t=cv.GaussianBlur(template,(5,5),0)
+    canny_t = cv.Canny(bl_t, 0, 140)
+    kernel_t = cv.getStructuringElement(cv.MORPH_ELLIPSE, (7,7))
+    closed_t = cv.morphologyEx(canny_t, cv.MORPH_CLOSE, kernel_t)
+    contours0_t = cv.findContours(closed_t.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[0]
+    contour_area_threshold_index = np.array([cv.contourArea(cont) for cont in contours0_t]).argmax()
+    global CONTOUR_AREA_THRESHOLD
+    CONTOUR_AREA_THRESHOLD = cv.contourArea(contours0_t[contour_area_threshold_index])
+    
     file_name = random_file(state['paths']['input'])
     img_arr = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_COLOR) ## IMREAD_UNCHANGED has -1 enum of imread modes
     img_arr = rotate_pic(img_arr, state['rotation'].get())
