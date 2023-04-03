@@ -55,7 +55,7 @@ state = {
         'out_dir': os.getcwd()
     },
     'rotation': 0,
-    'paper_area_thresold': 5000,
+    'paper_area_thresold': 1000,
     'paper_area': 0,
     'germ_thresh': 10,
     'progress': 0,
