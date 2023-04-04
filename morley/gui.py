@@ -19,14 +19,14 @@ state = {
         'gauss': 3,
         'canny_top': 160
     },
-    'color': {
-        'h_bottom': 50,
-        'h_top': 255,
-        's_bottom': 0,
-        's_top': 255,
-        'v_bottom': 100,
-        'v_top': 255,
-    },
+    # 'color': {
+    #     'h_bottom': 50,
+    #     'h_top': 255,
+    #     's_bottom': 0,
+    #     's_top': 255,
+    #     'v_bottom': 100,
+    #     'v_top': 255,
+    # },
     'roots': {
         'h_bottom': 0,
         'h_top': 255,
@@ -36,11 +36,11 @@ state = {
         'v_top': 255,
     },
     'leaves': {
-        'h_bottom': 0,
+        'h_bottom': 50,
         'h_top': 255,
         's_bottom': 0,
         's_top': 255,
-        'v_bottom': 0,
+        'v_bottom': 100,
         'v_top': 255,
     },
     'seed': {
@@ -62,7 +62,7 @@ state = {
     'seed_margin_width':100
 }
 
-STATE_SYNTAX_VERSION = 1
+STATE_SYNTAX_VERSION = 2
 STATE_SYNTAX_VERSION_KEY = 'syntax_version'
 CONTOUR_AREA_THRESHOLD = 1000  
 FORMAT='{:.0f}'
@@ -121,7 +121,7 @@ class LoggingToGUI(logging.Handler):
 
 def save_state(fname):
     state_dict = pythonize_state_dict()
-    for k in ['template', 'img_arr', 'img_arr_0', 'progress']:
+    for k in ['template', 'img_arr', 'img_arr_0', 'progress', 'abort_flag']:
         state_dict.pop(k, None)
     state_dict[STATE_SYNTAX_VERSION_KEY] = STATE_SYNTAX_VERSION
     with open(fname, 'w') as f:
@@ -141,6 +141,8 @@ def update_dict(old, new):
 def load_state(fname, label_dict):
     with open(fname) as f:
         d = json.load(f)
+    if d[STATE_SYNTAX_VERSION_KEY] == 1:
+        d.pop('color', None)
     update_dict(state, d)
     set_state_variables(state)
     update_labels(label_dict)
@@ -376,14 +378,14 @@ def blur(img_widget, event):
     img_widget['image'] = obj
 
 
-def color(img_widget, hsv, event):
+def color(img_widget, hsv, obj, event):
 
-    h1 = state['color']['h_bottom'].get()
-    s1 = state['color']['s_bottom'].get()
-    v1 = state['color']['v_bottom'].get()
-    h2 = state['color']['h_top'].get()
-    s2 = state['color']['s_top'].get()
-    v2 = state['color']['v_top'].get()
+    h1 = state[obj]['h_bottom'].get()
+    s1 = state[obj]['s_bottom'].get()
+    v1 = state[obj]['v_bottom'].get()
+    h2 = state[obj]['h_top'].get()
+    s2 = state[obj]['s_top'].get()
+    v2 = state[obj]['v_top'].get()
 
     # формируем начальный и конечный цвет фильтра
     h_min = np.array((h1, s1, v1), np.uint8)
@@ -501,9 +503,9 @@ def clear(w): # clear all the wigets
         c.destroy()
 
 
-def set_params(parameter):
-    for i in state[parameter]:
-        state[parameter][i] = state['color'][i].get()
+# def set_params(parameter):
+#     for i in state[parameter]:
+#         state[parameter][i] = state['color'][i].get()
 
 
 def add_color_sliders(d, frame, command, startrow=1):
@@ -521,19 +523,20 @@ def add_color_sliders(d, frame, command, startrow=1):
 
 
 def seeds_tab(img, tweak_frame):
+    tweak_frame.winfo_toplevel().title('Recognition settings: seeds')
     clear(tweak_frame)
     seed(img, None)
 
-    color_label = tk.Label(master=tweak_frame, text="Choosing color for seed excluding")
+    color_label = tk.Label(master=tweak_frame, text="Choose color range for seed exclusion")
     color_label.grid(column=0, row=0, columnspan=3)
     row = 1 + add_color_sliders(state['seed'], tweak_frame, partial(seed, img))
-    button_b2 = tk.Button(tweak_frame, text='Back', command=partial(colors_tab, img, tweak_frame))
+    button_b2 = tk.Button(tweak_frame, text='Back', command=partial(colors_tab, img, tweak_frame, 'roots'))
     button_end = tk.Button(tweak_frame, text='Done', command=tweak_frame.winfo_toplevel().destroy)
     button_b2.grid(column=0, row=row)
     button_end.grid(column=2, row=row)
 
 
-def colors_tab(img, tweak_frame):
+def colors_tab(img, tweak_frame, obj):
     src = state['img_arr'].copy()
     template = state['template']
     template = rotate_pic(template, state['rotation'].get())
@@ -562,19 +565,28 @@ def colors_tab(img, tweak_frame):
     cv.addWeighted(overlay, opacity, src, 1 - opacity, 0, src)
     hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
 
+    tweak_frame.winfo_toplevel().title('Recognition settings: ' + obj)
     clear(tweak_frame)
-    color(img, hsv, None)
+    color(img, hsv, obj, None)
 
-    color_label = tk.Label(master=tweak_frame, text="Choosing color for pixel counting")
+    color_label = tk.Label(master=tweak_frame, text=f"Choose color range for {obj} detection.")
     color_label.grid(column=0, row=0, columnspan=3)
-    row = add_color_sliders(state['color'], tweak_frame, partial(color, img, hsv)) + 1
+    row = add_color_sliders(state[obj], tweak_frame, partial(color, img, hsv, obj)) + 1
 
-    button_b1 = tk.Button(tweak_frame, text='Set sprouts', command=partial(set_params, 'leaves'))
-    button_n2 = tk.Button(tweak_frame, text='Set roots', command=partial(set_params, 'roots'))
-    button_b1.grid(column=0, row=row)
-    button_n2.grid(column=2, row=row)
-    button_b1 = tk.Button(tweak_frame, text='Back', command=partial(contours_tab, img, tweak_frame))
-    button_n2 = tk.Button(tweak_frame, text='Next', command=partial(seeds_tab, img, tweak_frame))
+    # button_b1 = tk.Button(tweak_frame, text='Set sprouts', command=partial(set_params, 'leaves'))
+    # button_n2 = tk.Button(tweak_frame, text='Set roots', command=partial(set_params, 'roots'))
+    # button_b1.grid(column=0, row=row)
+    # button_n2.grid(column=2, row=row)
+    if obj == 'leaves':
+        back_command = partial(contours_tab, img, tweak_frame)
+        next_command = partial(colors_tab, img, tweak_frame, 'roots')
+    elif obj == 'roots':
+        back_command = partial(colors_tab, img, tweak_frame, 'leaves')
+        next_command = partial(seeds_tab, img, tweak_frame)
+    else:
+        raise ValueError(f'Unsupported value for `obj`: {obj}. Must be "leaves" or "roots".')
+    button_b1 = tk.Button(tweak_frame, text='Back', command=back_command)
+    button_n2 = tk.Button(tweak_frame, text='Next', command=next_command)
     button_b1.grid(column=0, row=row+1)
     button_n2.grid(column=2, row=row+1)
 
@@ -609,7 +621,7 @@ def contours_tab(img, tweak_frame):
     canny_top_slider.grid(column=1, row=3)
     canny_top_slider_lbl.grid(column=2, row=3)
 
-    button_n1 = tk.Button(tweak_frame, text='Next', command=partial(colors_tab, img, tweak_frame))
+    button_n1 = tk.Button(tweak_frame, text='Next', command=partial(colors_tab, img, tweak_frame, 'leaves'))
     button_n1.grid(column=2, row=4)
 
 
@@ -627,7 +639,7 @@ def tweak_image(w):
     contour_area_threshold_index = np.array([cv.contourArea(cont) for cont in contours0_t]).argmax()
     global CONTOUR_AREA_THRESHOLD
     CONTOUR_AREA_THRESHOLD = cv.contourArea(contours0_t[contour_area_threshold_index])
-    
+
     file_name = random_file(state['paths']['input'])
     img_arr = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_COLOR) ## IMREAD_UNCHANGED has -1 enum of imread modes
     img_arr = rotate_pic(img_arr, state['rotation'].get())
