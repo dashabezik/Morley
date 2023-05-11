@@ -11,6 +11,7 @@ import random
 from functools import partial
 import json
 import logging
+from scipy import stats
 
 
 state = {
@@ -537,6 +538,8 @@ def seeds_tab(img, tweak_frame):
 
 
 def colors_tab(img, tweak_frame, obj):
+    import matplotlib
+    from matplotlib import pyplot as plt
     src = state['img_arr'].copy()
     template = state['template']
     template = rotate_pic(template, state['rotation'].get())
