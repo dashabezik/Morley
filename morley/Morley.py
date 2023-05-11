@@ -822,8 +822,12 @@ def search():
                         cv.putText(src_to_save, "%s" %(i,), (left[0] - 10, left[1]-10), cv.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 2), 4)
                         i+=1
             #                     cv.drawContours(src,[cont],0,(255,255,5),2)
-            cv.imwrite(path.join(path_to_output_dir,'contours',filename_in_folder.split('.')[0]+'_contours.jpg'), src_to_save)
-
+            script_path = os.getcwd()
+            os.chdir(path_to_output_dir)
+            cv.imwrite(path.join('contours','.'.join(filename_in_folder.split('.')[:-1])+'_contours.jpg'), src_to_save)
+            os.chdir(script_path)
+#             cv.imwrite(path.join(path_to_output_dir,'contours',filename_in_folder.split('.')[0]+'_contours.jpg'), src_to_save)
+#             print('out_pic_path:', str(path.join(path_to_output_dir,'contours',filename_in_folder.split('.')[0]+'_contours.jpg')))
             quantity_of_plants = len(real_conts)
             logger.info('Quantity of plants: %d', quantity_of_plants)
             logger.info('Pixels per metric: %.3f', pixelsPerMetric)
@@ -848,27 +852,58 @@ def search():
                 method = eval(meth)
                 # Apply template Matching
                 res = cv.matchTemplate(img,template,method)
-                threshold = 0.55
-                loc = np.where( res > threshold)
-                x=np.array([])
-                y=np.array([])
-                for pt in zip(*loc[::-1]):
-                    if (pt[0] > src.shape[1]/3)&((pt[0] < 2*src.shape[1]/3)):
-                        cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,0,255), 5)
-                        x=np.append(x,pt[0])
-                        y=np.append(y,pt[1])
-                slope, intercept = linear_approx(y,x)
+#                 threshold = 0.6
+#                 loc = np.where( res > threshold)
+#                 x=np.array([])
+#                 y=np.array([])
+#                 for pt in zip(*loc[::-1]):
+#                     if (pt[0] > src.shape[1]/3)&((pt[0] < 2*src.shape[1]/3)):
+#                         cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,0,255), 5)
+#                         x=np.append(x,pt[0])
+#                         y=np.append(y,pt[1])
+#                 slope, intercept = linear_approx(y,x)
+                
+                
+                
+                
+                threshold = 0.6
+                success = False
+                while success==False:
+                    print('attempt 1')
+                    print(threshold)
+                    try:
+                        loc = np.where( res > threshold)
+                        x=np.array([])
+                        y=np.array([])
+                        for pt in zip(*loc[::-1]):
+                            if (pt[0] > src.shape[1]/3)&((pt[0] < 2*src.shape[1]/3)):
+                                cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,0,255), 5)
+                                x=np.append(x,pt[0])
+                                y=np.append(y,pt[1])
+                        slope, intercept = linear_approx(y,x)
+                        success = True
+                    except ValueError: 
+                        logger.info('I am trying to find ... ')
+                        print('I am trying to find ... ')
+                        threshold -= 0.05
+#                     else:
+                        
+     
 
                 p1 = [int(intercept),0]
                 p2 = [int(slope*img.shape[0]+intercept),img.shape[0]]
                 pts_leaves = np.array([[0,0],p1,p2,[0,img.shape[0]]])
                 pts_roots = np.array([[p1[0]+3*w//4,p1[1]],[p2[0]+3*w//4,p2[1]],[img.shape[1],img.shape[0]],[img.shape[1],0]])
 
-                cv.imwrite(path.join(path_to_output_dir,'seeds_search',filename_in_folder.split('.')[0]+'_seeds_search.jpg'),img)
+                script_path = os.getcwd()
+                os.chdir(path_to_output_dir)
+                cv.imwrite(path.join('seeds_search','.'.join(filename_in_folder.split('.')[:-1])+'_seeds_search.jpg'), img)
+                os.chdir(script_path)
+#                 cv.imwrite(path.join(path_to_output_dir,'seeds_search',filename_in_folder.split('.')[0]+'_seeds_search.jpg'),img)
 
             Mode =pd.Series(x).mode()[0]
-            mean_left_x = int(Mode)-w//4
-            mean_right_x = int(Mode) + 3*w//4
+            mean_left_x = int(Mode)#-w//4
+            mean_right_x = int(Mode)# + 3*w//4
             mean_left_x = round(mean_left_x)
             mean_right_x = round(mean_right_x)
 
@@ -885,7 +920,13 @@ def search():
             cv.addWeighted(overlay, opacity, src, 1 - opacity, 0, src)
             bl = cv.medianBlur(src, 7)
             bl=cv.GaussianBlur(bl,(5,   5),0)
-            cv.imwrite(path.join(path_to_output_dir,'color_block_separation',filename_in_folder.split('.')[0]+ '_color_block_separation.jpg'), src)
+            script_path = os.getcwd()
+            
+            os.chdir(path_to_output_dir)
+            cv.imwrite(path.join('color_block_separation','.'.join(filename_in_folder.split('.')[:-1])+'_color_block_separation.jpg'), src)
+            os.chdir(script_path)
+#             cv.imwrite(path.join(path_to_output_dir,'color_block_separation',filename_in_folder.split('.')[0]+ '_color_block_separation.jpg'), src)
+
             img_hsv = cv.cvtColor(bl, cv.COLOR_BGR2HSV)
 #             cv.imwrite('colored/{0}'.format(filename_in_folder), src)
 #             mean_right_x = max(p1[0],p2[0])+3*w//4
@@ -1001,7 +1042,7 @@ def search():
             measure['roots_area_{0}'.format(file_name)] = measure.apply(lambda x: x['roots_area_{0}'.format(file_name)]/(pixelsPerMetric*pixelsPerMetric), axis = 1 )
             
     ### Add seed bias ###
-#             measure['leaves_length_{0}'.format(file_name)] = measure['leaves_length_{0}'.format(file_name)]+seed_circ_half_length/2
+            measure['leaves_length_{0}'.format(file_name)] = measure['leaves_length_{0}'.format(file_name)]+seed_circ_half_length/2
             measure['roots_max_length_{0}'.format(file_name)] = measure['roots_max_length_{0}'.format(file_name)]+seed_circ_half_length
             measure['roots_length_{0}'.format(file_name)] =measure.apply(lambda x: seed_bias(x['roots_length_{0}'.format(file_name)], x['roots_width_{0}'.format(file_name)], x['roots_quantity_{0}'.format(file_name)],seed_circ_half_length),axis = 1 )
             measure['leaves_to_seeds_{0}'.format(file_name)] = measure['leaves_area_{0}'.format(file_name)]*pixelsPerMetric/contour_area_threshold
