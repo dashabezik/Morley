@@ -19,12 +19,13 @@ def get_version(rel_path):
 
 setup(
     name                 = 'morley',
-    version              = get_version('morley/version.py'),
+    version              = '0.0.5',#get_version('morley/version.py'),
     description          = '''GUI software for plant morphometry''',
     long_description     = (''.join(open('pypi_md.md').readlines())),
     long_description_content_type="text/markdown",
     author               = 'Daria Emekeeva & Lev Levitsky',
     author_email         = 'dashabezik65@gmail.com',
+    python_requires      = '>=3.9',
     install_requires     = ['pyteomics', 'seaborn', 'scipy', 'scikit-learn', 'opencv-python', 'imutils'],
     classifiers          = ['Intended Audience :: Science/Research',
                             'Programming Language :: Python :: 3',
