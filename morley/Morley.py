@@ -747,8 +747,8 @@ def search():
 
     if 'color_block_separation' not in listdir(path_to_output_dir):
         os.mkdir(path.join(path_to_output_dir,'color_block_separation'))
-    if 'seeds_search' not in listdir(path_to_output_dir):
-        os.mkdir(path.join(path_to_output_dir,'seeds_search'))
+#     if 'seeds_search' not in listdir(path_to_output_dir):
+#         os.mkdir(path.join(path_to_output_dir,'seeds_search'))
     if 'contours' not in listdir(path_to_output_dir):
         os.mkdir(path.join(path_to_output_dir,'contours'))
 
