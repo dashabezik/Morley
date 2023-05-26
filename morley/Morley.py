@@ -203,7 +203,7 @@ def p_value_function (df, columns, is_norm):
     import scipy.stats as sps
     pvalue_table = pd.DataFrame(index = list(str(x) for x in columns.keys()),
                                 columns=list(str(x) for x in columns.keys()))
-    for i in (list(columns.keys())):
+    for i in (list(columns.keys())):  
         for j in (list(columns.keys())):
 #             a = pd.DataFrame(pd.Series(df[columns[i]].values.reshape(-1), dtype=np.float64).dropna())
 #             a = drop_outliers(a,a.columns)
@@ -520,9 +520,9 @@ def pixel_color_conditions(pixel ,h1=0, h2=255, s1=0, s2=255, v1=0, v2=255):
     v_condition = (v>=v1)&(v<=v2)
     full_condition = h_condition*s_condition*v_condition
     return full_condition
-
-def drop_seeds(src, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255):
-    src_hsv  = cv.cvtColor(src, cv.COLOR_BGR2HSV)
+ 
+def drop_seeds_old(src, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255):
+    src_hsv  = cv.cvtColor(src, cv.COLOR_BGR2HSV) 
     h_min = np.array((h1, s1, v1), np.uint8)
     h_max = np.array((h2, s2, v2), np.uint8)
     tresh = cv.inRange(src_hsv, h_min, h_max)
@@ -530,6 +530,33 @@ def drop_seeds(src, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255):
     mask = cv.bitwise_or(src, src, mask=tresh)
     return mask
 
+def drop_seeds(src, contours, area_cont, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255):
+    src_hsv  = cv.cvtColor(src, cv.COLOR_BGR2HSV)
+    h_min = np.array((h1, s1, v1), np.uint8)
+    h_max = np.array((h2, s2, v2), np.uint8)
+    thresh = cv.inRange(src_hsv, h_min, h_max)
+    thresh_=cv.bitwise_not(thresh)
+    mask = cv.bitwise_or(src, src, mask=thresh_)
+    thresh = np.clip(thresh, 0,1)
+    for i in range(len(contours)):
+        c = contours[i]
+        cimg1 = np.zeros_like(thresh)
+        cv.drawContours(cimg1, contours, i, color=255, thickness=-1)
+        
+        cimg1 = np.clip(cimg1, 0 ,1)
+        a = np.array(list(map(list,(zip(np.where(cimg1*thresh>0)[0],np.where(cimg1*thresh>0)[1])))))
+        a_cont = []
+        for i in range(len(a)):
+            a_cont.append([[a[i][1],a[i][0]]])
+        a_cont = np.array(a_cont)
+        
+        if ((cimg1*thresh).sum()>0)&(len(a_cont)>5):
+#             print(np.prod(np.array((cv.fitEllipseDirect(a_cont)[1]))))
+            if np.prod(np.array((cv.fitEllipseDirect(a_cont)[1])))<2*area_cont:
+                print(2)
+                cv.ellipse(mask, cv.fitEllipseDirect(a_cont),(0,0,0),-1)
+                cv.ellipse(mask, cv.fitEllipseDirect(a_cont),(0,0,0),10)
+    return mask
 
 # ### Linear approximation
 # After seed position search it is needed to find the line dividing leaves and roots.
@@ -832,7 +859,11 @@ def search():
             logger.info('Quantity of plants: %d', quantity_of_plants)
             logger.info('Pixels per metric: %.3f', pixelsPerMetric)
 
-            ### SEEDS ###
+           
+        
+        ##################################### OLD #########################################
+        
+        ### SEEDS ###
             logger.info('LOOKING FOR SEEDS POSITION ...')
 
 #             img2 = cv.imread(file_name,0)
@@ -900,15 +931,58 @@ def search():
                 os.chdir(script_path)
 #                 cv.imwrite(path.join(path_to_output_dir,'seeds_search',filename_in_folder.split('.')[0]+'_seeds_search.jpg'),img)
 
+
+##################################### OLD #########################################
+
+
+
             Mode =pd.Series(x).mode()[0]
             mean_left_x = int(Mode)#-w//4
             mean_right_x = int(Mode)# + 3*w//4
             mean_left_x = round(mean_left_x)
             mean_right_x = round(mean_right_x)
 
-            src = drop_seeds(src,hsb,hst,ssb,sst,vsb,vst)
+           
+        
+        
+            src = drop_seeds(src,real_conts, contour_area_threshold,hsb,hst,ssb,sst,vsb,vst)
             src_black_seeds = src.copy()
             src_black_seeds = cv.cvtColor(src_black_seeds, cv.COLOR_BGR2HSV)
+            
+            
+            os.chdir(path_to_output_dir)
+            cv.imwrite(path.join('color_block_separation','.'.join(filename_in_folder.split('.')[:-1])+'_black_seed.jpg'), src_black_seeds)
+            os.chdir(script_path)
+            
+            ##### NEW ######
+            h_min = np.array((0, 0, 0), np.uint8)
+            h_max = np.array((0, 0, 0), np.uint8)
+            thresh = cv.inRange(src_black_seeds, h_min, h_max)
+            thresh = np.clip(thresh, 0,1)
+            x = np.where(thresh ==1)[0]
+            y = np.where(thresh ==1)[1]
+            x = x[(y > src.shape[1]/3)&((y < 2*src.shape[1]/3))]
+            y = y[(y > src.shape[1]/3)&((y < 2*src.shape[1]/3))]
+            
+            mymodel = np.poly1d(np.polyfit(x, y, 3))
+
+            myline = np.linspace(1, src.shape[0], 100)
+
+            p1 = [mymodel(0),0]
+            p2 = [mymodel(src.shape[0]),src.shape[0]]
+            pts_leaves = np.array([[0,0]]+list(map(list,zip( map(int,mymodel(myline)), map(int,myline))))+[[0,src.shape[0]]])
+            pts_roots = np.array(list(map(list,zip(map(int,mymodel(myline)), map(int,myline))))+[[src.shape[1],src.shape[0]]]+[[src.shape[1],0]])
+
+            k,b = linear_approx(x, y)
+#             p1 = [int(b),0]
+#             p2 = [int(k*img.shape[0]+b),img.shape[0]]
+#             pts_leaves = np.array([[0,0],p1,p2,[0,img.shape[0]]])
+#             pts_roots = np.array([[p1[0]+3*w//4,p1[1]],[p2[0]+3*w//4,p2[1]],[img.shape[1],img.shape[0]],[img.shape[1],0]])
+            ##### NEW ######
+            
+            
+            
+            
             ### COLOR ###
             logger.info('MAKING COLOR ...')
 
@@ -924,14 +998,15 @@ def search():
             os.chdir(path_to_output_dir)
             cv.imwrite(path.join('color_block_separation','.'.join(filename_in_folder.split('.')[:-1])+'_color_block_separation.jpg'), src)
             os.chdir(script_path)
-#             cv.imwrite(path.join(path_to_output_dir,'color_block_separation',filename_in_folder.split('.')[0]+ '_color_block_separation.jpg'), src)
+            
+          
 
             img_hsv = cv.cvtColor(bl, cv.COLOR_BGR2HSV)
 #             cv.imwrite('colored/{0}'.format(filename_in_folder), src)
 #             mean_right_x = max(p1[0],p2[0])+3*w//4
 #             mean_left_x = min(p1[0],p2[0])
-            logger.info("Mean left seeds x-coordinate %d", mean_left_x)
-            logger.info("Mean right seeds x-coordinate %d", mean_right_x)
+#             logger.info("Mean left seeds x-coordinate %d", mean_left_x)
+#             logger.info("Mean right seeds x-coordinate %d", mean_right_x)
             ## WIDTH ###
             logger.info('WIDTH CALCULATION...')
 
@@ -958,6 +1033,12 @@ def search():
                 right = tuple(c[c[:, :, 0].argmax()][0])
                 top = tuple(c[c[:, :, 1].argmin()][0])
                 bottom = tuple(c[c[:, :, 1].argmax()][0])
+                
+                mean_left_x = int(mymodel(0.5*(top[1]+bottom[1])))
+                mean_right_x = int(mymodel(0.5*(top[1]+bottom[1]))+3*w/4)
+#                 logger.info("Mean left seeds x-coordinate %d", mean_left_x)
+#                 logger.info("Mean right seeds x-coordinate %d", mean_right_x)
+                
                 cv.line(img_hsv, left, right, (255, 255, 255), thickness=2)
                 step = (right[0]-mean_right_x)//3
                 if (mean_left_x-left[0])//3!=0:
@@ -1039,6 +1120,9 @@ def search():
             measure['leaves_length_{0}'.format(file_name)] = measure.apply(lambda x: length(x['leaves_width_{0}'.format(file_name)],x['leaves_area_{0}'.format(file_name)],pixelsPerMetric), axis = 1 )
             measure['leaves_area_{0}'.format(file_name)] = measure.apply(lambda x: x['leaves_area_{0}'.format(file_name)]/(pixelsPerMetric*pixelsPerMetric), axis = 1 )
             measure['roots_area_{0}'.format(file_name)] = measure.apply(lambda x: x['roots_area_{0}'.format(file_name)]/(pixelsPerMetric*pixelsPerMetric), axis = 1 )
+            measure['leaves_width_{0}'.format(file_name)] = measure.apply(lambda x: x['leaves_width_{0}'.format(file_name)]/(pixelsPerMetric), axis = 1 )
+            measure['roots_max_width_{0}'.format(file_name)] = measure.apply(lambda x: x['roots_max_width_{0}'.format(file_name)]/(pixelsPerMetric), axis = 1 )
+            measure['roots_width_{0}'.format(file_name)] = measure.apply(lambda x: x['roots_width_{0}'.format(file_name)]/(pixelsPerMetric), axis = 1 )
 
     ### Add seed bias ###
             measure['leaves_length_{0}'.format(file_name)] = measure['leaves_length_{0}'.format(file_name)]+seed_circ_half_length/2
