@@ -226,6 +226,8 @@ def main():
     if missing:
         logger.error("The following parameters are missing: %s", ', '.join(missing))
         sys.exit(1)
+
+    gui.state['abort_flag'] = 0
     Morley.search()
 
 

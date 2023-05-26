@@ -264,7 +264,7 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
                       is_save = False, figname=None,  union_DF_length = 500, xlabel = 'group label', ylabel = 'length, mm',
                       param = 'length', auto_or_man = 'automatic',  is_drop_outliers = False, is_norm = False):
     pv_tmp = pv_table.copy(deep=True)
-    print(pv_tmp)
+    logger.debug(pv_tmp)
     if type(columns)==dict:
         tmp = pd.DataFrame(columns=list(columns.keys()),index=np.arange(union_DF_length))
         for i in columns.keys():
@@ -315,11 +315,11 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
                 pv_tmp[str(i)].loc[str(j)] = scipy.stats.mannwhitneyu(pd.Series(tmp[i].values.reshape(-1), dtype=np.float64).dropna(),
                                                                   pd.Series(tmp[j].values.reshape(-1), dtype=np.float64).dropna(),
                                                                  use_continuity = False ,alternative = 'two-sided')[1]
-        
+
 #             pv_tmp[str(i)].loc[str(j)] = scipy.stats.mannwhitneyu(pd.Series(tmp[i].values.reshape(-1), dtype=np.float64).dropna(),
 #                                                                   pd.Series(tmp[j].values.reshape(-1), dtype=np.float64).dropna(),
 #                                                                  use_continuity = False ,alternative = 'two-sided')[1]
-    print(pv_tmp)
+    logger.debug(pv_tmp)
 
     for i in range(0,pv_tmp.shape[1]):
         for j in range(0,pv_tmp.shape[1]):
@@ -432,7 +432,7 @@ def folders_list_function(path_to_file_folder):
     for folder in not_needed_folders:
         if folder in folders_list:
             folders_list.remove(folder)
-            
+
     return folders_list
 
 
@@ -590,7 +590,7 @@ def color_range_counter(src, contours, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255)
     thresh = np.clip(thresh, 0,1)
     counter = np.zeros(len(contours))
     for i in range(len(contours)):
-        c = contours[i]
+        # c = contours[i]
         cimg1 = np.zeros_like(thresh)
         cv.drawContours(cimg1, contours, i, color=255, thickness=-1)
 #         plt.figure(figsize=(14,14))
@@ -758,7 +758,7 @@ def search():
     ppm = [7.45]
 
         ### Plant contour ####
-    template = cv.imdecode(np.fromfile(template_filename, dtype=np.uint8), cv.IMREAD_COLOR) 
+    template = cv.imdecode(np.fromfile(template_filename, dtype=np.uint8), cv.IMREAD_COLOR)
     template_hsv  = cv.cvtColor(template, cv.COLOR_BGR2HSV)
     bl_t=cv.GaussianBlur(template,(5,5),0)
     canny_t = cv.Canny(bl_t, 0, 140)
@@ -769,7 +769,7 @@ def search():
     contour_area_threshold = cv.contourArea(contours0_t[contour_area_threshold_index])
     seed_circ_half_length_in_pixels = math.sqrt(contour_area_threshold*3.14)
     logger.info('Template area = '+str(contour_area_threshold))
-    
+
     if 'color_block_separation' not in listdir(path_to_output_dir):
         os.mkdir(path.join(path_to_output_dir,'color_block_separation'))
     if 'seeds_search' not in listdir(path_to_output_dir):
@@ -811,7 +811,7 @@ def search():
             logger.info('LOOKING FOR CONTOURS ...')
 
             file_name = path.join(path_to_file_folder, filename_in_folder)
-            
+
             #src = cv.imread(file_name)
             src = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_COLOR)
             src = gui.rotate_pic(src, rotate)
@@ -826,14 +826,14 @@ def search():
             pixelsPerMetric = None
             quantity_of_plants = 0
             real_conts = []
-            
-            
+
+
 
             pixelsPerMetric, ppm = find_paper(src, paper_area, paper_area_threshold, position_x_axes(src,x_pos_divider), ppm,
                                          canny_top=c_top, canny_bottom=c_bottom,morph=morph)
 
             seed_circ_half_length = seed_circ_half_length_in_pixels/pixelsPerMetric
-            
+
             logger.info('Seeds circularity length, mm: ' + str(round(seed_circ_half_length)))
 
             i=0
@@ -893,33 +893,32 @@ def search():
 #                         x=np.append(x,pt[0])
 #                         y=np.append(y,pt[1])
 #                 slope, intercept = linear_approx(y,x)
-                
-                
-                
-                
+
+
+
+
                 threshold = 0.6
                 success = False
-                while success==False:
-                    print('attempt 1')
-                    print(threshold)
+                while not success:
+                    logger.debug('attempt 1')
+                    logger.debug(threshold)
                     try:
                         loc = np.where( res > threshold)
-                        x=np.array([])
-                        y=np.array([])
+                        x = np.array([])
+                        y = np.array([])
                         for pt in zip(*loc[::-1]):
                             if (pt[0] > src.shape[1]/3)&((pt[0] < 2*src.shape[1]/3)):
                                 cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,0,255), 5)
-                                x=np.append(x,pt[0])
-                                y=np.append(y,pt[1])
+                                x = np.append(x,pt[0])
+                                y = np.append(y,pt[1])
                         slope, intercept = linear_approx(y,x)
                         success = True
-                    except ValueError: 
-                        logger.info('I am trying to find ... ')
-                        print('I am trying to find ... ')
+                    except ValueError:
+                        logger.debug('I am trying to find ... ')
                         threshold -= 0.05
 #                     else:
-                        
-     
+
+
 
                 p1 = [int(intercept),0]
                 p2 = [int(slope*img.shape[0]+intercept),img.shape[0]]
@@ -995,7 +994,7 @@ def search():
             bl = cv.medianBlur(src, 7)
             bl=cv.GaussianBlur(bl,(5,   5),0)
             script_path = os.getcwd()
-            
+
             os.chdir(path_to_output_dir)
             cv.imwrite(path.join('color_block_separation','.'.join(filename_in_folder.split('.')[:-1])+'_color_block_separation.jpg'), src)
             os.chdir(script_path)
@@ -1106,7 +1105,7 @@ def search():
 #                 measure.iloc[i]['plant_area_{0}'.format(file_name)] = cv.contourArea(c)
 #                 print(cv.contourArea(c))
     #             measure.iloc[i]['seed_area_{0}'.format(file_name)] = seed_area
-    
+
     ### Calculation ###
             measure['leaves_area_{0}'.format(file_name)] =color_range_counter(src, real_conts, hlb,hlt,slb,slt,vlb,vlt)
             measure['roots_area_{0}'.format(file_name)] =color_range_counter(src, real_conts, hrb,hrt,srb,srt,vrb,vrt)
@@ -1124,13 +1123,13 @@ def search():
             measure['leaves_width_{0}'.format(file_name)] = measure.apply(lambda x: x['leaves_width_{0}'.format(file_name)]/(pixelsPerMetric), axis = 1 )
             measure['roots_max_width_{0}'.format(file_name)] = measure.apply(lambda x: x['roots_max_width_{0}'.format(file_name)]/(pixelsPerMetric), axis = 1 )
             measure['roots_width_{0}'.format(file_name)] = measure.apply(lambda x: x['roots_width_{0}'.format(file_name)]/(pixelsPerMetric), axis = 1 )
-            
+
     ### Add seed bias ###
             measure['leaves_length_{0}'.format(file_name)] = measure['leaves_length_{0}'.format(file_name)]+seed_circ_half_length/2
             measure['roots_max_length_{0}'.format(file_name)] = measure['roots_max_length_{0}'.format(file_name)]+seed_circ_half_length
             measure['roots_length_{0}'.format(file_name)] =measure.apply(lambda x: seed_bias(x['roots_length_{0}'.format(file_name)], x['roots_width_{0}'.format(file_name)], x['roots_quantity_{0}'.format(file_name)],seed_circ_half_length),axis = 1 )
             measure['leaves_to_seeds_{0}'.format(file_name)] = measure['leaves_area_{0}'.format(file_name)]*pixelsPerMetric/contour_area_threshold
-            
+
             measure_full2 = measure_full2.join(measure, how = 'outer')
 
     del res,bl,overlay, img, img2, img_hsv, gr, canny, src, closed, src_black_seeds
@@ -1171,7 +1170,7 @@ def search():
         is_norm = not is_not_norm
         test_type = 'test_type = '+str(is_norm*'Unpaired T-test'+is_not_norm*'Mann Whitney U-test')+'\n' +'\n'
         p_value_dict[i] = (p_value_function(measure_full2, dicts[i],is_norm),test_type)
-        
+
         ylabel = 'length, mm'*(i!='plant_area')+'area, mm2'*(i=='plant_area')
         result_dict[i], whiskers_dict[i] = bar_plot_function(plots_titles[i], measure_full2, dicts[i], p_value_dict[i][0], ylabel=ylabel,
                                   path_to_file_folder_fixed = path_to_file_folder_fixed, path_to_output_dir = path_to_output_dir,
