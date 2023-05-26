@@ -29,7 +29,7 @@ state = {
     #     'v_top': 255,
     # },
     'roots': {
-        'h_bottom': 0,
+        'h_bottom': 50,
         'h_top': 255,
         's_bottom': 0,
         's_top': 255,
@@ -37,8 +37,8 @@ state = {
         'v_top': 255,
     },
     'leaves': {
-        'h_bottom': 50,
-        'h_top': 255,
+        'h_bottom': 0,
+        'h_top': 50,
         's_bottom': 0,
         's_top': 255,
         'v_bottom': 100,

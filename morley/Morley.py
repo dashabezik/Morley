@@ -87,7 +87,6 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
         iterator = 0
 
         for g in tmp_l.columns:
-#             tmp[g] = tmp[tmp[g]>0][g]
             plt.subplot(len(tmp.columns), 4, param_type+4*iterator+1)
             mean = round(pd.Series(tmp[g].values.reshape(-1), dtype=np.float64).dropna().mean())
             ci = round(whiskers_dict[param[param_type]][g])
@@ -105,7 +104,6 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
 
             iterator +=1
         param_type+=1
-#     plt.show()
     for ax in axes.flat:
         ax.set(xlabel='x-label', ylabel='y-label')
 
@@ -114,7 +112,6 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
             figname = pic_filename('hist','l_rm_rs',path_to_file_folder_fixed)
 #             report_area.insert(tk.END, str(path.join(path_to_output_dir,figname))+'\n')
         plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
-#     plt.show()
 
 
 # ### Drop outliers
@@ -264,7 +261,6 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
                       is_save = False, figname=None,  union_DF_length = 500, xlabel = 'group label', ylabel = 'length, mm',
                       param = 'length', auto_or_man = 'automatic',  is_drop_outliers = False, is_norm = False):
     pv_tmp = pv_table.copy(deep=True)
-    logger.debug(pv_tmp)
     if type(columns)==dict:
         tmp = pd.DataFrame(columns=list(columns.keys()),index=np.arange(union_DF_length))
         for i in columns.keys():
@@ -316,11 +312,6 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
                                                                   pd.Series(tmp[j].values.reshape(-1), dtype=np.float64).dropna(),
                                                                  use_continuity = False ,alternative = 'two-sided')[1]
 
-#             pv_tmp[str(i)].loc[str(j)] = scipy.stats.mannwhitneyu(pd.Series(tmp[i].values.reshape(-1), dtype=np.float64).dropna(),
-#                                                                   pd.Series(tmp[j].values.reshape(-1), dtype=np.float64).dropna(),
-#                                                                  use_continuity = False ,alternative = 'two-sided')[1]
-    logger.debug(pv_tmp)
-
     for i in range(0,pv_tmp.shape[1]):
         for j in range(0,pv_tmp.shape[1]):
             if i>j:
@@ -350,7 +341,6 @@ def bar_plot_function(l_or_r, df, columns, pv_table, path_to_file_folder_fixed, 
             figname = pic_filename('bar',l_or_r.replace(' ', ''),path_to_file_folder_fixed)
 #             report_area.insert(tk.END, path.join(path_to_output_dir,figname)+'\n')
         plt.savefig(path.join(path_to_output_dir,figname),bbox_inches = 'tight')
-#     plt.show()
 
     return tmp, whiskers
 
@@ -535,9 +525,8 @@ def drop_seeds(src, contours, area_cont, h1=0, h2=255, s1=0, s2=255, v1=0, v2=25
     h_min = np.array((h1, s1, v1), np.uint8)
     h_max = np.array((h2, s2, v2), np.uint8)
     thresh = cv.inRange(src_hsv, h_min, h_max)
-    thresh_=cv.bitwise_not(thresh)
-    mask = cv.bitwise_or(src, src, mask=thresh_)
-    thresh = np.clip(thresh, 0,1)
+    mask = src.copy()
+#     thresh = np.clip(thresh, 0,1)
     for i in range(len(contours)):
         c = contours[i]
         cimg1 = np.zeros_like(thresh)
@@ -549,11 +538,9 @@ def drop_seeds(src, contours, area_cont, h1=0, h2=255, s1=0, s2=255, v1=0, v2=25
         for i in range(len(a)):
             a_cont.append([[a[i][1],a[i][0]]])
         a_cont = np.array(a_cont)
-        
+        mask = cv.bitwise_and(mask, mask, mask=cv.bitwise_not(cimg1*thresh))
         if ((cimg1*thresh).sum()>0)&(len(a_cont)>5):
-#             print(np.prod(np.array((cv.fitEllipseDirect(a_cont)[1]))))
             if np.prod(np.array((cv.fitEllipseDirect(a_cont)[1])))<2*area_cont:
-                print(2)
                 cv.ellipse(mask, cv.fitEllipseDirect(a_cont),(0,0,0),-1)
                 cv.ellipse(mask, cv.fitEllipseDirect(a_cont),(0,0,0),10)
     return mask
@@ -593,14 +580,6 @@ def color_range_counter(src, contours, h1=0, h2=255, s1=0, s2=255, v1=0, v2=255)
         # c = contours[i]
         cimg1 = np.zeros_like(thresh)
         cv.drawContours(cimg1, contours, i, color=255, thickness=-1)
-#         plt.figure(figsize=(14,14))
-#         plt.imshow(cimg1)
-#         plt.show()
-#         plt.figure(figsize=(14,14))
-#         plt.imshow(thresh)
-#         plt.show()
-
-#         print('plant area = ', cv.contourArea(c) )
         cimg1 = np.clip(cimg1, 0 ,1)
         counter[i] = (cimg1*thresh).sum()
     return counter
@@ -627,7 +606,6 @@ def find_paper(src, template_size, square_threshold, position_x_axes, ppm, canny
             sm = cv.arcLength(cont, True)
             apd = cv.approxPolyDP(cont, 0.025*sm, True)
             center, radius = cv.minEnclosingCircle(cont)
-#             cv.drawContours(src, [cont], -1, (0,255,0), -2)
             if True:
                 # is_paper_founded = True
                 # paper = cont
@@ -641,9 +619,6 @@ def find_paper(src, template_size, square_threshold, position_x_axes, ppm, canny
                 (blbrX, blbrY) = midpoint(bl, br)
                 (tlblX, tlblY) = midpoint(tl, bl)
                 (trbrX, trbrY) = midpoint(tr, br)
-                # dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
-                # dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
-    #             if (dB/template_size > (square_threshold/)):
                 pixelsPerMetric = math.sqrt(cv.contourArea(cont)/(template_size))
                 ppm.append(pixelsPerMetric)
             else:
@@ -800,10 +775,6 @@ def search():
                 return
             Progress_bar_value += 90 // (PL * FL)
             gui.state['progress'].set(Progress_bar_value)
-            # pb.configure(value = Progress_bar_value)
-            # pb_lbl['text'] = str(round(Progress_bar_value))+'%'
-            # pb.update()
-            # pb_lbl.update()
             if filename_in_folder=='.ipynb_checkpoints':
                 continue
             ### CONTOURS ###
@@ -811,8 +782,6 @@ def search():
             logger.info('LOOKING FOR CONTOURS ...')
 
             file_name = path.join(path_to_file_folder, filename_in_folder)
-
-            #src = cv.imread(file_name)
             src = cv.imdecode(np.fromfile(file_name, dtype=np.uint8), cv.IMREAD_COLOR)
             src = gui.rotate_pic(src, rotate)
             gr = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
@@ -848,13 +817,10 @@ def search():
                         cv.drawContours(src_to_save,[cont],0,(255,255,5),2)
                         cv.putText(src_to_save, "%s" %(i,), (left[0] - 10, left[1]-10), cv.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 2), 4)
                         i+=1
-            #                     cv.drawContours(src,[cont],0,(255,255,5),2)
             script_path = os.getcwd()
             os.chdir(path_to_output_dir)
             cv.imwrite(path.join('contours','.'.join(filename_in_folder.split('.')[:-1])+'_contours.jpg'), src_to_save)
             os.chdir(script_path)
-#             cv.imwrite(path.join(path_to_output_dir,'contours',filename_in_folder.split('.')[0]+'_contours.jpg'), src_to_save)
-#             print('out_pic_path:', str(path.join(path_to_output_dir,'contours',filename_in_folder.split('.')[0]+'_contours.jpg')))
             quantity_of_plants = len(real_conts)
             logger.info('Quantity of plants: %d', quantity_of_plants)
             logger.info('Pixels per metric: %.3f', pixelsPerMetric)
@@ -877,72 +843,7 @@ def search():
             w, h = template.shape[::-1]
 
 
-            methods = ['cv.TM_CCOEFF_NORMED']
-            for meth in methods:
-                img = img2.copy()
-                method = eval(meth)
-                # Apply template Matching
-                res = cv.matchTemplate(img,template,method)
-#                 threshold = 0.6
-#                 loc = np.where( res > threshold)
-#                 x=np.array([])
-#                 y=np.array([])
-#                 for pt in zip(*loc[::-1]):
-#                     if (pt[0] > src.shape[1]/3)&((pt[0] < 2*src.shape[1]/3)):
-#                         cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,0,255), 5)
-#                         x=np.append(x,pt[0])
-#                         y=np.append(y,pt[1])
-#                 slope, intercept = linear_approx(y,x)
-
-
-
-
-                threshold = 0.6
-                success = False
-                while not success:
-                    logger.debug('attempt 1')
-                    logger.debug(threshold)
-                    try:
-                        loc = np.where( res > threshold)
-                        x = np.array([])
-                        y = np.array([])
-                        for pt in zip(*loc[::-1]):
-                            if (pt[0] > src.shape[1]/3)&((pt[0] < 2*src.shape[1]/3)):
-                                cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,0,255), 5)
-                                x = np.append(x,pt[0])
-                                y = np.append(y,pt[1])
-                        slope, intercept = linear_approx(y,x)
-                        success = True
-                    except ValueError:
-                        logger.debug('I am trying to find ... ')
-                        threshold -= 0.05
-#                     else:
-
-
-
-                p1 = [int(intercept),0]
-                p2 = [int(slope*img.shape[0]+intercept),img.shape[0]]
-                pts_leaves = np.array([[0,0],p1,p2,[0,img.shape[0]]])
-                pts_roots = np.array([[p1[0]+3*w//4,p1[1]],[p2[0]+3*w//4,p2[1]],[img.shape[1],img.shape[0]],[img.shape[1],0]])
-
-                script_path = os.getcwd()
-                os.chdir(path_to_output_dir)
-                cv.imwrite(path.join('seeds_search','.'.join(filename_in_folder.split('.')[:-1])+'_seeds_search.jpg'), img)
-                os.chdir(script_path)
-#                 cv.imwrite(path.join(path_to_output_dir,'seeds_search',filename_in_folder.split('.')[0]+'_seeds_search.jpg'),img)
-
-
 ##################################### OLD #########################################
-
-
-
-            Mode =pd.Series(x).mode()[0]
-            mean_left_x = int(Mode)#-w//4
-            mean_right_x = int(Mode)# + 3*w//4
-            mean_left_x = round(mean_left_x)
-            mean_right_x = round(mean_right_x)
-
-           
         
         
             src = drop_seeds(src,real_conts, contour_area_threshold,hsb,hst,ssb,sst,vsb,vst)
@@ -950,9 +851,9 @@ def search():
             src_black_seeds = cv.cvtColor(src_black_seeds, cv.COLOR_BGR2HSV)
             
             
-            os.chdir(path_to_output_dir)
-            cv.imwrite(path.join('color_block_separation','.'.join(filename_in_folder.split('.')[:-1])+'_black_seed.jpg'), src_black_seeds)
-            os.chdir(script_path)
+#             os.chdir(path_to_output_dir)
+#             cv.imwrite(path.join('color_block_separation','.'.join(filename_in_folder.split('.')[:-1])+'_black_seed.jpg'), src_black_seeds)
+#             os.chdir(script_path)
             
             ##### NEW ######
             h_min = np.array((0, 0, 0), np.uint8)
