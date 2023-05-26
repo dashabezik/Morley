@@ -1033,7 +1033,7 @@ def search():
 
             measure_full2 = measure_full2.join(measure, how = 'outer')
 
-    del res,bl,overlay, img, img2, img_hsv, gr, canny, src, closed, src_black_seeds
+    del bl,overlay, img, img2, img_hsv, gr, canny, src, closed, src_black_seeds
 
     measure_full2.to_csv(path.join(path_to_output_dir,'measure_'+str(datetime.datetime.now().date())+'.csv'))
 
