@@ -106,9 +106,9 @@ def start_gui():
     germ_threshold = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20, textvariable=gui.state['germ_thresh'])
     germ_threshold_lbl = tk.Label(master=main_frame, text="Germination threshold, mm", width=28)
 
-    seed_margin_width = tk.Entry(master=main_frame, text="Germination threshold, mm", width=20, textvariable=gui.state['seed_margin_width'])
-    seed_margin_width_lbl = tk.Label(master=main_frame, text="Seed margin width, %", width=28)
-
+    seed_margin_width = tk.Checkbutton(master=main_frame, width=20, variable=gui.state['is_seed_big'])
+    seed_margin_width_lbl = tk.Label(master=main_frame, text="Shoot length is less or equal to the seeds max width", width=40)
+    
     report_area = st.ScrolledText(main_frame, width=60, height=20, state=tk.DISABLED)
     handler = gui.LoggingToGUI(report_area)
     formatter = logging.Formatter('{levelname:>8}: {asctime} {message}',
@@ -137,7 +137,7 @@ def start_gui():
         gui.state[name].trace('w', gui.trace_entry(name))
         gui.state[name].set(gui.state[name].get())  # trigger trace functions
 
-    for w in [paper_size, germ_threshold, seed_margin_width]:
+    for w in [paper_size, germ_threshold]:
         Hovertip(w,'Enter an integer number.')
 
     main_frame.grid(sticky=tk.N+tk.E+tk.S+tk.W)
