@@ -20,20 +20,12 @@ state = {
         'gauss': 3,
         'canny_top': 160
     },
-    # 'color': {
-    #     'h_bottom': 50,
-    #     'h_top': 255,
-    #     's_bottom': 0,
-    #     's_top': 255,
-    #     'v_bottom': 100,
-    #     'v_top': 255,
-    # },
     'roots': {
         'h_bottom': 50,
         'h_top': 255,
         's_bottom': 0,
         's_top': 255,
-        'v_bottom': 0,
+        'v_bottom': 100,
         'v_top': 255,
     },
     'leaves': {
@@ -60,7 +52,7 @@ state = {
     'paper_area': 0,
     'germ_thresh': 10,
     'progress': 0,
-    'seed_margin_width':100
+    'is_seed_big':0
 }
 
 STATE_SYNTAX_VERSION = 2
@@ -261,19 +253,6 @@ def trace_entry(key):
             conditions.satisfied.add(key)
         conditions.update_conditions()
     return callback
-
-
-# def random_file(path_to_file_folder):
-#     a=random.choice(os.listdir(path_to_file_folder))
-#     while (a=='template')|(a=='.ipynb_checkpoints')|(not os.path.isdir(os.path.join(path_to_file_folder,a))):
-#         a=random.choice(os.listdir(path_to_file_folder))
-#     path_to_file = os.path.join(path_to_file_folder, a+'/')
-#     b = random.choice(os.listdir(path_to_file))
-#     while (b=='.ipynb_checkpoints'):
-#         b=random.choice(os.listdir(path_to_file))
-#     path_to_file = os.path.join(path_to_file, b)
-#     return path_to_file
-
 
 
 
