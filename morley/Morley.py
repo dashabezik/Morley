@@ -395,14 +395,17 @@ def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_di
 
 
 def length(width, square, pixel):
-    if (width!=0):
+#     length = 0
+    if (width!=0):#(round(width/pixel)!=0):
         length = square/(width*pixel)
     else:
         length = 0
+#     if (round(width/pixel)==0):
+#         length = 0
     return length
 
 def seed_bias(length, width, roots_quantity, seed_length):
-    if (width!=0):
+    if (round(width)!=0):
         length = length+seed_length*roots_quantity
     return length
 
@@ -722,7 +725,8 @@ def search():
     germ_thresh = gui.state['germ_thresh'].get()
     paper_area_threshold = gui.state['paper_area_thresold'].get()
     x_pos_divider = 11
-    indent_width_calc = gui.state['seed_margin_width'].get() #indent from the grain to calculate the width of the parts of the plants, so as not to take into account the width of the grain. For large grains and short sprouts, it is recommended to take a value of 10%; for small seeds, it is recommended to take a value of 100%.
+    is_seed_big = gui.state['is_seed_big'].get()
+    indent_width_calc = 10*(is_seed_big==1)+100*(is_seed_big==0) #indent from the grain to calculate the width of the parts of the plants, so as not to take into account the width of the grain. For large grains and short sprouts, it is recommended to take a value of 10%; for small seeds, it is recommended to take a value of 100%.
     contour_area_threshold = gui.CONTOUR_AREA_THRESHOLD # look at your img size and evaluate the threshold, 1000 is recomended
     template_filename = gui.state['paths']['template_file']
     hlb,hlt,slb,slt,vlb,vlt = get_state_values('leaves')
@@ -741,7 +745,8 @@ def search():
     closed_t = cv.morphologyEx(canny_t, cv.MORPH_CLOSE, kernel_t)
     contours0_t = cv.findContours(closed_t.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)[0]
     contour_area_threshold_index = np.array([cv.contourArea(cont) for cont in contours0_t]).argmax()
-    contour_area_threshold = cv.contourArea(contours0_t[contour_area_threshold_index])
+    ellipse = cv.fitEllipse(contours0_t[contour_area_threshold_index])
+    contour_area_threshold = int(np.prod(np.array(ellipse[1]))/4)
     seed_circ_half_length_in_pixels = math.sqrt(contour_area_threshold*3.14)
     logger.info('Template area = '+str(contour_area_threshold))
 
@@ -871,8 +876,8 @@ def search():
 
             p1 = [mymodel(0),0]
             p2 = [mymodel(src.shape[0]),src.shape[0]]
-            pts_leaves = np.array([[0,0]]+list(map(list,zip( map(int,mymodel(myline)), map(int,myline))))+[[0,src.shape[0]]])
-            pts_roots = np.array(list(map(list,zip(map(int,mymodel(myline)), map(int,myline))))+[[src.shape[1],src.shape[0]]]+[[src.shape[1],0]])
+            pts_leaves = np.array([[0,0]]+list(map(list,zip( map(int,mymodel(myline)-w*is_seed_big/2), map(int,myline))))+[[0,src.shape[0]]])
+            pts_roots = np.array(list(map(list,zip(map(int,mymodel(myline)+w*is_seed_big/2), map(int,myline))))+[[src.shape[1],src.shape[0]]]+[[src.shape[1],0]])
 
             k,b = linear_approx(x, y)
 #             p1 = [int(b),0]
@@ -1026,8 +1031,8 @@ def search():
             measure['roots_width_{0}'.format(file_name)] = measure.apply(lambda x: x['roots_width_{0}'.format(file_name)]/(pixelsPerMetric), axis = 1 )
 
     ### Add seed bias ###
-            measure['leaves_length_{0}'.format(file_name)] = measure['leaves_length_{0}'.format(file_name)]+seed_circ_half_length/2
-            measure['roots_max_length_{0}'.format(file_name)] = measure['roots_max_length_{0}'.format(file_name)]+seed_circ_half_length
+            measure['leaves_length_{0}'.format(file_name)] = measure.apply(lambda x: seed_bias(x['leaves_length_{0}'.format(file_name)], x['leaves_width_{0}'.format(file_name)], 1,seed_circ_half_length),axis = 1)
+            measure['roots_max_length_{0}'.format(file_name)] = measure.apply(lambda x: seed_bias(x['roots_max_length_{0}'.format(file_name)], x['roots_max_width_{0}'.format(file_name)], 1,seed_circ_half_length),axis = 1)
             measure['roots_length_{0}'.format(file_name)] =measure.apply(lambda x: seed_bias(x['roots_length_{0}'.format(file_name)], x['roots_width_{0}'.format(file_name)], x['roots_quantity_{0}'.format(file_name)],seed_circ_half_length),axis = 1 )
             measure['leaves_to_seeds_{0}'.format(file_name)] = measure['leaves_area_{0}'.format(file_name)]*pixelsPerMetric/contour_area_threshold
 
