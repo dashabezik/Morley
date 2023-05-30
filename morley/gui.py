@@ -263,13 +263,28 @@ def trace_entry(key):
     return callback
 
 
+# def random_file(path_to_file_folder):
+#     a=random.choice(os.listdir(path_to_file_folder))
+#     while (a=='template')|(a=='.ipynb_checkpoints')|(not os.path.isdir(os.path.join(path_to_file_folder,a))):
+#         a=random.choice(os.listdir(path_to_file_folder))
+#     path_to_file = os.path.join(path_to_file_folder, a+'/')
+#     b = random.choice(os.listdir(path_to_file))
+#     while (b=='.ipynb_checkpoints'):
+#         b=random.choice(os.listdir(path_to_file))
+#     path_to_file = os.path.join(path_to_file, b)
+#     return path_to_file
+
+
+
+
 def random_file(path_to_file_folder):
     a=random.choice(os.listdir(path_to_file_folder))
-    while (a=='template')|(a=='.ipynb_checkpoints')|(not os.path.isdir(os.path.join(path_to_file_folder,a))):
+    not_needed_folders_list = ['.ipynb_checkpoints', 'template', 'color_block_separation', 'seeds_search', 'contours']
+    while any(a==i for i in not_needed_folders_list)|(not os.path.isdir(os.path.join(path_to_file_folder,a))):
         a=random.choice(os.listdir(path_to_file_folder))
     path_to_file = os.path.join(path_to_file_folder, a+'/')
     b = random.choice(os.listdir(path_to_file))
-    while (b=='.ipynb_checkpoints'):
+    while any(b==i for i in not_needed_folders_list):
         b=random.choice(os.listdir(path_to_file))
     path_to_file = os.path.join(path_to_file, b)
     return path_to_file
