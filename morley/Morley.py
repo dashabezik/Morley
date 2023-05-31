@@ -395,13 +395,10 @@ def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_di
 
 
 def length(width, square, pixel):
-#     length = 0
-    if (width!=0):#(round(width/pixel)!=0):
+    if (width!=0):
         length = square/(width*pixel)
     else:
         length = 0
-#     if (round(width/pixel)==0):
-#         length = 0
     return length
 
 def seed_bias(length, width, roots_quantity, seed_length):
@@ -1066,10 +1063,10 @@ def search():
                    'plant_area': '',
                    'leaves': '',
                   'full_file_photo_separated': measure_full2}
-    plots_titles = {'roots_sum': 'Total roots length',
-               'roots_max': 'Maximal root length',
-               'plant_area': 'Plant surface area',
-               'leaves': 'Shoot length'}
+    plots_titles = {'roots_sum': 'Total roots',
+               'roots_max': 'Maximum root',
+               'plant_area': 'Plant surface',
+               'leaves': 'Shoot'}
 
     for i in whiskers_dict.keys():
         is_not_norm = any(shap[i]<0.05)
