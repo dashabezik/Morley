@@ -83,6 +83,7 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
     fig.suptitle('X axis: Length, mm (root max, root sum and leaves); Area, mm2 (plant area);'
                  +'\n Y axis: Frequency, rel. units')
     param = ['leaves','roots_max','roots_sum', 'plant_area']
+    param_for_label = ['shoots','maximum_root','total_root', 'plant_surface_area']
     for tmp in [tmp_l,tmp_r_max, tmp_r_sum, tmp_p]:
         iterator = 0
 
@@ -90,7 +91,7 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
             plt.subplot(len(tmp.columns), 4, param_type+4*iterator+1)
             mean = round(pd.Series(tmp[g].values.reshape(-1), dtype=np.float64).dropna().mean())
             ci = round(whiskers_dict[param[param_type]][g])
-            label = (str(param[param_type])+' '+str(g) +'\n'+
+            label = (str(param_for_label[param_type])+' '+str(g) +'\n'+
                      f'shapiro p-value = {scipy.stats.shapiro(pd.Series(tmp[g].values.reshape(-1), dtype=np.float64).dropna())[1]:.2e}'+
                     '\n'+'mean = '+str(mean)+'$\pm$'+str(ci))
 
@@ -99,7 +100,7 @@ def hist(tmp_l,tmp_r_max, tmp_r_sum,tmp_p, whiskers_dict, path_to_file_folder_fi
                                  label=label, kde = True)
             plt.xlim(left = 0, right = mean+3*max(mean,ci))
             plt.ylabel('')
-            light = mpatches.Patch(color=sns.color_palette("Set2")[param_type], label=r'{param}'.format(param =  param[param_type][0].upper()+param[param_type][1:]))
+            light = mpatches.Patch(color=sns.color_palette("Set2")[param_type], label=r'{param}'.format(param =  param_for_label[param_type][0].upper()+param_for_label[param_type][1:]))
             plt.legend(loc = 'upper right')
 
             iterator +=1
@@ -378,7 +379,7 @@ def seed_germination(df,group_names,path_to_file_folder_fixed, path_to_output_di
     plt.yticks(fontsize = 20)
     sns.barplot(x=non_germinated_table.columns, y = non_germinated_table.values[0],
                 palette=sns.color_palette("Set2"))
-    plt.title('Germination efficiency', fontsize=20)
+    plt.title('Germination rate', fontsize=20)
 
     if is_save:
         if figname is None:
