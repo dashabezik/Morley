@@ -1064,7 +1064,7 @@ def search():
                    'plant_area': '',
                    'leaves': '',
                   'full_file_photo_separated': measure_full2}
-    plots_titles = {'roots_sum': 'Total roots',
+    plots_titles = {'roots_sum': 'Total root',
                'roots_max': 'Maximum root',
                'plant_area': 'Plant surface',
                'leaves': 'Shoot'}
