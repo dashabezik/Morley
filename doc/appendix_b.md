@@ -85,7 +85,7 @@ Select the angle so that the location of the objects and the sprout-root orienta
 </p>
 
   >**NOTE:** For correct processing, the paper sticker should be the most left contour,
-  the seeds must form a vertical line in the center, and the leaves and the roots must be on the left and right
+  the seeds must form a vertical line in the center, and the shoot and the roots must be on the left and right
   from that vertical line, respectively. All the original photos should have the same orientation of sprouts and roots.
 
 After setting the rotation angle, all the photos will be properly rotated, including the seed template image.
@@ -251,15 +251,17 @@ The output files can be found in the output directory. Morley generates the foll
   and heatmaps visualizing the conclusions on statistical significance of the morphometric changes.
 
 > 1. ***Statistical analysis.*** Each sample group is tested for Gauss distribution using the Shapiro-Wilk test,
-> with a p-value threshold of 0.05. Next, the null hypothesis that the means for two sample groups are equal is tested
-> using either parametric Unpaired T-test or nonparametric Mann-Whitney test, depending on the results of normality testing.
+> with a p-value threshold of 0.05. Next, the null hypothesis that the means for two groups are equal is tested
+> using either parametric Unpaired T-test or nonparametric Mann-Whitney test, depending on the results of the Shapiro-Wilk test result.
 > The p-value below 0.05 is used as default criterion for rejecting the null hypothesis.
 > 2. ***Germination efficiency.*** Germination efficiency is calculated as the ratio of the number of plants
 > with the length of roots and sprouts above the germination threshold (simultaneously) divided by the total number of plants.
-> 3. ***Root length***. The programm calculates two parameters for roots: "root sum" and "root max".
-> The first parameter is the sum of the lengths of all the roots of a plant.
+\[1-\dfrac{NG}{TN}\]
+where NG - number of non-germinated seedlings, TN - total number of plants. 
+> 4. ***Root length***. The programm calculates two parameters for roots: "root sum" and "root max".
+> The first parameter is a plant total root length.
 > The second parameter is the length of the longest root of a plant.
-> 4. ***Tables***. Tables with individual parameters: a table in which the columns are the names of the groups,
+> 5. ***Tables***. Tables with individual parameters: a table in which the columns are the names of the groups,
 > and the rows are the plant number, the values are presented in $mm$ for lengths and in $mm^2$ for area.
 > There may be gaps in this table, such situations mean that this parameter for a particular plant is null,
 > which does not mean a null value for another parameter (for example, the plant already has a root, but does not yet have a sprout).
