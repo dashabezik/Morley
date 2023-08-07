@@ -243,12 +243,52 @@ optional arguments:
 ## Output
 The output files can be found in the output directory. Morley generates the following files:
 
-- CSV tables with p-values<sup>1</sup> corresponding to all pairwise comparisons between sample groups,
-  the calculated germination efficiency<sup>2</sup>, sprout and root lengths<sup>3</sup>,
-  total plant areas and the summary table with all digital measurements<sup>4</sup>.
+**“Measure” CSV table** contains a table with measured parameters for each plant object recognized in each image:
 
-- figures characterizing distributions of measured plant sizes, bar plots with mean values and standard deviations,
-  and heatmaps visualizing the conclusions on statistical significance of the morphometric changes.
+Root surface area ($mm^2$)
+
+Shoot surface area ($mm^2$)
+
+Seed surface area  ($mm^2$)
+
+Plant surface area  ($mm^2$) (the sum of root and leaf surface areas without seed)
+
+Maximum root length ($mm^2$)
+
+Total root length (mm)
+
+Root width  (mm) (this parameter is used to calculate root and shoot lengths)
+
+Estimated number of roots (this parameter is calculated as the maximum number of occurrence of pixels lieing in roots color range, when passing across the plane of the roots)
+
+Shoot length (mm)
+
+Shoot width (mm)
+
+Shoot-to-seeds ratio (this parameter shows the ratio of shoot area and seed area)
+
+**“Seed_germ” CSV table**  <sup>2</sup> summarizes germination rates for each condition. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_seed_germ_2023-05-30.csv)
+
+**“Shapiro” CSV table** summarizes results of the Shapiro-Wilk test for each condition. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_shapiro_2023-05-30.csv)
+
+**“p-value” CSV table**<sup>1</sup> summarizes results of the t-test or Mann-Whitney test for each measured parameter. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_pvalue_leaves2023-05-30.csv)
+
+Histogram shows the data distribution for the measured parameters and how the distribution changes between conditions:
+
+
+<p align="center">
+  <img src="https://github.com/dashabezik/Morley/blob/main/doc/hist1.png"  width="400" />
+  <img src="https://github.com/dashabezik/Morley/blob/main/doc/hist2.png"  width="390" /> 
+</p>
+Barplot and heatmap summarize the measurements and results of statistical analysis.
+
+<p align="center">
+<img src="https://github.com/dashabezik/Morley/blob/main/doc/barplot.png" width=50% height=50% title = "Folders structure." >
+
+</p>
+
+Bars with whiskers correspond to the mean ± SD in 95% CI. Heatmap shows statistical significance without correction for multiple comparisons: p-value < 0.05 is significant, p-value > 0.05 is non-significant difference.
+
 
 > 1. ***Statistical analysis.*** Each sample group is tested for Gauss distribution using the Shapiro-Wilk test,
 > with a p-value threshold of 0.05. Next, the null hypothesis that the means for two groups are equal is tested
@@ -256,15 +296,8 @@ The output files can be found in the output directory. Morley generates the foll
 > The p-value below 0.05 is used as default criterion for rejecting the null hypothesis.
 > 2. ***Germination efficiency.*** Germination efficiency is calculated as the ratio of the number of plants
 > with the length of roots and sprouts above the germination threshold (simultaneously) divided by the total number of plants.
-\[1-\dfrac{NG}{TN}\]
-where NG - number of non-germinated seedlings, TN - total number of plants. 
-> 4. ***Root length***. The programm calculates two parameters for roots: "root sum" and "root max".
-> The first parameter is a plant total root length.
-> The second parameter is the length of the longest root of a plant.
-> 5. ***Tables***. Tables with individual parameters: a table in which the columns are the names of the groups,
-> and the rows are the plant number, the values are presented in $mm$ for lengths and in $mm^2$ for area.
-> There may be gaps in this table, such situations mean that this parameter for a particular plant is null,
-> which does not mean a null value for another parameter (for example, the plant already has a root, but does not yet have a sprout).
-> Thus, you do not lose information about the correspondence of one parameter to another.
-> The summary table is a table, the columns of which contain all the parameters for each photo
-> (therefore, the number of rows in each column is the number of plants in this photo).
+$1-\dfrac{NG}{TN}$
+where NG - number of non-germinated seedlings, TN - total number of plants.
+
+> The *“Measure”* table is a table, the columns of which contain all the parameters for each photo
+> (therefore, the number of rows in each column is the number of plants on this photo).
