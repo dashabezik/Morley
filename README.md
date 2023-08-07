@@ -107,7 +107,7 @@ Initial values of the parameters are set, you should just fix them a little bit 
 >4) If shoot length is less or equal to the seeds maximum width, seeds will give a large contribution to the calculation error. If the seeds maximum width is comparable in linear plant parameters, then select this condition. See more [here](doc/appendix_b.md#Parameters-setting). 
 
 
-# Results interpretation
+# Interpretation of the results
 
 Morley output consists of CSV tables and plots.
 
@@ -133,7 +133,7 @@ Shoot length (mm)
 
 Shoot width (mm)
 
-Shoot-to-seeds ratio (this parameter is calculated for …)
+Shoot-to-seeds ratio (this parameter shows the ratio of shoot area and seed area)
 
 **“Seed_germ” CSV table** summarizes germination rates for each condition. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_seed_germ_2023-05-30.csv)
 
@@ -143,6 +143,16 @@ Shoot-to-seeds ratio (this parameter is calculated for …)
 
 Histogram shows the data distribution for the measured parameters and how the distribution changes between conditions:
 
+
+<p align="center">
+  <img src="https://github.com/dashabezik/Morley/blob/main/doc/hist1.png"  width="400" />
+  <img src="https://github.com/dashabezik/Morley/blob/main/doc/hist2.png"  width="390" /> 
+</p>
 Barplot and heatmap summarize the measurements and results of statistical analysis.
+
+<p align="center">
+<img src="https://github.com/dashabezik/Morley/blob/main/doc/barplot.png" width=50% height=50% title = "Folders structure." >
+
+</p>
 
 Bars with whiskers correspond to the mean ± SD in 95% CI. Heatmap shows statistical significance without correction for multiple comparisons: p-value < 0.05 is significant, p-value > 0.05 is non-significant difference.
