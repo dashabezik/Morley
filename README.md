@@ -105,3 +105,8 @@ How to set them read in the [user guide](doc/appendix_b.md#Color-ranges).
 Initial values of the parameters are set, you should just fix them a little bit if needed.
 
 >4) If shoot length is less or equal to the seeds maximum width, seeds will give a large contribution to the calculation error. If the seeds maximum width is comparable in linear plant parameters, then select this condition. See more [here](doc/appendix_b.md#Parameters-setting). 
+
+
+# Results interpretation
+
+Morley output consist of CSV tables and plots: histogramm, barplotsand heatmaps. Bars with whiskers correspond to the mean ± SD in 95% CI. Heatmap demonstrates the significant difference between groups: the dark color corresponds to p-value lower than 0.05, the light one shows no difference.
