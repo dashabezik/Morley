@@ -109,4 +109,40 @@ Initial values of the parameters are set, you should just fix them a little bit 
 
 # Results interpretation
 
-Morley output consist of CSV tables and plots: histogramm, barplotsand heatmaps. Bars with whiskers correspond to the mean ± SD in 95% CI. Heatmap demonstrates the significant difference between groups: the dark color corresponds to p-value lower than 0.05, the light one shows no difference.
+Morley output consists of CSV tables and plots.
+
+**“Measure” CSV table** contains a table with measured parameters for each plant object recognized in each image:
+
+Root surface area ($mm^2$)
+
+Shoot surface area ($mm^2$)
+
+Seed surface area  ($mm^2$)
+
+Plant surface area  ($mm^2$) (the sum of root and leaf surface areas without seed)
+
+Maximum root length ($mm^2$)
+
+Total root length (mm)
+
+Root width  (mm) (this parameter is used to calculate root and shoot lengths)
+
+Estimated number of roots (this parameter is calculated as the maximum number of occurrence of pixels lieing in roots color range, when passing across the plane of the roots)
+
+Shoot length (mm)
+
+Shoot width (mm)
+
+Shoot-to-seeds ratio (this parameter is calculated for …)
+
+**“Seed_germ” CSV table** summarizes germination rates for each condition. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_seed_germ_2023-05-30.csv)
+
+**“Shapiro” CSV table** summarizes results of the Shapiro-Wilk test for each condition. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_shapiro_2023-05-30.csv)
+
+**“p-value” CSV table** summarizes results of the t-test or Mann-Whitney test for each measured parameter. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_pvalue_leaves2023-05-30.csv)
+
+Histogram shows the data distribution for the measured parameters and how the distribution changes between conditions:
+
+Barplot and heatmap summarize the measurements and results of statistical analysis.
+
+Bars with whiskers correspond to the mean ± SD in 95% CI. Heatmap shows statistical significance without correction for multiple comparisons: p-value < 0.05 is significant, p-value > 0.05 is non-significant difference.
