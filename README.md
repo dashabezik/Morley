@@ -121,19 +121,19 @@ Seed surface area  ($mm^2$)
 
 Plant surface area  ($mm^2$) (the sum of root and leaf surface areas without seed)
 
-Maximum root length ($mm^2$)
+Maximum root length (mm)
 
 Total root length (mm)
 
 Root width  (mm) (this parameter is used to calculate root and shoot lengths)
 
-Estimated number of roots (this parameter is calculated as the maximum number of occurrence of pixels lieing in roots color range, when passing across the plane of the roots)
+Estimated number of roots 
 
 Shoot length (mm)
 
 Shoot width (mm)
 
-Shoot-to-seeds ratio (this parameter shows the ratio of shoot area and seed area)
+Shoot-to-seed ratio (this parameter shows the ratio of the shoot surface area to the seed surface area)
 
 **“Seed_germ” CSV table** summarizes germination rates for each condition. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_seed_germ_2023-05-30.csv)
 
