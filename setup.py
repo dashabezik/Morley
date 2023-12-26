@@ -19,7 +19,7 @@ def get_version(rel_path):
 
 setup(
     name                 = 'morley',
-    version              = '0.0.5',#get_version('morley/version.py'),
+    version              = '0.0.6',#get_version('morley/version.py'),
     description          = '''GUI software for plant morphometry''',
     long_description     = (''.join(open('pypi_md.md').readlines())),
     long_description_content_type="text/markdown",
