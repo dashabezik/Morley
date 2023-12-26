@@ -105,3 +105,54 @@ How to set them read in the [user guide](doc/appendix_b.md#Color-ranges).
 Initial values of the parameters are set, you should just fix them a little bit if needed.
 
 >4) If shoot length is less or equal to the seeds maximum width, seeds will give a large contribution to the calculation error. If the seeds maximum width is comparable in linear plant parameters, then select this condition. See more [here](doc/appendix_b.md#Parameters-setting). 
+
+
+# Interpretation of the results
+
+Morley output consists of CSV tables and plots.
+
+**“Measure” CSV table** contains a table with measured parameters for each plant object recognized in each image:
+
+Root surface area ($mm^2$)
+
+Shoot surface area ($mm^2$)
+
+Seed surface area  ($mm^2$)
+
+Plant surface area  ($mm^2$) (the sum of root and leaf surface areas without seed)
+
+Maximum root length (mm)
+
+Total root length (mm)
+
+Root width  (mm) (this parameter is used to calculate root and shoot lengths)
+
+Estimated number of roots 
+
+Shoot length (mm)
+
+Shoot width (mm)
+
+Shoot-to-seed ratio (this parameter shows the ratio of the shoot surface area to the seed surface area)
+
+**“Seed_germ” CSV table** summarizes germination rates for each condition. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_seed_germ_2023-05-30.csv)
+
+**“Shapiro” CSV table** summarizes results of the Shapiro-Wilk test for each condition. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_shapiro_2023-05-30.csv)
+
+**“p-value” CSV table** summarizes results of the t-test or Mann-Whitney test for each measured parameter. [Example](https://github.com/dashabezik/plants/blob/main/wheat_4567days_old/report/raw_data_pvalue_leaves2023-05-30.csv)
+
+Histogram shows the data distribution for the measured parameters and how the distribution changes between conditions:
+
+
+<p align="center">
+  <img src="https://github.com/dashabezik/Morley/blob/main/doc/hist1.png"  width="400" />
+  <img src="https://github.com/dashabezik/Morley/blob/main/doc/hist2.png"  width="390" /> 
+</p>
+Barplot and heatmap summarize the measurements and results of statistical analysis.
+
+<p align="center">
+<img src="https://github.com/dashabezik/Morley/blob/main/doc/barplot.png" width=50% height=50% title = "Folders structure." >
+
+</p>
+
+Bars with whiskers correspond to the mean ± SD in 95% CI. Heatmap shows statistical significance without correction for multiple comparisons: p-value < 0.05 is significant, p-value > 0.05 is non-significant difference.
