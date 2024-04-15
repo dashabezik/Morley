@@ -12,6 +12,9 @@ their comparison in a heatmap and histogramms with distribution of the parameter
 You can use Morley through the GUI and CLI interfaces by installing the package, or learn the algorithm deeper using the
 Jupyter Notebook placed [here](https://github.com/dashabezik/plants).
 
+# Citing Morley
+Emekeeva DD, et al. Morley: Image Analysis and Evaluation of Statistically Significant Differences in Geometric Sizes of Crop Seedlings in Response to Biotic Stimulation. Agronomy. 2023; 13(8):2134. https://doi.org/10.3390/agronomy13082134
+
 # Useful links
 
 Read the following information before the **first usage**.
